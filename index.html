@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Surprise Artwork</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #artwork {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.3);
+      object-fit: contain;
+    }
+
+    /* Popup styles */
+    #popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255,255,255,0.95);
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      text-align: center;
+      font-size: 18px;
+      display: none;
+      z-index: 10;
+      max-width: 80vw;
+    }
+
+    #popup button {
+      margin-top: 15px;
+      padding: 8px 20px;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    #popup button:hover {
+      background: #0056b3;
+    }
+
+    /* Canvas for confetti */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Artwork -->
+  <img id="artwork" src="https://res.cloudinary.com/dl1kjmaoq/image/upload/v1764195965/2_uixubr.png" alt="Artwork">
+
+  <!-- Popup -->
+  <div id="popup">
+    <div id="popupMessage">✨ Surprise! This is for you 💛 ✨</div>
+    <button onclick="closePopup()">Close</button>
+  </div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <script>
+    const popup = document.getElementById('popup');
+
+    // Show popup + confetti after 0.5s
+    window.onload = function() {
+      setTimeout(() => {
+        popup.style.display = 'block';
+        launchConfetti();
+      }, 500);
+    }
+
+    function closePopup() {
+      popup.style.display = 'none';
+    }
+
+    // Confetti function
+    function launchConfetti() {
+      const duration = 3000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 10 };
+
+      const interval = setInterval(function() {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) return clearInterval(interval);
+
+        const particleCount = 50 * (timeLeft / duration);
+        confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
+      }, 250);
+    }
+  </script>
+
+</body>
+</html>

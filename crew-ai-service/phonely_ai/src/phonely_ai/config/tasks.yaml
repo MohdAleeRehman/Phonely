@@ -1,0 +1,41 @@
+vision_analysis_task:
+  description: >
+    Analyze {num_images} images of {brand} {model}.
+    Images: {image_urls}
+    
+    Assess condition (0-10), detect physical issues, verify authenticity (0-100).
+    Return clean JSON with condition_score, condition, detected_issues array, authenticity object.
+    NO reasoning field.
+    
+  expected_output: >
+    Clean JSON object with: condition_score (number 0-10), condition (string), detected_issues (array), authenticity (object with score 0-100 and is_authentic boolean).
+  agent: vision_agent
+
+text_analysis_task:
+  description: >
+    Evaluate description: "{description}"
+    Phone: {brand} {model}, {storage}, Box: {has_box}, Warranty: {has_warranty}
+    
+    Rate quality, assess completeness percentage, identify 3-5 specific missing details.
+    NO strengths, suggestions, or reasoning fields.
+    
+  expected_output: >
+    Clean JSON object with: description_quality (string: excellent/good/fair/poor), completeness (number 0-100), missing_information (array of 3-5 strings).
+  agent: text_agent
+  context:
+    - vision_analysis_task
+
+pricing_analysis_task:
+  description: >
+    Determine fair market price for {brand} {model} ({storage}, {age_months} months old, launched {launch_date}).
+    Original retail: {retail_price} PKR.
+    
+    Apply age depreciation (Y1: 20%, Y2: 15%, Y3+: 10%) and adjust for condition from vision analysis.
+    Consider Pakistani market dynamics. NO pricing_breakdown, reasoning, or market_insights.
+    
+  expected_output: >
+    Clean JSON object with: suggested_min_price (integer PKR), suggested_max_price (integer PKR), market_average (integer PKR), confidence_level (string: low/medium/high).
+  agent: pricing_agent
+  context:
+    - vision_analysis_task
+    - text_analysis_task
