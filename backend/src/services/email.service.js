@@ -3,14 +3,20 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Create reusable transporter for Gmail
-// Using 'service: gmail' is the recommended approach for Gmail with App Passwords
+// Create reusable transporter for Zoho Mail
+// Professional email: noreply@phonely.com.pk
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: process.env.SMTP_HOST || 'smtp.zoho.com',
+  port: process.env.SMTP_PORT || 587,
+  secure: false, // true for 465, false for other ports
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  tls: {
+    rejectUnauthorized: true,
+    minVersion: 'TLSv1.2'
+  }
 });
 
 // Verify connection configuration
@@ -19,6 +25,7 @@ transporter.verify((error, success) => {
     console.error('❌ Email service configuration error:', error);
   } else {
     console.log('✅ Email service is ready to send messages');
+    console.log(`📧 Sending from: ${process.env.SMTP_USER || 'noreply@phonely.com.pk'}`);
   }
 });
 
