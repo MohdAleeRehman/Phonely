@@ -207,8 +207,13 @@ export const sendListingNotification = async (email, name, listing) => {
         .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
         .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
         .listing-card { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .listing-image { width: 100%; max-width: 300px; border-radius: 8px; margin: 10px 0; }
-        .price { font-size: 24px; color: #667eea; font-weight: bold; margin: 10px 0; }
+        .listing-image { width: 100%; max-width: 400px; height: auto; border-radius: 8px; margin: 10px 0; display: block; }
+        .price { font-size: 28px; color: #667eea; font-weight: bold; margin: 15px 0; }
+        .listing-details { background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+        .detail-label { font-weight: bold; color: #666; }
+        .detail-value { color: #333; }
+        .button { display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold; }
         .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
       </style>
     </head>
@@ -222,10 +227,42 @@ export const sendListingNotification = async (email, name, listing) => {
           <p>Great news! Your listing is now live on Phonely and ready for buyers to discover.</p>
           
           <div class="listing-card">
-            ${listing.images && listing.images[0] ? `<img src="${listing.images[0]}" alt="Listing" class="listing-image" />` : ''}
+            ${listing.images && listing.images[0] ? `<img src="${typeof listing.images[0] === 'string' ? listing.images[0] : listing.images[0].url}" alt="${listing.title}" class="listing-image" />` : ''}
             <h3>${listing.title}</h3>
-            <div class="price">₹${listing.price?.toLocaleString()}</div>
-            <p>${listing.description?.substring(0, 150)}${listing.description?.length > 150 ? '...' : ''}</p>
+            <div class="price">Rs. ${listing.price?.toLocaleString('en-PK')} PKR</div>
+            
+            <div class="listing-details">
+              ${listing.phone ? `
+                <div class="detail-row">
+                  <span class="detail-label">📱 Brand:</span>
+                  <span class="detail-value">${listing.phone.brand || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">📲 Model:</span>
+                  <span class="detail-value">${listing.phone.model || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">💾 Storage:</span>
+                  <span class="detail-value">${listing.phone.storage || 'N/A'}</span>
+                </div>
+              ` : ''}
+              ${listing.condition ? `
+                <div class="detail-row">
+                  <span class="detail-label">✨ Condition:</span>
+                  <span class="detail-value">${listing.condition.charAt(0).toUpperCase() + listing.condition.slice(1)}</span>
+                </div>
+              ` : ''}
+              ${listing.location ? `
+                <div class="detail-row">
+                  <span class="detail-label">📍 Location:</span>
+                  <span class="detail-value">${listing.location.city || 'N/A'}${listing.location.area ? ', ' + listing.location.area : ''}</span>
+                </div>
+              ` : ''}
+            </div>
+            
+            <p style="color: #666; margin: 15px 0;">${listing.description?.substring(0, 200)}${listing.description?.length > 200 ? '...' : ''}</p>
+            
+            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/listings/${listing._id}" class="button">View Your Listing</a>
           </div>
           
           <p><strong>Next steps:</strong></p>
