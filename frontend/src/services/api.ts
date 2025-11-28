@@ -1,6 +1,18 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+// Prefer Vite env var set at build time. If not present (e.g., built without env),
+// choose a sensible runtime default for production when served from beta.phonely.com.pk.
+let API_BASE_URL = import.meta.env.VITE_API_URL || '';
+if (!API_BASE_URL) {
+  const host = typeof window !== 'undefined' ? window.location.hostname : null;
+  if (host && host.includes('phonely.com')) {
+    // Running on production frontend — point to production API
+    API_BASE_URL = 'https://api.phonely.com.pk/api/v1';
+  } else {
+    // Local development fallback
+    API_BASE_URL = 'http://localhost:3000/api/v1';
+  }
+}
 
 export const api = axios.create({
   baseURL: API_BASE_URL,

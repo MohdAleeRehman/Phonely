@@ -1,7 +1,15 @@
 import { io, Socket } from 'socket.io-client';
 import type { Message } from '../types';
 
-const SOCKET_URL = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:3000';
+// Derive socket URL from VITE_API_URL if available. Otherwise, at runtime use production API host
+let SOCKET_URL = '';
+if (import.meta.env.VITE_API_URL) {
+  SOCKET_URL = import.meta.env.VITE_API_URL.replace('/api/v1', '');
+} else if (typeof window !== 'undefined' && window.location.hostname.includes('phonely.com')) {
+  SOCKET_URL = 'https://api.phonely.com.pk';
+} else {
+  SOCKET_URL = 'http://localhost:3000';
+}
 
 class SocketService {
   private socket: Socket | null = null;
