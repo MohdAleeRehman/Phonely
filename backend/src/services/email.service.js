@@ -1,36 +1,24 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Create reusable transporter for Zoho Mail
-// Professional email: noreply@phonely.com.pk
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.zoho.com',
-  port: process.env.SMTP_PORT || 587,
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  tls: {
-    rejectUnauthorized: true,
-    minVersion: 'TLSv1.2'
-  }
-});
+// Initialize Resend with API key
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Verify connection configuration
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('❌ Email service configuration error:', error);
-  } else {
-    console.log('✅ Email service is ready to send messages');
-    console.log(`📧 Sending from: ${process.env.SMTP_USER || 'noreply@phonely.com.pk'}`);
+// Export function to check email configuration status
+export const checkEmailConfig = () => {
+  if (!process.env.RESEND_API_KEY) {
+    console.error('❌ RESEND_API_KEY is not configured in .env file');
+    return false;
   }
-});
+  console.log('✅ Email service (Resend) is ready to send messages');
+  console.log(`📧 Sending from: ${process.env.FROM_EMAIL || 'noreply@phonely.com.pk'}`);
+  return true;
+};
 
 /**
- * Send an email
+ * Send an email using Resend
  * @param {Object} options - Email options
  * @param {string} options.to - Recipient email address
  * @param {string} options.subject - Email subject
@@ -40,17 +28,21 @@ transporter.verify((error, success) => {
  */
 export const sendEmail = async ({ to, subject, text, html }) => {
   try {
-    const mailOptions = {
-      from: `${process.env.FROM_NAME || 'Phonely'} <${process.env.FROM_EMAIL}>`,
-      to,
+    const { data, error } = await resend.emails.send({
+      from: `${process.env.FROM_NAME || 'Phonely'} <${process.env.FROM_EMAIL || 'noreply@phonely.com.pk'}>`,
+      to: [to],
       subject,
-      text,
       html,
-    };
+      ...(text && { text }), // Add text only if provided
+    });
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('✉️ Email sent successfully:', info.messageId);
-    return info;
+    if (error) {
+      console.error('❌ Error sending email via Resend:', error);
+      throw error;
+    }
+
+    console.log('✉️ Email sent successfully via Resend:', data.id);
+    return data;
   } catch (error) {
     console.error('❌ Error sending email:', error);
     throw error;

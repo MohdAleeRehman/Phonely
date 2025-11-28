@@ -11,12 +11,16 @@ cloudinary.config({
   secure: true,
 });
 
-// Validate configuration
+// Validate configuration (silent - will be logged in server.js)
 if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
   console.error('❌ Cloudinary configuration is missing. Please check your .env file.');
   process.exit(1);
 }
 
-console.log('✅ Cloudinary configured successfully');
+// Export function to check Cloudinary status
+export const checkCloudinaryStatus = () => {
+  console.log('✅ Cloudinary configured successfully');
+  return true;
+};
 
 export default cloudinary;

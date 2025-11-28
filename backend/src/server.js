@@ -7,11 +7,16 @@ import mongoSanitize from 'express-mongo-sanitize';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import connectDB from './config/database.js';
 import connectRedis from './config/redis.js';
 import { errorHandler, notFound } from './middleware/error.middleware.js';
 import { rateLimiter } from './middleware/rateLimiter.middleware.js';
+import { checkFirebaseStatus } from './config/firebase.js';
+import { checkCloudinaryStatus } from './config/cloudinary.js';
+import { checkEmailConfig } from './services/email.service.js';
 
 // Import routes
 import authRoutes from './routes/auth.routes.js';
@@ -23,8 +28,12 @@ import uploadRoutes from './routes/upload.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import testRoutes from './routes/test.routes.js';
 
-// Load environment variables
-dotenv.config();
+// Get directory name in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load environment variables from backend/.env file (absolute path)
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 // Initialize Express app
 const app = express();
@@ -145,6 +154,9 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 3000;
 
 httpServer.listen(PORT, () => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  const baseUrl = isProduction ? 'https://api.phonely.com.pk' : 'http://localhost';
+  
   console.log(`
   ╔═══════════════════════════════════════╗
   ║                                       ║
@@ -155,11 +167,19 @@ httpServer.listen(PORT, () => {
   ║   API Version: ${API_VERSION}                     ║
   ║                                       ║
   ║   Endpoints:                          ║
-  ║   • Health: http://localhost:${PORT}/health
-  ║   • API: http://localhost:${PORT}/api/${API_VERSION}
+  ║   • Health: ${baseUrl}${isProduction ? '' : ':' + PORT}/health
+  ║   • API: ${baseUrl}${isProduction ? '' : ':' + PORT}/api/${API_VERSION}
   ║                                       ║
   ╚═══════════════════════════════════════╝
   `);
+  
+  // Check service status after banner
+  console.log('📋 Service Status:');
+  console.log('');
+  checkFirebaseStatus();
+  checkCloudinaryStatus();
+  checkEmailConfig();
+  console.log('');
 });
 
 // Handle unhandled promise rejections

@@ -9,6 +9,7 @@ let firebaseApp = null;
 let auth = null;
 let storage = null;
 let bucket = null;
+let initError = null;
 
 if (hasFirebaseCredentials) {
   try {
@@ -27,15 +28,25 @@ if (hasFirebaseCredentials) {
     auth = admin.auth();
     storage = admin.storage();
     bucket = storage.bucket();
-
-    console.log('✅ Firebase Admin initialized');
   } catch (error) {
-    console.error('❌ Firebase initialization error:', error.message);
-    console.log('ℹ️  Firebase features will be unavailable');
+    initError = error.message;
   }
-} else {
-  console.log('ℹ️  Firebase credentials not configured - using Cloudinary for storage');
 }
+
+// Export function to check Firebase status
+export const checkFirebaseStatus = () => {
+  if (initError) {
+    console.error('❌ Firebase initialization error:', initError);
+    console.log('ℹ️  Firebase features will be unavailable');
+    return false;
+  } else if (!hasFirebaseCredentials) {
+    console.log('ℹ️  Firebase credentials not configured - using Cloudinary for storage');
+    return false;
+  } else {
+    console.log('✅ Firebase Admin initialized');
+    return true;
+  }
+};
 
 export { auth, storage, bucket };
 export default firebaseApp;

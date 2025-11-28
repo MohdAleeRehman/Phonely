@@ -140,6 +140,7 @@ const inspectionSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    suppressReservedKeysWarning: true, // Suppress warning for 'errors' field
   }
 );
 
