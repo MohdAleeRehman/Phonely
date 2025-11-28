@@ -25,7 +25,7 @@ export default function ChatPage() {
     queryFn: chatService.getChats,
   });
 
-  const chats = chatsResponse?.data || [];
+  const chats = chatsResponse?.data?.listings || [];
 
   // Fetch messages for selected chat
   const { data: chatData, isLoading: messagesLoading } = useQuery({

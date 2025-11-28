@@ -201,8 +201,18 @@ export default function AdminDashboard() {
                     {stats.recentListings.map((listing: Listing) => (
                       <div key={listing._id} className="flex items-center gap-3 pb-3 border-b last:border-0">
                         <div className="h-10 w-10 rounded-lg bg-gray-200 overflow-hidden flex-shrink-0">
-                          {listing.images[0] ? (
-                            <img src={listing.images[0]} alt={listing.title} className="h-full w-full object-cover" />
+                          {listing.images?.[0] ? (
+                            (() => {
+                              const first = listing.images[0];
+                              const src = typeof first === 'string' ? first : first?.url;
+                              return src ? <img src={src} alt={listing.title} className="h-full w-full object-cover" /> : (
+                                <div className="h-full w-full flex items-center justify-center text-gray-400">
+                                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                  </svg>
+                                </div>
+                              );
+                            })()
                           ) : (
                             <div className="h-full w-full flex items-center justify-center text-gray-400">
                               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -251,7 +261,7 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {usersResponse.data.map((user: User) => (
+                    {usersResponse.data.listings.map((user: User) => (
                       <tr key={user._id} className="hover:bg-gray-50">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
@@ -290,10 +300,10 @@ export default function AdminDashboard() {
               </div>
 
               {/* Pagination */}
-              {usersResponse.pagination && usersResponse.pagination.pages > 1 && (
+              {usersResponse.data.pagination && usersResponse.data.pagination.totalPages > 1 && (
                 <div className="flex items-center justify-between mt-6">
                   <p className="text-sm text-gray-600">
-                    Page {usersResponse.pagination.page} of {usersResponse.pagination.pages}
+                    Page {usersResponse.data.pagination.currentPage} of {usersResponse.data.pagination.totalPages}
                   </p>
                   <div className="flex gap-2">
                     <button
@@ -305,7 +315,7 @@ export default function AdminDashboard() {
                     </button>
                     <button
                       onClick={() => setUsersPage((p) => p + 1)}
-                      disabled={usersPage >= usersResponse.pagination.pages}
+                      disabled={usersPage >= usersResponse.data.pagination.totalPages}
                       className="btn-secondary disabled:opacity-50"
                     >
                       Next
@@ -359,13 +369,23 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {listingsResponse.data.map((listing: Listing) => (
+                    {listingsResponse.data.listings.map((listing: Listing) => (
                       <tr key={listing._id} className="hover:bg-gray-50">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             <div className="h-12 w-12 rounded-lg bg-gray-200 overflow-hidden flex-shrink-0">
-                              {listing.images[0] ? (
-                                <img src={listing.images[0]} alt={listing.title} className="h-full w-full object-cover" />
+                              {listing.images?.[0] ? (
+                                (() => {
+                                  const first = listing.images[0];
+                                  const src = typeof first === 'string' ? first : first?.url;
+                                  return src ? <img src={src} alt={listing.title} className="h-full w-full object-cover" /> : (
+                                    <div className="h-full w-full flex items-center justify-center text-gray-400">
+                                      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                      </svg>
+                                    </div>
+                                  );
+                                })()
                               ) : (
                                 <div className="h-full w-full flex items-center justify-center text-gray-400">
                                   <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -412,10 +432,10 @@ export default function AdminDashboard() {
               </div>
 
               {/* Pagination */}
-              {listingsResponse.pagination && listingsResponse.pagination.pages > 1 && (
+              {listingsResponse.data.pagination && listingsResponse.data.pagination.totalPages > 1 && (
                 <div className="flex items-center justify-between mt-6">
                   <p className="text-sm text-gray-600">
-                    Page {listingsResponse.pagination.page} of {listingsResponse.pagination.pages}
+                    Page {listingsResponse.data.pagination.currentPage} of {listingsResponse.data.pagination.totalPages}
                   </p>
                   <div className="flex gap-2">
                     <button
@@ -427,7 +447,7 @@ export default function AdminDashboard() {
                     </button>
                     <button
                       onClick={() => setListingsPage((p) => p + 1)}
-                      disabled={listingsPage >= listingsResponse.pagination.pages}
+                      disabled={listingsPage >= listingsResponse.data.pagination.totalPages}
                       className="btn-secondary disabled:opacity-50"
                     >
                       Next
