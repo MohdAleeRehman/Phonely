@@ -177,7 +177,7 @@ export default function ListingsPage() {
               value={filters.ptaApproved === undefined ? '' : filters.ptaApproved ? 'true' : 'false'}
               onChange={(e) => {
                 const value = e.target.value;
-                updateFilter('ptaApproved', value === '' ? undefined : value === 'true');
+                updateFilter('ptaApproved', value === '' ? undefined : value);
               }}
               className="input-field"
             >

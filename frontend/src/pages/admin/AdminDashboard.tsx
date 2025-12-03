@@ -269,8 +269,8 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {usersResponse.data.users && usersResponse.data.users.length > 0 ? (
-                      usersResponse.data.users.map((user: User) => (
+                    {usersResponse.data.listings && usersResponse.data.listings.length > 0 ? (
+                      usersResponse.data.listings.map((user: User) => (
                       <tr key={user._id} className="hover:bg-gray-50">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">

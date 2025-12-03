@@ -24,15 +24,22 @@ export interface UserDetails extends User {
 
 export interface ListingDetails extends Listing {
   inspectionReport?: {
-    inspection_id: string;
-    overall_score: number;
-    condition_assessment: string;
-    pricing_analysis: {
+    reportId: string;
+    conditionScore: number;
+    detectedIssues: string[];
+    authenticityScore: number;
+    completedAt: string;
+    aiSuggestedPriceRange?: { min: number; max: number };
+    // Also support the AI inspection format
+    inspection_id?: string;
+    overall_score?: number;
+    condition_assessment?: string;
+    pricing_analysis?: {
       market_value: number;
       recommended_price: number;
       price_range: { min: number; max: number };
     };
-    recommendations: string[];
+    recommendations?: string[];
   };
 }
 

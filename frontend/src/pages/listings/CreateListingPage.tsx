@@ -94,7 +94,7 @@ const listingSchema = z.object({
   title: z.string().min(10, 'Title must be at least 10 characters'),
   description: z.string().min(50, 'Description must be at least 50 characters'),
   price: z.number().min(1000, 'Price must be at least 1000'),
-  priceNegotiable: z.boolean().default(false),
+  priceNegotiable: z.boolean().optional(),
   brand: z.string().min(1, 'Brand is required'),
   model: z.string().min(1, 'Model is required'),
   storage: z.string().min(1, 'Storage is required'),
@@ -103,16 +103,16 @@ const listingSchema = z.object({
   color: z.string().min(1, 'Color is required'),
   imei: z.string().optional(),
   warranty: z.boolean().optional(),
-  ptaApproved: z.boolean().default(true),
+  ptaApproved: z.boolean().optional(),
   // Battery Health (Apple only)
   batteryHealth: z.number().min(0).max(100).optional(),
   // Phonely's Unique Condition Assessment
   displayQuality: z.enum(['flawless', 'minor-scratches', 'noticeable-wear', 'cracked']).optional(),
-  allFeaturesWorking: z.boolean().default(true),
+  allFeaturesWorking: z.boolean().optional(),
   issues: z.array(z.string()).optional(),
   additionalNotes: z.string().max(500).optional(),
   // Accessories (new simplified options)
-  accessories: z.enum(['complete-box', 'cable-only', 'device-only']).default('device-only'),
+  accessories: z.enum(['complete-box', 'cable-only', 'device-only']).optional(),
   // Location
   address: z.string().min(10, 'Address must be at least 10 characters'),
   city: z.string().min(1, 'City is required'),
@@ -162,12 +162,13 @@ export default function CreateListingPage() {
   } = useForm<ListingFormData>({
     resolver: zodResolver(listingSchema),
     defaultValues: {
+      priceNegotiable: false,
       warranty: false,
-      hasBox: false,
-      hasCharger: false,
-      hasCable: false,
-      hasEarphones: false,
+      ptaApproved: true,
+      allFeaturesWorking: true,
+      accessories: 'device-only',
       batteryHealth: 80,
+      issues: [],
     },
   });
 
@@ -201,7 +202,6 @@ export default function CreateListingPage() {
             model: listing.phone.model,
             storage: listing.phone.storage,
             condition: listing.condition,
-            ptaApproved: listing.ptaApproved,
           },
           listing.description
         );
@@ -307,7 +307,7 @@ export default function CreateListingPage() {
     setError('');
 
     // Map accessories enum to object format expected by backend
-    const accessoriesMap = {
+    const accessoriesMap: Record<string, any> = {
       'complete-box': { box: true, charger: false, cable: true, earphones: false, case: false, screenProtector: false },
       'cable-only': { box: false, charger: false, cable: true, earphones: false, case: false, screenProtector: false },
       'device-only': { box: false, charger: false, cable: false, earphones: false, case: false, screenProtector: false },
@@ -339,7 +339,7 @@ export default function CreateListingPage() {
           type: 'official',
         } : undefined,
       },
-      accessories: accessoriesMap[data.accessories],
+      accessories: accessoriesMap[data.accessories || 'device-only'],
       location: {
         city: data.city,
         area: data.address,
@@ -406,7 +406,7 @@ export default function CreateListingPage() {
         </motion.div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-6">
         {/* Images Section */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
