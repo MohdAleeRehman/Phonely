@@ -20,9 +20,10 @@ export default function ImageUpload({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      setError('Please select an image file');
+    // Validate file type - be more lenient for mobile
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+    if (!validTypes.includes(file.type.toLowerCase()) && !file.type.startsWith('image/')) {
+      setError('Please select a valid image file (JPG, PNG, WEBP)');
       return;
     }
 
@@ -33,14 +34,22 @@ export default function ImageUpload({
     }
 
     setError('');
-    setPreview(URL.createObjectURL(file));
+    
+    // Create preview with object URL
+    try {
+      const objectUrl = URL.createObjectURL(file);
+      setPreview(objectUrl);
+    } catch (err) {
+      console.error('Error creating preview:', err);
+    }
 
     try {
       setIsUploading(true);
       const url = await onUpload(file);
       onImageChange(url);
-    } catch {
-      setError('Failed to upload image');
+    } catch (err) {
+      console.error('Upload error:', err);
+      setError('Failed to upload image. Please try again.');
       setPreview(currentImage || null);
     } finally {
       setIsUploading(false);
@@ -52,7 +61,8 @@ export default function ImageUpload({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,image/heic,image/heif"
+        capture="environment"
         onChange={handleFileChange}
         className="hidden"
       />
