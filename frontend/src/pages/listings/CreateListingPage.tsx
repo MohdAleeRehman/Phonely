@@ -46,6 +46,26 @@ const CITIES_BY_PROVINCE = {
 const BRANDS = ['Apple', 'Samsung', 'OnePlus', 'Xiaomi', 'Oppo', 'Vivo', 'Realme', 'Huawei', 'Google', 'Nokia', 'Infinix', 'Tecno', 'Other'];
 const STORAGE_OPTIONS = ['32GB', '64GB', '128GB', '256GB', '512GB', '1TB'];
 
+// Phonely's Unique Display Quality Assessment
+const DISPLAY_QUALITY = {
+  flawless: { label: 'Flawless', description: 'No scratches, perfect display', icon: '✨' },
+  'minor-scratches': { label: 'Minor Scratches', description: 'Light scratches, barely visible', icon: '👌' },
+  'noticeable-wear': { label: 'Noticeable Wear', description: 'Visible scratches but functional', icon: '📱' },
+  cracked: { label: 'Cracked', description: 'Cracked screen but usable', icon: '💔' },
+};
+
+// Common phone issues for quick selection
+const COMMON_ISSUES = [
+  { value: 'battery-drains-fast', label: 'Battery Drains Fast', icon: '🔋' },
+  { value: 'camera-issue', label: 'Camera Issue', icon: '📷' },
+  { value: 'speaker-low', label: 'Speaker Low/Muffled', icon: '🔊' },
+  { value: 'microphone-issue', label: 'Microphone Issue', icon: '🎤' },
+  { value: 'wifi-bluetooth', label: 'WiFi/Bluetooth Issues', icon: '📡' },
+  { value: 'charging-slow', label: 'Slow Charging', icon: '⚡' },
+  { value: 'touch-not-responsive', label: 'Touch Not Responsive', icon: '👆' },
+  { value: 'overheating', label: 'Overheating', icon: '🔥' },
+];
+
 // Detailed condition descriptions
 const CONDITION_INFO = {
   excellent: {
@@ -86,6 +106,11 @@ const listingSchema = z.object({
   ptaApproved: z.boolean().default(true),
   // Battery Health (Apple only)
   batteryHealth: z.number().min(0).max(100).optional(),
+  // Phonely's Unique Condition Assessment
+  displayQuality: z.enum(['flawless', 'minor-scratches', 'noticeable-wear', 'cracked']).optional(),
+  allFeaturesWorking: z.boolean().default(true),
+  issues: z.array(z.string()).optional(),
+  additionalNotes: z.string().max(500).optional(),
   // Accessories (new simplified options)
   accessories: z.enum(['complete-box', 'cable-only', 'device-only']).default('device-only'),
   // Location
@@ -105,6 +130,7 @@ export default function CreateListingPage() {
   const [isCreatingListing, setIsCreatingListing] = useState(false);
   const [inspectionProgress, setInspectionProgress] = useState(0);
   const [selectedCondition, setSelectedCondition] = useState<keyof typeof CONDITION_INFO | ''>('');
+  const [selectedIssues, setSelectedIssues] = useState<string[]>([]);
 
   const imageTypes = [
     { type: 'front', label: '📱 Front View', description: 'Full front view with screen off' },
@@ -132,6 +158,7 @@ export default function CreateListingPage() {
     handleSubmit,
     formState: { errors },
     watch,
+    setValue,
   } = useForm<ListingFormData>({
     resolver: zodResolver(listingSchema),
     defaultValues: {
@@ -294,6 +321,10 @@ export default function CreateListingPage() {
       ptaApproved: data.ptaApproved,
       conditionDetails: {
         batteryHealth: data.batteryHealth || undefined,
+        displayQuality: data.displayQuality || undefined,
+        allFeaturesWorking: data.allFeaturesWorking !== undefined ? data.allFeaturesWorking : true,
+        functionalIssues: data.issues && data.issues.length > 0 ? data.issues : [],
+        additionalNotes: data.additionalNotes || undefined,
       },
       phone: {
         brand: data.brand,
@@ -766,6 +797,141 @@ export default function CreateListingPage() {
             </div>
           </motion.div>
         )}
+
+        {/* Phonely's Unique: Display Quality Assessment */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="card bg-linear-to-br from-indigo-50 to-indigo-100 border-2 border-indigo-100 shadow-lg hover:shadow-xl transition-shadow"
+        >
+          <h2 className="text-2xl font-bold mb-4">
+            <span className="mr-2">📱</span>
+            <span className="bg-linear-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
+              Display Condition
+            </span>
+          </h2>
+          <p className="text-gray-600 mb-4">👀 Rate your screen's physical condition</p>
+          
+          <div className="grid md:grid-cols-4 gap-3">
+            {Object.entries(DISPLAY_QUALITY).map(([key, info]) => (
+              <ButtonCard
+                key={key}
+                icon={info.icon}
+                label={info.label}
+                selected={watch('displayQuality') === key}
+                onClick={() => setValue('displayQuality', key as any)}
+              />
+            ))}
+          </div>
+          
+          {watch('displayQuality') && (
+            <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                {DISPLAY_QUALITY[watch('displayQuality') as keyof typeof DISPLAY_QUALITY]?.description}
+              </p>
+            </div>
+          )}
+        </motion.div>
+
+        {/* Phonely's Unique: Working Status */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.55 }}
+          className="card bg-linear-to-br from-emerald-50 to-emerald-100 border-2 border-emerald-100 shadow-lg hover:shadow-xl transition-shadow"
+        >
+          <h2 className="text-2xl font-bold mb-4">
+            <span className="mr-2">⚙️</span>
+            <span className="bg-linear-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
+              Device Functionality
+            </span>
+          </h2>
+          <p className="text-gray-600 mb-4">✨ Are all features working perfectly?</p>
+          
+          <div className="grid md:grid-cols-2 gap-3 mb-4">
+            <ButtonCard
+              icon="✅"
+              label="Everything Works"
+              selected={watch('allFeaturesWorking') === true}
+              onClick={() => {
+                setValue('allFeaturesWorking', true);
+                setSelectedIssues([]);
+                setValue('issues', []);
+              }}
+            />
+            <ButtonCard
+              icon="⚠️"
+              label="Has Some Issues"
+              selected={watch('allFeaturesWorking') === false}
+              onClick={() => setValue('allFeaturesWorking', false)}
+            />
+          </div>
+
+          {watch('allFeaturesWorking') === false && (
+            <div className="space-y-3">
+              <p className="text-sm text-gray-600 font-medium">Select all issues that apply:</p>
+              <div className="grid md:grid-cols-2 gap-2">
+                {COMMON_ISSUES.map((issue) => {
+                  const isSelected = selectedIssues.includes(issue.value);
+                  return (
+                    <motion.button
+                      key={issue.value}
+                      type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        const newIssues = isSelected
+                          ? selectedIssues.filter(i => i !== issue.value)
+                          : [...selectedIssues, issue.value];
+                        setSelectedIssues(newIssues);
+                        setValue('issues', newIssues);
+                      }}
+                      className={`
+                        flex items-center gap-2 p-3 rounded-lg border-2 transition-all text-left
+                        ${isSelected 
+                          ? 'border-orange-500 bg-orange-50' 
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                        }
+                      `}
+                    >
+                      <span className="text-lg">{issue.icon}</span>
+                      <span className={`text-sm ${isSelected ? 'text-orange-700 font-medium' : 'text-gray-700'}`}>
+                        {issue.label}
+                      </span>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </motion.div>
+
+        {/* Phonely's Unique: Additional Notes (Optional) */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.58 }}
+          className="card bg-linear-to-br from-amber-50 to-amber-100 border-2 border-amber-100 shadow-lg hover:shadow-xl transition-shadow"
+        >
+          <h2 className="text-2xl font-bold mb-4">
+            <span className="mr-2">📝</span>
+            <span className="bg-linear-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+              Additional Details (Optional)
+            </span>
+          </h2>
+          <p className="text-gray-600 mb-4">💬 Anything else buyers should know?</p>
+          
+          <textarea
+            {...register('additionalNotes')}
+            className="input-field min-h-[100px]"
+            placeholder="Example: Minor dent on back corner, phone was always kept in a case, recently serviced, etc."
+            maxLength={500}
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            {watch('additionalNotes')?.length || 0}/500 characters
+          </p>
+        </motion.div>
 
         {/* Accessories */}
         <motion.div

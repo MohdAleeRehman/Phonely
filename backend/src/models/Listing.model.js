@@ -75,6 +75,19 @@ const listingSchema = new mongoose.Schema(
       bodyCondition: String,
       batteryHealth: Number,
       functionalIssues: [String],
+      // Phonely's Unique Fields
+      displayQuality: {
+        type: String,
+        enum: ['flawless', 'minor-scratches', 'noticeable-wear', 'cracked'],
+      },
+      allFeaturesWorking: {
+        type: Boolean,
+        default: true,
+      },
+      additionalNotes: {
+        type: String,
+        maxlength: 500,
+      },
     },
     price: {
       type: Number,
