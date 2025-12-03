@@ -123,7 +123,8 @@ async def process_inspection(request: InspectionRequest):
             "has_warranty": pd.get("hasWarranty", False),
             "launch_date": pd.get("launchDate", "2023-01"),
             "retail_price": pd.get("retailPrice", 50000),
-            "age_months": calculate_age_months(pd.get("launchDate", "2023-01"))
+            "age_months": calculate_age_months(pd.get("launchDate", "2023-01")),
+            "pta_approved": pd.get("ptaApproved", True)  # PTA status for Pakistan market
         }
         
         logger.info(f"   Device: {brand} {model} ({inspection_data['storage']})")

@@ -28,13 +28,36 @@ text_analysis_task:
 pricing_analysis_task:
   description: >
     Determine fair market price for {brand} {model} ({storage}, {age_months} months old, launched {launch_date}).
-    Original retail: {retail_price} PKR.
+    Original retail: {retail_price} PKR. PTA Approved: {pta_approved}.
     
-    Apply age depreciation (Y1: 20%, Y2: 15%, Y3+: 10%) and adjust for condition from vision analysis.
-    Consider Pakistani market dynamics. NO pricing_breakdown, reasoning, or market_insights.
+    **IMPORTANT PRICING GUIDELINES:**
+    1. Start with retail price depreciation:
+       - Year 1: 25% depreciation
+       - Year 2: 20% depreciation  
+       - Year 3+: 15% depreciation per year
+    
+    2. Apply condition adjustments from vision analysis:
+       - Excellent (9-10): No additional reduction
+       - Good (7-8): Reduce by 10-15%
+       - Fair (5-6): Reduce by 20-30%
+       - Poor (3-4): Reduce by 35-50%
+    
+    3. **PTA Status Impact (CRITICAL for Pakistan market):**
+       - If PTA Approved (pta_approved=true): Use calculated price
+       - If Non-PTA (pta_approved=false): Apply 30-40% reduction from PTA price
+       - Non-PTA phones cannot use SIM cards legally in Pakistan, significantly reducing value
+    
+    4. Market reality check:
+       - Aim for middle-ground pricing (not too high, not too low)
+       - Target 15-18K PKR range for mid-range phones (adjust proportionally for high-end)
+       - Consider Pakistani purchasing power and local market conditions
+       - Cross-reference with OLX/PriceOye data for similar models
+    
+    Provide realistic, competitive prices that balance seller satisfaction with buyer appeal.
+    NO pricing_breakdown, reasoning, or market_insights fields.
     
   expected_output: >
-    Clean JSON object with: suggested_min_price (integer PKR), suggested_max_price (integer PKR), market_average (integer PKR), confidence_level (string: low/medium/high).
+    Clean JSON object with: suggested_min_price (integer PKR), suggested_max_price (integer PKR), market_average (integer PKR), confidence_level (string: low/medium/high), pta_impact_applied (boolean).
   agent: pricing_agent
   context:
     - vision_analysis_task

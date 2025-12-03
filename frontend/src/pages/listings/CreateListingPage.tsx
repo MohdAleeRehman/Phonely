@@ -201,6 +201,7 @@ export default function CreateListingPage() {
             model: listing.phone.model,
             storage: listing.phone.storage,
             condition: listing.condition,
+            ptaApproved: listing.ptaApproved,
           },
           listing.description
         );
