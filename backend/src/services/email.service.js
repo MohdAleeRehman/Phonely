@@ -65,6 +65,7 @@ export const sendOTPEmail = async (email, otp, name = 'User') => {
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .logo { width: 60px; height: 60px; margin: 0 auto 15px; }
         .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
         .otp-box { background: white; border: 2px solid #667eea; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; }
         .otp-code { font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 5px; }
@@ -74,6 +75,7 @@ export const sendOTPEmail = async (email, otp, name = 'User') => {
     <body>
       <div class="container">
         <div class="header">
+          <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/phonely-p.svg" alt="Phonely" class="logo" />
           <h1>📱 Phonely</h1>
           <p>Your trusted phone marketplace</p>
         </div>
@@ -123,6 +125,7 @@ export const sendWelcomeEmail = async (email, name) => {
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .logo { width: 60px; height: 60px; margin: 0 auto 15px; }
         .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
         .feature-box { background: white; border-radius: 8px; padding: 15px; margin: 10px 0; border-left: 4px solid #667eea; }
         .cta-button { display: inline-block; background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
@@ -132,6 +135,7 @@ export const sendWelcomeEmail = async (email, name) => {
     <body>
       <div class="container">
         <div class="header">
+          <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/phonely-p.svg" alt="Phonely" class="logo" />
           <h1>🎉 Welcome to Phonely!</h1>
           <p>You're now part of our community</p>
         </div>
@@ -197,6 +201,7 @@ export const sendListingNotification = async (email, name, listing) => {
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .logo { width: 60px; height: 60px; margin: 0 auto 15px; }
         .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
         .listing-card { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .listing-image { width: 100%; max-width: 400px; height: auto; border-radius: 8px; margin: 10px 0; display: block; }
@@ -212,6 +217,7 @@ export const sendListingNotification = async (email, name, listing) => {
     <body>
       <div class="container">
         <div class="header">
+          <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/phonely-p.svg" alt="Phonely" class="logo" />
           <h1>🎉 Listing Published!</h1>
         </div>
         <div class="content">
@@ -281,6 +287,75 @@ export const sendListingNotification = async (email, name, listing) => {
 };
 
 /**
+ * Send admin OTP email
+ * @param {string} email - Admin email
+ * @param {string} otp - One-time password
+ * @param {string} name - Admin name
+ */
+export const sendAdminOTPEmail = async (email, otp, name = 'Admin') => {
+  const subject = '🔒 Admin Login OTP - Phonely';
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .logo { width: 60px; height: 60px; margin: 0 auto 15px; filter: brightness(0) invert(1); }
+        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+        .otp-box { background: white; border: 3px solid #ef4444; border-radius: 8px; padding: 30px; text-align: center; margin: 20px 0; }
+        .otp-code { font-size: 48px; font-weight: bold; color: #ef4444; letter-spacing: 8px; font-family: monospace; }
+        .warning-box { background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0; }
+        .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/phonely-p.svg" alt="Phonely" class="logo" />
+          <h1>🔒 Admin Authentication</h1>
+          <p>Secure access verification</p>
+        </div>
+        <div class="content">
+          <h2>Hi ${name}! 👋</h2>
+          <p>You are attempting to log in to the <strong>Phonely Admin Panel</strong>.</p>
+          <p>For security reasons, please use the OTP code below to complete your login:</p>
+          
+          <div class="otp-box">
+            <p style="margin: 0; color: #666; font-size: 14px; text-transform: uppercase;">Your Admin OTP Code</p>
+            <div class="otp-code">${otp}</div>
+            <p style="margin: 10px 0 0 0; color: #999; font-size: 12px;">Valid for 5 minutes</p>
+          </div>
+          
+          <div class="warning-box">
+            <p style="margin: 0;"><strong>⚠️ Security Notice:</strong></p>
+            <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+              <li>This code expires in <strong>5 minutes</strong></li>
+              <li>Never share this code with anyone</li>
+              <li>If you didn't request this, secure your account immediately</li>
+              <li>This is an admin-level access attempt</li>
+            </ul>
+          </div>
+          
+          <p style="margin-top: 30px;">If you didn't attempt to log in, please change your password immediately and contact support.</p>
+          
+          <p>Stay secure! 🛡️</p>
+          <p>Best regards,<br>The Phonely Security Team</p>
+        </div>
+        <div class="footer">
+          <p>© ${new Date().getFullYear()} Phonely. All rights reserved.</p>
+          <p>This is an automated security email. Please do not reply.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({ to: email, subject, html });
+};
+
+/**
  * Send email verification link
  * @param {string} email - Recipient email
  * @param {string} name - User name
@@ -318,6 +393,12 @@ export const sendVerificationEmail = async (email, name, verificationToken) => {
         .header {
           text-align: center;
           margin-bottom: 30px;
+        }
+        .logo-image {
+          width: 60px;
+          height: 60px;
+          margin: 0 auto 15px;
+          display: block;
         }
         .logo {
           font-size: 32px;
@@ -358,6 +439,7 @@ export const sendVerificationEmail = async (email, name, verificationToken) => {
       <div class="container">
         <div class="content">
           <div class="header">
+            <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/phonely-p.svg" alt="Phonely" class="logo-image" />
             <div class="logo">📱 Phonely</div>
             <h2 style="color: #333; margin: 0;">Verify Your Email Address</h2>
           </div>
@@ -401,5 +483,6 @@ export default {
   sendWelcomeEmail,
   sendListingNotification,
   sendVerificationEmail,
+  sendAdminOTPEmail,
 };
 

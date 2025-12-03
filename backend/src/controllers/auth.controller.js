@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { asyncHandler, AppError } from '../middleware/error.middleware.js';
 import User from '../models/User.model.js';
-import { sendVerificationEmail } from '../services/email.service.js';
+import { sendVerificationEmail, sendAdminOTPEmail } from '../services/email.service.js';
 
 // Generate JWT token
 const generateToken = (userId) => {
@@ -108,8 +108,120 @@ export const login = asyncHandler(async (req, res) => {
     throw new AppError('Your account has been deactivated', 403);
   }
 
-  // Update last active
-  user.updateLastActive();
+  // If admin user, send OTP instead of token
+  if (user.role === 'admin') {
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Update last active and store OTP with 5-minute expiry
+    user.lastActive = Date.now();
+    user.adminOtp = {
+      code: otp,
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
+      attempts: 0,
+    };
+    await user.save();
+
+    // Send OTP via email
+    try {
+      await sendAdminOTPEmail(user.email, otp, user.name);
+    } catch (emailError) {
+      console.error('Failed to send admin OTP email:', emailError);
+      throw new AppError('Failed to send OTP. Please try again.', 500);
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'OTP sent to your email. Please verify to complete login.',
+      data: {
+        requiresOtp: true,
+        email: user.email,
+        userId: user._id,
+      },
+    });
+  }
+
+  // For regular users, update last active and generate tokens
+  user.lastActive = Date.now();
+  await user.save();
+
+  const token = generateToken(user._id);
+  const refreshToken = generateRefreshToken(user._id);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Login successful',
+    token,
+    refreshToken,
+    data: {
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        avatar: user.avatar,
+        verified: user.verified,
+        city: user.location?.city || '',
+        role: user.role,
+        createdAt: user.createdAt,
+      },
+    },
+  });
+});
+
+/**
+ * @desc    Verify admin OTP
+ * @route   POST /api/v1/auth/verify-admin-otp
+ * @access  Public
+ */
+export const verifyAdminOTP = asyncHandler(async (req, res) => {
+  const { userId, otp } = req.body;
+
+  // Validate input
+  if (!userId || !otp) {
+    throw new AppError('User ID and OTP are required', 400);
+  }
+
+  // Find user
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+
+  // Check if user is admin
+  if (user.role !== 'admin') {
+    throw new AppError('Unauthorized access', 403);
+  }
+
+  // Check if OTP exists and not expired
+  if (!user.adminOtp?.code || !user.adminOtp?.expiresAt) {
+    throw new AppError('No OTP found. Please request a new one.', 400);
+  }
+
+  if (new Date() > user.adminOtp.expiresAt) {
+    // Clear expired OTP
+    user.adminOtp = { code: null, expiresAt: null, attempts: 0 };
+    await user.save();
+    throw new AppError('OTP has expired. Please request a new one.', 400);
+  }
+
+  // Check max attempts (5 attempts)
+  if (user.adminOtp.attempts >= 5) {
+    user.adminOtp = { code: null, expiresAt: null, attempts: 0 };
+    await user.save();
+    throw new AppError('Maximum OTP attempts exceeded. Please request a new one.', 400);
+  }
+
+  // Verify OTP
+  if (user.adminOtp.code !== otp) {
+    user.adminOtp.attempts += 1;
+    await user.save();
+    throw new AppError(`Invalid OTP. ${5 - user.adminOtp.attempts} attempts remaining.`, 401);
+  }
+
+  // OTP verified successfully - clear OTP and generate tokens
+  user.adminOtp = { code: null, expiresAt: null, attempts: 0 };
+  await user.save();
 
   // Generate tokens
   const token = generateToken(user._id);
@@ -117,7 +229,7 @@ export const login = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     status: 'success',
-    message: 'Login successful',
+    message: 'Admin login successful',
     token,
     refreshToken,
     data: {

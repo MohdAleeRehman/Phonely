@@ -10,6 +10,7 @@ import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import VerifyEmailSentPage from './pages/auth/VerifyEmailSentPage';
 import VerifyEmailPage from './pages/auth/VerifyEmailPage';
+import AdminOTPVerification from './pages/auth/AdminOTPVerification';
 import ListingsPage from './pages/listings/ListingsPage';
 import CreateListingPage from './pages/listings/CreateListingPage';
 import ListingDetailPage from './pages/listings/ListingDetailPage';
@@ -89,6 +90,9 @@ function AnimatedRoutes() {
           <Route path="/verify-email-sent" element={<VerifyEmailSentPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
         </Route>
+
+        {/* Admin OTP Route (no layout) */}
+        <Route path="/admin/verify-otp" element={<AdminOTPVerification />} />
 
         {/* Protected Routes */}
         <Route element={<MainLayout />}>

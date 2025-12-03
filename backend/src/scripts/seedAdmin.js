@@ -53,6 +53,14 @@ const seedAdmin = async () => {
       existingAdmin.verified = true;
       existingAdmin.verificationBadge = 'platinum';
       
+      // Ensure location is set
+      if (!existingAdmin.location || !existingAdmin.location.city) {
+        existingAdmin.location = {
+          city: 'Islamabad',
+          country: 'Pakistan',
+        };
+      }
+      
       await existingAdmin.save();
       console.log('✅ Admin user updated with new password');
     } else {
@@ -69,6 +77,10 @@ const seedAdmin = async () => {
         verificationBadge: 'platinum',
         phone: '+92300000000',
         avatar: 'https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff',
+        location: {
+          city: 'Islamabad',
+          country: 'Pakistan',
+        },
       });
 
       console.log('✅ Admin user created successfully!');

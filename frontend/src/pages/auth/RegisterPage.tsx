@@ -131,8 +131,8 @@ export default function RegisterPage() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Name Field */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1 items-center gap-1">
-            <span>👤</span> Full Name
+          <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
+            <span className="grayscale opacity-70">👤</span> Full Name
           </label>
           <input
             {...register('name')}
@@ -141,15 +141,15 @@ export default function RegisterPage() {
           />
           {errors.name && (
             <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-              <span>⚠️</span> {errors.name.message}
+              <span className="grayscale opacity-70">⚠️</span> {errors.name.message}
             </p>
           )}
         </div>
 
         {/* Email Field */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1 items-center gap-1">
-            <span>📧</span> Email
+          <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
+            <span className="grayscale opacity-70">📧</span> Email
           </label>
           <input
             type="email"
@@ -159,15 +159,15 @@ export default function RegisterPage() {
           />
           {errors.email && (
             <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-              <span>⚠️</span> {errors.email.message}
+              <span className="grayscale opacity-70">⚠️</span> {errors.email.message}
             </p>
           )}
         </div>
 
         {/* Phone Field */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1 items-center gap-1">
-            <span>📱</span> Phone (with country code)
+          <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
+            <span className="grayscale opacity-70">📱</span> Phone (with country code)
           </label>
           <input
             {...register('phone')}
@@ -176,15 +176,15 @@ export default function RegisterPage() {
           />
           {errors.phone && (
             <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-              <span>⚠️</span> {errors.phone.message}
+              <span className="grayscale opacity-70">⚠️</span> {errors.phone.message}
             </p>
           )}
         </div>
 
         {/* Password Field with Strength Indicator */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1 items-center gap-1">
-            <span>🔒</span> Password
+          <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
+            <span className="grayscale opacity-70">🔒</span> Password
           </label>
           <div className="relative">
             <input
@@ -247,15 +247,15 @@ export default function RegisterPage() {
           
           {errors.password && (
             <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-              <span>⚠️</span> {errors.password.message}
+              <span className="grayscale opacity-70">⚠️</span> {errors.password.message}
             </p>
           )}
         </div>
 
         {/* City Field */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1 items-center gap-1">
-            <span>📍</span> City
+          <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
+            <span className="grayscale opacity-70">📍</span> City
           </label>
           <select
             {...register('city')}
@@ -274,7 +274,7 @@ export default function RegisterPage() {
           </select>
           {errors.city && (
             <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-              <span>⚠️</span> {errors.city.message}
+              <span className="grayscale opacity-70">⚠️</span> {errors.city.message}
             </p>
           )}
         </div>

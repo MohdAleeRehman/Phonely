@@ -227,3 +227,272 @@ export const deleteListingAdmin = asyncHandler(async (req, res) => {
     message: 'Listing deleted successfully',
   });
 });
+
+/**
+ * @desc    Ban/Unban user
+ * @route   PATCH /api/v1/admin/users/:id/ban
+ * @access  Private/Admin
+ */
+export const toggleUserBan = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+
+  // Prevent admin from banning themselves
+  if (user._id.toString() === req.user._id.toString()) {
+    throw new AppError('You cannot ban yourself', 400);
+  }
+
+  user.isActive = !user.isActive;
+  await user.save();
+
+  // If banning, remove all active listings
+  if (!user.isActive) {
+    await Listing.updateMany(
+      { seller: user._id, status: 'active' },
+      { status: 'removed' }
+    );
+  }
+
+  res.status(200).json({
+    status: 'success',
+    message: user.isActive ? 'User unbanned successfully' : 'User banned successfully',
+    data: {
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isActive: user.isActive,
+      },
+    },
+  });
+});
+
+/**
+ * @desc    Get user details with stats
+ * @route   GET /api/v1/admin/users/:id
+ * @access  Private/Admin
+ */
+export const getUserDetails = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id).select('-password');
+
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+
+  // Get user's listings
+  const listings = await Listing.find({ seller: user._id })
+    .select('title price status createdAt images')
+    .sort({ createdAt: -1 })
+    .limit(10);
+
+  const listingsCount = await Listing.countDocuments({ seller: user._id });
+  const activeListingsCount = await Listing.countDocuments({ seller: user._id, status: 'active' });
+  const soldListingsCount = await Listing.countDocuments({ seller: user._id, status: 'sold' });
+
+  // Get user's inspections
+  const inspectionsCount = await Inspection.countDocuments({ user: user._id });
+  const completedInspectionsCount = await Inspection.countDocuments({ 
+    user: user._id, 
+    status: 'completed' 
+  });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user,
+      stats: {
+        listings: {
+          total: listingsCount,
+          active: activeListingsCount,
+          sold: soldListingsCount,
+        },
+        inspections: {
+          total: inspectionsCount,
+          completed: completedInspectionsCount,
+        },
+      },
+      recentListings: listings,
+    },
+  });
+});
+
+/**
+ * @desc    Update listing status
+ * @route   PATCH /api/v1/admin/listings/:id/status
+ * @access  Private/Admin
+ */
+export const updateListingStatus = asyncHandler(async (req, res) => {
+  const { status } = req.body;
+
+  if (!['draft', 'active', 'sold', 'removed', 'expired'].includes(status)) {
+    throw new AppError('Invalid status', 400);
+  }
+
+  const listing = await Listing.findById(req.params.id);
+
+  if (!listing) {
+    throw new AppError('Listing not found', 404);
+  }
+
+  listing.status = status;
+  await listing.save();
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Listing status updated successfully',
+    data: {
+      listing,
+    },
+  });
+});
+
+/**
+ * @desc    Get listing details with inspection report
+ * @route   GET /api/v1/admin/listings/:id
+ * @access  Private/Admin
+ */
+export const getListingDetails = asyncHandler(async (req, res) => {
+  const listing = await Listing.findById(req.params.id)
+    .populate('seller', 'name email phone verified verificationBadge')
+    .populate('inspectionReport.reportId');
+
+  if (!listing) {
+    throw new AppError('Listing not found', 404);
+  }
+
+  // Get inspection if exists
+  let inspection = null;
+  if (listing.inspectionReport?.reportId) {
+    inspection = await Inspection.findById(listing.inspectionReport.reportId);
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      listing,
+      inspection,
+    },
+  });
+});
+
+/**
+ * @desc    Get platform analytics
+ * @route   GET /api/v1/admin/analytics
+ * @access  Private/Admin
+ */
+export const getAnalytics = asyncHandler(async (req, res) => {
+  const { period = '30' } = req.query; // days
+  const daysAgo = parseInt(period);
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - daysAgo);
+
+  // User growth over time
+  const userGrowth = await User.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: startDate },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
+        },
+        count: { $sum: 1 },
+      },
+    },
+    { $sort: { _id: 1 } },
+  ]);
+
+  // Listing growth over time
+  const listingGrowth = await Listing.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: startDate },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
+        },
+        count: { $sum: 1 },
+      },
+    },
+    { $sort: { _id: 1 } },
+  ]);
+
+  // Listings by brand
+  const listingsByBrand = await Listing.aggregate([
+    {
+      $match: { status: 'active' },
+    },
+    {
+      $group: {
+        _id: '$phone.brand',
+        count: { $sum: 1 },
+      },
+    },
+    { $sort: { count: -1 } },
+    { $limit: 10 },
+  ]);
+
+  // Listings by condition
+  const listingsByCondition = await Listing.aggregate([
+    {
+      $match: { status: 'active' },
+    },
+    {
+      $group: {
+        _id: '$condition',
+        count: { $sum: 1 },
+      },
+    },
+    { $sort: { count: -1 } },
+  ]);
+
+  // PTA Approved vs Non-PTA
+  const ptaStats = await Listing.aggregate([
+    {
+      $match: { status: 'active' },
+    },
+    {
+      $group: {
+        _id: '$ptaApproved',
+        count: { $sum: 1 },
+        avgPrice: { $avg: '$price' },
+      },
+    },
+  ]);
+
+  // Average listing price by brand
+  const avgPriceByBrand = await Listing.aggregate([
+    {
+      $match: { status: 'active' },
+    },
+    {
+      $group: {
+        _id: '$phone.brand',
+        avgPrice: { $avg: '$price' },
+        count: { $sum: 1 },
+      },
+    },
+    { $sort: { avgPrice: -1 } },
+    { $limit: 10 },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      userGrowth,
+      listingGrowth,
+      listingsByBrand,
+      listingsByCondition,
+      ptaStats,
+      avgPriceByBrand,
+    },
+  });
+});

@@ -177,20 +177,24 @@ export default function AdminDashboard() {
                 <div className="card">
                   <h3 className="text-lg font-semibold mb-4">Recent Users</h3>
                   <div className="space-y-3">
-                    {stats.recentUsers.map((user: User) => (
-                      <div key={user._id} className="flex items-center gap-3 pb-3 border-b last:border-0">
-                        <div className="h-10 w-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-semibold">
-                          {user.name.charAt(0).toUpperCase()}
+                    {stats?.recentUsers && stats.recentUsers.length > 0 ? (
+                      stats.recentUsers.map((user: User) => (
+                        <div key={user._id} className="flex items-center gap-3 pb-3 border-b last:border-0">
+                          <div className="h-10 w-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-semibold">
+                            {user.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium">{user.name}</p>
+                            <p className="text-sm text-gray-600">{user.email}</p>
+                          </div>
+                          <span className="text-xs text-gray-500">
+                            {new Date(user.createdAt).toLocaleDateString()}
+                          </span>
                         </div>
-                        <div className="flex-1">
-                          <p className="font-medium">{user.name}</p>
-                          <p className="text-sm text-gray-600">{user.email}</p>
-                        </div>
-                        <span className="text-xs text-gray-500">
-                          {new Date(user.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <p className="text-gray-500 text-center py-4">No recent users</p>
+                    )}
                   </div>
                 </div>
 
@@ -198,7 +202,8 @@ export default function AdminDashboard() {
                 <div className="card">
                   <h3 className="text-lg font-semibold mb-4">Recent Listings</h3>
                   <div className="space-y-3">
-                    {stats.recentListings.map((listing: Listing) => (
+                    {stats?.recentListings && stats.recentListings.length > 0 ? (
+                      stats.recentListings.map((listing: Listing) => (
                       <div key={listing._id} className="flex items-center gap-3 pb-3 border-b last:border-0">
                         <div className="h-10 w-10 rounded-lg bg-gray-200 overflow-hidden flex-shrink-0">
                           {listing.images?.[0] ? (
@@ -229,7 +234,10 @@ export default function AdminDashboard() {
                           {new Date(listing.createdAt).toLocaleDateString()}
                         </span>
                       </div>
-                    ))}
+                    ))
+                    ) : (
+                      <p className="text-gray-500 text-center py-4">No recent listings</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -261,7 +269,8 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {usersResponse.data.listings.map((user: User) => (
+                    {usersResponse.data.users && usersResponse.data.users.length > 0 ? (
+                      usersResponse.data.users.map((user: User) => (
                       <tr key={user._id} className="hover:bg-gray-50">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
@@ -294,7 +303,14 @@ export default function AdminDashboard() {
                           </button>
                         </td>
                       </tr>
-                    ))}
+                    ))
+                    ) : (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                          No users found
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -369,7 +385,8 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {listingsResponse.data.listings.map((listing: Listing) => (
+                    {listingsResponse.data.listings && listingsResponse.data.listings.length > 0 ? (
+                      listingsResponse.data.listings.map((listing: Listing) => (
                       <tr key={listing._id} className="hover:bg-gray-50">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
@@ -426,7 +443,14 @@ export default function AdminDashboard() {
                           </button>
                         </td>
                       </tr>
-                    ))}
+                    ))
+                    ) : (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                          No listings found
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>

@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import api from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import type { AuthResponse } from '../../types';
+import type { AdminOTPResponse } from '../../services/auth.service';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -35,10 +36,28 @@ export default function LoginPage() {
       setIsLoading(true);
       setError('');
       
-      const response = await api.post<AuthResponse>('/auth/login', data);
-      const { user } = response.data.data;
-      const token = response.data.token;
-      const refreshToken = response.data.refreshToken;
+      const response = await api.post<AuthResponse | AdminOTPResponse>('/auth/login', data);
+      
+      // Check if admin OTP is required
+      if ('data' in response.data && response.data.data && 'requiresOtp' in response.data.data) {
+        const otpData = response.data.data as { requiresOtp: boolean; email: string; userId: string };
+        if (otpData.requiresOtp) {
+          // Redirect to OTP verification page
+          navigate('/admin/verify-otp', {
+            state: {
+              userId: otpData.userId,
+              email: otpData.email,
+            },
+          });
+          return;
+        }
+      }
+      
+      // Regular user login
+      const authResponse = response.data as AuthResponse;
+      const { user } = authResponse.data;
+      const token = authResponse.token;
+      const refreshToken = authResponse.refreshToken;
       
       login(user, token, refreshToken);
       navigate('/');
@@ -80,7 +99,7 @@ export default function LoginPage() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div>
           <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
-            <span>📧</span> Email
+            <span className="grayscale opacity-70">📧</span> Email
           </label>
           <input
             type="email"
@@ -90,14 +109,14 @@ export default function LoginPage() {
           />
           {errors.email && (
             <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-              <span>⚠️</span> {errors.email.message}
+              <span className="grayscale opacity-70">⚠️</span> {errors.email.message}
             </p>
           )}
         </div>
 
         <div>
           <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
-            <span>🔒</span> Password
+            <span className="grayscale opacity-70">🔒</span> Password
           </label>
           <div className="relative">
             <input
@@ -125,7 +144,7 @@ export default function LoginPage() {
           </div>
           {errors.password && (
             <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-              <span>⚠️</span> {errors.password.message}
+              <span className="grayscale opacity-70">⚠️</span> {errors.password.message}
             </p>
           )}
         </div>

@@ -36,7 +36,10 @@ const userSchema = new mongoose.Schema(
     location: {
       city: {
         type: String,
-        required: true,
+        required: function() {
+          // Only require city for non-admin users
+          return this.role !== 'admin';
+        },
       },
       country: {
         type: String,
@@ -106,6 +109,20 @@ const userSchema = new mongoose.Schema(
     verificationTokenExpiry: {
       type: Date,
       default: null,
+    },
+    adminOtp: {
+      code: {
+        type: String,
+        default: null,
+      },
+      expiresAt: {
+        type: Date,
+        default: null,
+      },
+      attempts: {
+        type: Number,
+        default: 0,
+      },
     },
     fcmTokens: [
       {

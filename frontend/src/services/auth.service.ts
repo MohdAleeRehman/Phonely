@@ -6,9 +6,29 @@ import type {
   ResendVerificationData,
 } from '../types';
 
+export interface AdminOTPResponse {
+  status: string;
+  message: string;
+  data: {
+    requiresOtp: boolean;
+    email: string;
+    userId: string;
+  };
+}
+
+export interface VerifyAdminOTPData {
+  userId: string;
+  otp: string;
+}
+
 export const authService = {
   login: async (credentials: LoginCredentials) => {
-    const response = await api.post<AuthResponse>('/auth/login', credentials);
+    const response = await api.post<AuthResponse | AdminOTPResponse>('/auth/login', credentials);
+    return response.data;
+  },
+
+  verifyAdminOTP: async (data: VerifyAdminOTPData) => {
+    const response = await api.post<AuthResponse>('/auth/verify-admin-otp', data);
     return response.data;
   },
 

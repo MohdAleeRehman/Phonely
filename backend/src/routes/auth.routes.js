@@ -5,7 +5,8 @@ import {
   verifyEmail, 
   resendVerification,
   refreshToken, 
-  logout 
+  logout,
+  verifyAdminOTP
 } from '../controllers/auth.controller.js';
 import { authLimiter } from '../middleware/rateLimiter.middleware.js';
 
@@ -24,6 +25,13 @@ router.post('/register', authLimiter, register);
  * @access  Public
  */
 router.post('/login', authLimiter, login);
+
+/**
+ * @route   POST /api/v1/auth/verify-admin-otp
+ * @desc    Verify admin OTP after login
+ * @access  Public
+ */
+router.post('/verify-admin-otp', authLimiter, verifyAdminOTP);
 
 /**
  * @route   GET /api/v1/auth/verify-email/:token
