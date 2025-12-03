@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { listingService } from '../../services/listing.service';
 import { inspectionService } from '../../services/inspection.service';
 import ImageUpload from '../../components/common/ImageUpload';
+import { ButtonCard } from '../../components/common/ButtonCard';
 import Loading from '../../components/common/Loading';
 
 // Complete Cities of Pakistan organized by Province
@@ -73,6 +74,7 @@ const listingSchema = z.object({
   title: z.string().min(10, 'Title must be at least 10 characters'),
   description: z.string().min(50, 'Description must be at least 50 characters'),
   price: z.number().min(1000, 'Price must be at least 1000'),
+  priceNegotiable: z.boolean().default(false),
   brand: z.string().min(1, 'Brand is required'),
   model: z.string().min(1, 'Model is required'),
   storage: z.string().min(1, 'Storage is required'),
@@ -81,46 +83,11 @@ const listingSchema = z.object({
   color: z.string().min(1, 'Color is required'),
   imei: z.string().optional(),
   warranty: z.boolean().optional(),
+  ptaApproved: z.boolean().default(true),
   // Battery Health (Apple only)
   batteryHealth: z.number().min(0).max(100).optional(),
-  // Functionality Issues (multi-select)
-  faultyDisplay: z.boolean().optional(),
-  faultyEarpiece: z.boolean().optional(),
-  faultyFaceID: z.boolean().optional(),
-  faultyProximitySensor: z.boolean().optional(),
-  faultyVibrationMotor: z.boolean().optional(),
-  faultyPowerButton: z.boolean().optional(),
-  faultyVolumeButton: z.boolean().optional(),
-  faultyMuteSwitch: z.boolean().optional(),
-  faultyFrontCamera: z.boolean().optional(),
-  faultyBackCamera: z.boolean().optional(),
-  faultyFlash: z.boolean().optional(),
-  faultySpeaker: z.boolean().optional(),
-  faultyChargingPort: z.boolean().optional(),
-  // Physical Damage (multi-select)
-  damagedDisplay: z.boolean().optional(),
-  damagedBack: z.boolean().optional(),
-  damagedFrame: z.boolean().optional(),
-  damagedCamera: z.boolean().optional(),
-  // Repair History (multi-select)
-  repairedTouchScreen: z.boolean().optional(),
-  repairedDisplay: z.boolean().optional(),
-  repairedFrontCamera: z.boolean().optional(),
-  repairedBackCamera: z.boolean().optional(),
-  repairedLoudspeaker: z.boolean().optional(),
-  repairedEarpiece: z.boolean().optional(),
-  repairedMicrophone: z.boolean().optional(),
-  repairedBattery: z.boolean().optional(),
-  otherRepairs: z.string().optional(),
-  // Cosmetic Condition
-  cosmeticFront: z.enum(['excellent', 'good', 'fair']),
-  cosmeticBack: z.enum(['excellent', 'good', 'fair']),
-  cosmeticFrame: z.enum(['excellent', 'good', 'fair']),
-  // Accessories
-  hasBox: z.boolean().optional(),
-  hasCharger: z.boolean().optional(),
-  hasCable: z.boolean().optional(),
-  hasEarphones: z.boolean().optional(),
+  // Accessories (new simplified options)
+  accessories: z.enum(['complete-box', 'cable-only', 'device-only']).default('device-only'),
   // Location
   address: z.string().min(10, 'Address must be at least 10 characters'),
   city: z.string().min(1, 'City is required'),
@@ -311,55 +278,22 @@ export default function CreateListingPage() {
 
     setError('');
 
-    // Collect functionality issues
-    const functionalIssues = [];
-    if (data.faultyDisplay) functionalIssues.push('Faulty Display');
-    if (data.faultyEarpiece) functionalIssues.push('Faulty Earpiece');
-    if (data.faultyFaceID) functionalIssues.push('Faulty Face ID');
-    if (data.faultyProximitySensor) functionalIssues.push('Faulty Proximity Sensor');
-    if (data.faultyVibrationMotor) functionalIssues.push('Faulty Vibration Motor');
-    if (data.faultyPowerButton) functionalIssues.push('Faulty Power Button');
-    if (data.faultyVolumeButton) functionalIssues.push('Faulty Volume Button');
-    if (data.faultyMuteSwitch) functionalIssues.push('Faulty Mute Switch/Action Button');
-    if (data.faultyFrontCamera) functionalIssues.push('Faulty Front Camera');
-    if (data.faultyBackCamera) functionalIssues.push('Faulty Back Camera');
-    if (data.faultyFlash) functionalIssues.push('Faulty Flash');
-    if (data.faultySpeaker) functionalIssues.push('Faulty Speaker');
-    if (data.faultyChargingPort) functionalIssues.push('Faulty Charging Port');
-
-    // Collect physical damage
-    const physicalDamage = [];
-    if (data.damagedDisplay) physicalDamage.push('Damaged Display');
-    if (data.damagedBack) physicalDamage.push('Damaged Back');
-    if (data.damagedFrame) physicalDamage.push('Damaged Frame');
-    if (data.damagedCamera) physicalDamage.push('Damaged Camera');
-
-    // Collect repair history
-    const repairHistory = [];
-    if (data.repairedTouchScreen) repairHistory.push('Touch Screen');
-    if (data.repairedDisplay) repairHistory.push('Display');
-    if (data.repairedFrontCamera) repairHistory.push('Front Camera');
-    if (data.repairedBackCamera) repairHistory.push('Back Camera');
-    if (data.repairedLoudspeaker) repairHistory.push('Loudspeaker');
-    if (data.repairedEarpiece) repairHistory.push('Earpiece');
-    if (data.repairedMicrophone) repairHistory.push('Microphone');
-    if (data.repairedBattery) repairHistory.push('Battery');
-    if (data.otherRepairs) repairHistory.push(`Other: ${data.otherRepairs}`);
+    // Map accessories enum to object format expected by backend
+    const accessoriesMap = {
+      'complete-box': { box: true, charger: false, cable: true, earphones: false, case: false, screenProtector: false },
+      'cable-only': { box: false, charger: false, cable: true, earphones: false, case: false, screenProtector: false },
+      'device-only': { box: false, charger: false, cable: false, earphones: false, case: false, screenProtector: false },
+    };
 
     const listingData = {
       title: data.title,
       description: data.description,
       price: Number(data.price),
-      priceNegotiable: true,
+      priceNegotiable: data.priceNegotiable,
       condition: data.condition,
+      ptaApproved: data.ptaApproved,
       conditionDetails: {
-        screenCondition: `Front: ${data.cosmeticFront}, Back: ${data.cosmeticBack}, Frame: ${data.cosmeticFrame}`,
-        bodyCondition: `${physicalDamage.length > 0 ? 'Damaged: ' + physicalDamage.join(', ') : 'No physical damage'}`,
         batteryHealth: data.batteryHealth || undefined,
-        functionalIssues: [
-          ...functionalIssues,
-          ...(repairHistory.length > 0 ? [`Repair History: ${repairHistory.join(', ')}`] : [])
-        ],
       },
       phone: {
         brand: data.brand,
@@ -373,14 +307,7 @@ export default function CreateListingPage() {
           type: 'official',
         } : undefined,
       },
-      accessories: {
-        box: data.hasBox || false,
-        charger: data.hasCharger || false,
-        cable: data.hasCable || false,
-        earphones: data.hasEarphones || false,
-        case: false,
-        screenProtector: false,
-      },
+      accessories: accessoriesMap[data.accessories],
       location: {
         city: data.city,
         area: data.address,
@@ -603,6 +530,51 @@ export default function CreateListingPage() {
                 <p className="text-red-600 text-sm mt-1">{errors.price.message}</p>
               )}
             </div>
+
+            {/* PTA Approved Status */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                PTA Approval Status *
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <ButtonCard
+                  icon="✅"
+                  label="PTA Approved"
+                  selected={watch('ptaApproved') === true}
+                  onClick={() => setValue('ptaApproved', true)}
+                />
+                <ButtonCard
+                  icon="⚠️"
+                  label="Non-PTA"
+                  selected={watch('ptaApproved') === false}
+                  onClick={() => setValue('ptaApproved', false)}
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                💡 PTA approval significantly affects resale value in Pakistan market
+              </p>
+            </div>
+
+            {/* Price Negotiable */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Price Flexibility
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <ButtonCard
+                  icon="💰"
+                  label="Fixed Price"
+                  selected={watch('priceNegotiable') === false}
+                  onClick={() => setValue('priceNegotiable', false)}
+                />
+                <ButtonCard
+                  icon="💬"
+                  label="Negotiable"
+                  selected={watch('priceNegotiable') === true}
+                  onClick={() => setValue('priceNegotiable', true)}
+                />
+              </div>
+            </div>
           </div>
         </motion.div>
 
@@ -669,24 +641,24 @@ export default function CreateListingPage() {
               )}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
                 Condition *
               </label>
-              <select 
-                {...register('condition')} 
-                className="input-field"
-                onChange={(e) => {
-                  setSelectedCondition(e.target.value as keyof typeof CONDITION_INFO);
-                }}
-              >
-                <option value="">Select Condition</option>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {Object.entries(CONDITION_INFO).map(([key, info]) => (
-                  <option key={key} value={key}>
-                    {info.icon} {info.label}
-                  </option>
+                  <ButtonCard
+                    key={key}
+                    icon={info.icon}
+                    label={info.label}
+                    selected={watch('condition') === key}
+                    onClick={() => {
+                      setValue('condition', key as any);
+                      setSelectedCondition(key as keyof typeof CONDITION_INFO);
+                    }}
+                  />
                 ))}
-              </select>
+              </div>
               {errors.condition && (
                 <p className="text-red-600 text-sm mt-1">{errors.condition.message}</p>
               )}
@@ -757,241 +729,12 @@ export default function CreateListingPage() {
           </div>
         </motion.div>
 
-        {/* Condition Details */}
-        {/* ⚙️ Functionality Issues */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="card bg-linear-to-br from-purple-50 to-purple-100 border-2 border-purple-100 shadow-lg hover:shadow-xl transition-shadow"
-        >
-          <h2 className="text-2xl font-bold mb-4">
-            <span className="mr-2">⚙️</span>
-            <span className="bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Functionality Issues
-            </span>
-          </h2>
-          <p className="text-gray-600 mb-4">✨ Select all that apply (leave unchecked if phone works perfectly)</p>
-          
-          <div className="grid md:grid-cols-2 gap-3">
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('faultyDisplay')} className="h-4 w-4 text-purple-600 rounded" />
-              <span>📱 Faulty Display</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('faultyEarpiece')} className="h-4 w-4 text-purple-600 rounded" />
-              <span>🔊 Faulty Earpiece</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('faultyFaceID')} className="h-4 w-4 text-purple-600 rounded" />
-              <span>🔐 Faulty Face ID</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('faultyProximitySensor')} className="h-4 w-4 text-purple-600 rounded" />
-              <span>📡 Faulty Proximity Sensor</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('faultyVibrationMotor')} className="h-4 w-4 text-purple-600 rounded" />
-              <span>📳 Faulty Vibration Motor</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('faultyPowerButton')} className="h-4 w-4 text-purple-600 rounded" />
-              <span>🔘 Faulty Power Button</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('faultyVolumeButton')} className="h-4 w-4 text-purple-600 rounded" />
-              <span>🔊 Faulty Volume Button</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('faultyMuteSwitch')} className="h-4 w-4 text-purple-600 rounded" />
-              <span>🔇 Faulty Mute Switch/Action Button</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('faultyFrontCamera')} className="h-4 w-4 text-purple-600 rounded" />
-              <span>🤳 Faulty Front Camera</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('faultyBackCamera')} className="h-4 w-4 text-purple-600 rounded" />
-              <span>📷 Faulty Back Camera</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('faultyFlash')} className="h-4 w-4 text-purple-600 rounded" />
-              <span>💡 Faulty Flash</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('faultySpeaker')} className="h-4 w-4 text-purple-600 rounded" />
-              <span>� Faulty Speaker</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('faultyChargingPort')} className="h-4 w-4 text-purple-600 rounded" />
-              <span>🔌 Faulty Charging Port</span>
-            </label>
-          </div>
-        </motion.div>
-
-        {/* 💥 Physical Damage */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="card bg-linear-to-br from-blue-50 to-blue-100 border-2 border-blue-100 shadow-lg hover:shadow-xl transition-shadow"
-        >
-          <h2 className="text-2xl font-bold mb-4">
-            <span className="mr-2">💥</span>
-            <span className="bg-linear-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
-              Physical Damage
-            </span>
-          </h2>
-          <p className="text-gray-600 mb-4">🔍 Select all types of damage (leave unchecked if no damage)</p>
-          
-          <div className="grid md:grid-cols-2 gap-3">
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('damagedDisplay')} className="h-4 w-4 text-red-600 rounded" />
-              <span>📱 Damaged Display</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('damagedBack')} className="h-4 w-4 text-red-600 rounded" />
-              <span>🔄 Damaged Back</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('damagedFrame')} className="h-4 w-4 text-red-600 rounded" />
-              <span>🔲 Damaged Frame</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('damagedCamera')} className="h-4 w-4 text-red-600 rounded" />
-              <span>📷 Damaged Camera</span>
-            </label>
-          </div>
-        </motion.div>
-
-        {/* 🔧 Repair History */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.7 }}
-          className="card bg-linear-to-br from-green-50 to-green-100 border-2 border-green-100 shadow-lg hover:shadow-xl transition-shadow"
-        >
-          <h2 className="text-2xl font-bold mb-4">
-            <span className="mr-2">🔧</span>
-            <span className="bg-linear-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
-              Repair History
-            </span>
-          </h2>
-          <p className="text-gray-600 mb-4">🛠️ Select all parts that have been repaired or replaced</p>
-          
-          <div className="grid md:grid-cols-2 gap-3 mb-4">
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('repairedTouchScreen')} className="h-4 w-4 text-blue-600 rounded" />
-              <span>📱 Touch Screen</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('repairedDisplay')} className="h-4 w-4 text-blue-600 rounded" />
-              <span>🖥️ Display</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('repairedFrontCamera')} className="h-4 w-4 text-blue-600 rounded" />
-              <span>🤳 Front Camera</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('repairedBackCamera')} className="h-4 w-4 text-blue-600 rounded" />
-              <span>📷 Back Camera</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('repairedLoudspeaker')} className="h-4 w-4 text-blue-600 rounded" />
-              <span>🔊 Loudspeaker</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('repairedEarpiece')} className="h-4 w-4 text-blue-600 rounded" />
-              <span>👂 Earpiece</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('repairedMicrophone')} className="h-4 w-4 text-blue-600 rounded" />
-              <span>🎤 Microphone</span>
-            </label>
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" {...register('repairedBattery')} className="h-4 w-4 text-blue-600 rounded" />
-              <span>🔋 Battery</span>
-            </label>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Other Repairs (Optional)
-            </label>
-            <input
-              {...register('otherRepairs')}
-              className="input-field"
-              placeholder="Describe any other repairs..."
-            />
-          </div>
-        </motion.div>
-
-        {/* ✨ Cosmetic Condition */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="card bg-linear-to-br from-purple-50 to-purple-100 border-2 border-purple-100 shadow-lg hover:shadow-xl transition-shadow"
-        >
-          <h2 className="text-2xl font-bold mb-4">
-            <span className="mr-2">✨</span>
-            <span className="bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Cosmetic Condition
-            </span>
-          </h2>
-          <p className="text-gray-600 mb-4">💎 Rate the physical appearance of each area</p>
-          
-          <div className="grid md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Front Surface *
-              </label>
-              <select {...register('cosmeticFront')} className="input-field">
-                <option value="excellent">⭐ Excellent - No visible wear</option>
-                <option value="good">👍 Good - Minor wear</option>
-                <option value="fair">📱 Fair - Noticeable wear</option>
-              </select>
-              {errors.cosmeticFront && (
-                <p className="text-red-600 text-sm mt-1">{errors.cosmeticFront.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Back Surface *
-              </label>
-              <select {...register('cosmeticBack')} className="input-field">
-                <option value="excellent">⭐ Excellent - No visible wear</option>
-                <option value="good">👍 Good - Minor wear</option>
-                <option value="fair">📱 Fair - Noticeable wear</option>
-              </select>
-              {errors.cosmeticBack && (
-                <p className="text-red-600 text-sm mt-1">{errors.cosmeticBack.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Frame/Edges *
-              </label>
-              <select {...register('cosmeticFrame')} className="input-field">
-                <option value="excellent">⭐ Excellent - No visible wear</option>
-                <option value="good">👍 Good - Minor wear</option>
-                <option value="fair">📱 Fair - Noticeable wear</option>
-              </select>
-              {errors.cosmeticFrame && (
-                <p className="text-red-600 text-sm mt-1">{errors.cosmeticFrame.message}</p>
-              )}
-            </div>
-          </div>
-        </motion.div>
-
         {/* Battery Health (Apple Only) */}
         {watch('brand') === 'Apple' && (
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.9 }}
+            transition={{ delay: 0.5 }}
             className="card bg-linear-to-br from-blue-50 to-blue-100 border-2 border-blue-100 shadow-lg hover:shadow-xl transition-shadow"
           >
             <h2 className="text-2xl font-bold mb-4">
@@ -1028,68 +771,47 @@ export default function CreateListingPage() {
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 1.0 }}
+          transition={{ delay: 0.6 }}
           className="card bg-linear-to-br from-green-50 to-green-100 border-2 border-green-100 shadow-lg hover:shadow-xl transition-shadow"
         >
           <h2 className="text-2xl font-bold mb-4">
             <span className="mr-2">📦</span>
             <span className="bg-linear-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
-              Included Accessories
+              What's Included?
             </span>
           </h2>
+          <p className="text-gray-600 mb-4">📱 Select what comes with your device</p>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                {...register('hasBox')}
-                className="h-4 w-4 text-primary-600 rounded"
-              />
-              <label className="ml-2 text-sm text-gray-700">
-                📦 Original Box
-              </label>
-            </div>
-
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                {...register('hasCharger')}
-                className="h-4 w-4 text-primary-600 rounded"
-              />
-              <label className="ml-2 text-sm text-gray-700">
-                🔌 Charger
-              </label>
-            </div>
-
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                {...register('hasCable')}
-                className="h-4 w-4 text-primary-600 rounded"
-              />
-              <label className="ml-2 text-sm text-gray-700">
-                🔗 Cable
-              </label>
-            </div>
-
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                {...register('hasEarphones')}
-                className="h-4 w-4 text-primary-600 rounded"
-              />
-              <label className="ml-2 text-sm text-gray-700">
-                🎧 Earphones
-              </label>
-            </div>
+          <div className="grid md:grid-cols-3 gap-3">
+            <ButtonCard
+              icon="📦"
+              label="Complete Box"
+              selected={watch('accessories') === 'complete-box'}
+              onClick={() => setValue('accessories', 'complete-box')}
+            />
+            <ButtonCard
+              icon="🔗"
+              label="Cable Only"
+              selected={watch('accessories') === 'cable-only'}
+              onClick={() => setValue('accessories', 'cable-only')}
+            />
+            <ButtonCard
+              icon="📱"
+              label="Device Only"
+              selected={watch('accessories') === 'device-only'}
+              onClick={() => setValue('accessories', 'device-only')}
+            />
           </div>
+          <p className="text-xs text-gray-500 mt-3">
+            💡 Note: Most manufacturers no longer include charging adapters with new phones
+          </p>
         </motion.div>
 
         {/* Location */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 1.1 }}
+          transition={{ delay: 0.7 }}
           className="card bg-linear-to-br from-purple-50 to-purple-100 border-2 border-purple-100 shadow-lg hover:shadow-xl transition-shadow"
         >
           <h2 className="text-2xl font-bold mb-4">
@@ -1141,7 +863,7 @@ export default function CreateListingPage() {
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 1.2 }}
+          transition={{ delay: 0.8 }}
           className="flex gap-4"
         >
           <button

@@ -65,6 +65,11 @@ const listingSchema = new mongoose.Schema(
       required: true,
       enum: ['excellent', 'good', 'fair', 'poor'],
     },
+    ptaApproved: {
+      type: Boolean,
+      default: true,
+      index: true,
+    },
     conditionDetails: {
       screenCondition: String,
       bodyCondition: String,
