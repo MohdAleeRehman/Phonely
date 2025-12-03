@@ -91,6 +91,7 @@ export const getAllListings = asyncHandler(async (req, res) => {
     condition,
     city,
     storage,
+    ptaApproved,
     page = 1,
     limit = 20,
     sort = '-createdAt',
@@ -104,6 +105,11 @@ export const getAllListings = asyncHandler(async (req, res) => {
   if (condition) query.condition = condition;
   if (city) query['location.city'] = city;
   if (storage) query['phone.storage'] = storage;
+  
+  // PTA Approval filter
+  if (ptaApproved !== undefined) {
+    query.ptaApproved = ptaApproved === 'true' || ptaApproved === true;
+  }
 
   if (minPrice || maxPrice) {
     query.price = {};

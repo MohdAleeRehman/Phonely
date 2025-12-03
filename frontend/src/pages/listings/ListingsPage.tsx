@@ -168,6 +168,25 @@ export default function ListingsPage() {
             </select>
           </div>
 
+          {/* PTA Approval Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              PTA Status
+            </label>
+            <select
+              value={filters.ptaApproved === undefined ? '' : filters.ptaApproved ? 'true' : 'false'}
+              onChange={(e) => {
+                const value = e.target.value;
+                updateFilter('ptaApproved', value === '' ? undefined : value === 'true');
+              }}
+              className="input-field"
+            >
+              <option value="">All Phones</option>
+              <option value="true">✅ PTA Approved</option>
+              <option value="false">⚠️ Non-PTA</option>
+            </select>
+          </div>
+
           {/* Price Range */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">

@@ -14,6 +14,7 @@ export interface ListingFilters extends PaginationParams {
   brand?: string;
   condition?: string;
   status?: string;
+  ptaApproved?: boolean;
 }
 
 export const listingService = {
