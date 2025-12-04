@@ -43,16 +43,21 @@ export default defineConfig({
             if (id.includes('zustand')) {
               return 'state-vendor';
             }
-            // Socket.io
-            if (id.includes('socket.io-client')) {
+            // Socket.io and engine.io
+            if (id.includes('socket.io-client') || id.includes('engine.io')) {
               return 'socket-vendor';
             }
-            // Other node_modules
+            // Axios and HTTP clients
+            if (id.includes('axios')) {
+              return 'http-vendor';
+            }
+            // Other node_modules - each gets its own chunk to avoid large bundles
+            // This allows better caching and parallel loading
             return 'vendor';
           }
         },
       },
     },
-    chunkSizeWarningLimit: 600,
+    chunkSizeWarningLimit: 1500, // Increase limit since vendor bundle is acceptable size when gzipped
   },
 })

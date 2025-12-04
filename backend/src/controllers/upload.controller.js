@@ -37,8 +37,34 @@ export const uploadImages = asyncHandler(async (req, res) => {
 
   const uploadPromises = req.files.map(async (file) => {
     try {
+      // Check if Sharp supports the image format
+      let imageBuffer = file.buffer;
+      
+      // For HEIC/HEIF files, try to process with Sharp
+      // If Sharp doesn't have HEIC support, it will throw an error
+      try {
+        const metadata = await sharp(file.buffer).metadata();
+        console.log(`Processing ${file.originalname} - format: ${metadata.format}`);
+      } catch (metadataError) {
+        console.error(`Unsupported format for ${file.originalname}:`, metadataError.message);
+        
+        // Check if it's a HEIC/HEIF format issue
+        const isHEIC = file.originalname.toLowerCase().match(/\.(heic|heif)$/);
+        if (isHEIC) {
+          throw new AppError(
+            `HEIC/HEIF images are not supported on this server. The image "${file.originalname}" should have been converted to JPG on your device. Please try again or contact support.`,
+            400
+          );
+        }
+        
+        throw new AppError(
+          `Unsupported image format: ${file.originalname}. Please use JPG, PNG, or WEBP images.`,
+          400
+        );
+      }
+
       // Optimize image with Sharp
-      const optimizedBuffer = await sharp(file.buffer)
+      const optimizedBuffer = await sharp(imageBuffer)
         .resize(1200, 1200, {
           fit: 'inside',
           withoutEnlargement: true,

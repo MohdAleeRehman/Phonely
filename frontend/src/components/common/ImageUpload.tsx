@@ -35,9 +35,39 @@ export default function ImageUpload({
 
     setError('');
     
+    let processedFile = file;
+    
+    // Convert HEIC/HEIF to JPEG before uploading
+    if (file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif')) {
+      try {
+        console.log('Converting HEIC/HEIF to JPEG...');
+        
+        // Dynamically import heic2any only when needed (reduces initial bundle size)
+        const { default: heic2any } = await import('heic2any');
+        
+        const convertedBlob = await heic2any({
+          blob: file,
+          toType: 'image/jpeg',
+          quality: 0.9,
+        });
+        
+        // heic2any can return Blob or Blob[]
+        const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+        
+        // Create a new File object from the converted blob
+        const fileName = file.name.replace(/\.(heic|heif)$/i, '.jpg');
+        processedFile = new File([blob], fileName, { type: 'image/jpeg' });
+        console.log('HEIC conversion successful:', fileName);
+      } catch (convertError) {
+        console.error('HEIC conversion error:', convertError);
+        setError('Failed to convert HEIC image. Please try converting it to JPG first.');
+        return;
+      }
+    }
+    
     // Create preview with object URL
     try {
-      const objectUrl = URL.createObjectURL(file);
+      const objectUrl = URL.createObjectURL(processedFile);
       setPreview(objectUrl);
     } catch (err) {
       console.error('Error creating preview:', err);
@@ -45,7 +75,7 @@ export default function ImageUpload({
 
     try {
       setIsUploading(true);
-      const url = await onUpload(file);
+      const url = await onUpload(processedFile);
       onImageChange(url);
     } catch (err) {
       console.error('Upload error:', err);
