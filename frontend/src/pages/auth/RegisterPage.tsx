@@ -109,8 +109,8 @@ export default function RegisterPage() {
       transition={{ duration: 0.3 }}
     >
       <div className="text-center mb-6">
-        <h2 className="text-3xl font-black bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
-          Join Phonely ✨
+        <h2 className="text-3xl font-black">
+          <span className="bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">Join Phonely</span> <span>✨</span>
         </h2>
         <p className="text-gray-600 mt-2">Create your account and start selling</p>
       </div>
@@ -131,9 +131,9 @@ export default function RegisterPage() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Name Field */}
         <div>
-          <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
-            <span className="grayscale opacity-70">👤</span> Full Name
-          </label>
+            <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
+              👤 Full Name
+            </label>
           <input
             {...register('name')}
             className="input-field"
@@ -167,7 +167,7 @@ export default function RegisterPage() {
         {/* Phone Field */}
         <div>
           <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
-            <span className="grayscale opacity-70">📱</span> Phone (with country code)
+            📱 Phone (with country code)
           </label>
           <input
             {...register('phone')}
@@ -183,9 +183,9 @@ export default function RegisterPage() {
 
         {/* Password Field with Strength Indicator */}
         <div>
-          <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
-            <span className="grayscale opacity-70">🔒</span> Password
-          </label>
+            <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
+              🔒 Password
+            </label>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
@@ -255,7 +255,7 @@ export default function RegisterPage() {
         {/* City Field */}
         <div>
           <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
-            <span className="grayscale opacity-70">📍</span> City
+            📍 City
           </label>
           <select
             {...register('city')}

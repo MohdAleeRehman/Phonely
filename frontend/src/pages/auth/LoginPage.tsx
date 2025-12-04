@@ -77,8 +77,8 @@ export default function LoginPage() {
       transition={{ duration: 0.3 }}
     >
       <div className="text-center mb-6">
-        <h2 className="text-3xl font-black text-transparent bg-clip-text bg-linear-to-r from-primary-600 to-primary-800">
-          Welcome Back! 👋
+        <h2 className="text-3xl font-black">
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-600 to-primary-800">Welcome Back!</span> <span>👋</span>
         </h2>
         <p className="text-gray-600 mt-2">Login to your account</p>
       </div>
@@ -115,9 +115,9 @@ export default function LoginPage() {
         </div>
 
         <div>
-          <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
-            <span className="grayscale opacity-70">🔒</span> Password
-          </label>
+            <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
+              🔒 Password
+            </label>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}

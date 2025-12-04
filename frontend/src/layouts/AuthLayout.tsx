@@ -18,8 +18,8 @@ export default function AuthLayout() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-5xl font-black mb-2 text-transparent bg-clip-text bg-linear-to-r from-primary-600 to-primary-800">
-            📱 Phonely
+          <h1 className="text-5xl font-black mb-2">
+            <span>📱</span> <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-600 to-primary-800">Phonely</span>
           </h1>
           <p className="text-gray-600 mt-2">Your trusted phone marketplace ✨</p>
         </motion.div>

@@ -75,7 +75,7 @@ export const sendOTPEmail = async (email, otp, name = 'User') => {
     <body>
       <div class="container">
         <div class="header">
-          <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/phonely-p.svg" alt="Phonely" class="logo" />
+          <img src="https://res.cloudinary.com/dl1kjmaoq/image/upload/w_120,h_120,c_fit/v1764805159/phonely-p-logo.png" alt="Phonely" class="logo" />
           <h1>📱 Phonely</h1>
           <p>Your trusted phone marketplace</p>
         </div>
@@ -135,7 +135,7 @@ export const sendWelcomeEmail = async (email, name) => {
     <body>
       <div class="container">
         <div class="header">
-          <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/phonely-p.svg" alt="Phonely" class="logo" />
+          <img src="https://res.cloudinary.com/dl1kjmaoq/image/upload/w_120,h_120,c_fit/v1764805159/phonely-p-logo.png" alt="Phonely" class="logo" />
           <h1>🎉 Welcome to Phonely!</h1>
           <p>You're now part of our community</p>
         </div>
@@ -217,7 +217,7 @@ export const sendListingNotification = async (email, name, listing) => {
     <body>
       <div class="container">
         <div class="header">
-          <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/phonely-p.svg" alt="Phonely" class="logo" />
+          <img src="https://res.cloudinary.com/dl1kjmaoq/image/upload/w_120,h_120,c_fit/v1764805159/phonely-p-logo.png" alt="Phonely" class="logo" />
           <h1>🎉 Listing Published!</h1>
         </div>
         <div class="content">
@@ -313,7 +313,7 @@ export const sendAdminOTPEmail = async (email, otp, name = 'Admin') => {
     <body>
       <div class="container">
         <div class="header">
-          <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/phonely-p.svg" alt="Phonely" class="logo" />
+          <img src="https://res.cloudinary.com/dl1kjmaoq/image/upload/w_120,h_120,c_fit,e_colorize:100,co_white/v1764805159/phonely-p-logo.png" alt="Phonely" class="logo" />
           <h1>🔒 Admin Authentication</h1>
           <p>Secure access verification</p>
         </div>
@@ -439,7 +439,7 @@ export const sendVerificationEmail = async (email, name, verificationToken) => {
       <div class="container">
         <div class="content">
           <div class="header">
-            <img src="${process.env.FRONTEND_URL || 'http://localhost:5173'}/phonely-p.svg" alt="Phonely" class="logo-image" />
+            <img src="https://res.cloudinary.com/dl1kjmaoq/image/upload/w_120,h_120,c_fit/v1764805159/phonely-p-logo.png" alt="Phonely" class="logo-image" />
             <div class="logo">📱 Phonely</div>
             <h2 style="color: #333; margin: 0;">Verify Your Email Address</h2>
           </div>

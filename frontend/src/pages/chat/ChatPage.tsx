@@ -199,8 +199,8 @@ export default function ChatPage() {
       {/* Sidebar - Conversation List */}
       <div className="w-80 border-r bg-white/90 backdrop-blur-sm overflow-y-auto relative z-10">
         <div className="p-4 border-b bg-white/80 backdrop-blur-sm">
-          <h2 className="text-2xl font-black bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent flex items-center gap-2">
-            💬 Messages
+          <h2 className="text-2xl font-black flex items-center gap-2">
+            <span>💬</span> <span className="bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">Messages</span>
           </h2>
         </div>
 

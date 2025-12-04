@@ -16,8 +16,9 @@ export default function MainLayout() {
           <div className="flex justify-between h-16">
             {/* Logo & Nav */}
             <div className="flex items-center space-x-8">
-              <Link to="/" className="text-2xl font-black text-transparent bg-clip-text bg-linear-to-r from-primary-600 to-primary-800 hover:scale-105 transition-transform duration-200">
-                📱 Phonely
+              <Link to="/" className="text-2xl font-black hover:scale-105 transition-transform duration-200 flex items-center gap-2">
+                <span>📱</span>
+                <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-600 to-primary-800">Phonely</span>
               </Link>
               <div className="hidden md:flex items-center space-x-6">
                 <Link to="/listings" className="text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 hover:scale-105 transform">
@@ -132,8 +133,8 @@ export default function MainLayout() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Brand */}
             <div className="space-y-4">
-              <h3 className="text-2xl font-black text-transparent bg-clip-text bg-linear-to-r from-primary-400 to-primary-600">
-                📱 Phonely
+              <h3 className="text-2xl font-black">
+                <span>📱</span> <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-400 to-primary-600">Phonely</span>
               </h3>
               <p className="text-gray-400 text-sm">
                 Your trusted marketplace for buying and selling phones. AI-powered authenticity checks. 🔥
