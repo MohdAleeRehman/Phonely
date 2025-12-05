@@ -187,16 +187,6 @@ async def process_inspection(request: InspectionRequest):
             "text_analysis": text_result,
             "pricing_analysis": pricing_result
         }
-                    "description_quality": "good",
-                    "completeness": 70,
-                    "missing_information": []
-                },
-                "pricing_analysis": pricing_result or {
-                    "suggested_min_price": 20000,
-                    "suggested_max_price": 25000,
-                    "market_average": 22500,
-                    "confidence_level": "medium"
-                }
         
         # Prepare results for callback in backend's expected format
         callback_data = {
@@ -217,10 +207,6 @@ async def process_inspection(request: InspectionRequest):
         
         # Send callback to backend
         await send_callback(request.inspection_id, callback_data)
-        # Send callback to backend
-        await send_callback(request.inspection_id, callback_data)
-        
-        logger.success(f"✅ Inspection {request.inspection_id} completed in {processing_time:.2f}ms")
         
     except Exception as e:
         logger.error(f"❌ Inspection {request.inspection_id} failed: {str(e)}")
