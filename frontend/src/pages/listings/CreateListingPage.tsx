@@ -201,7 +201,14 @@ export default function CreateListingPage() {
             brand: listing.phone.brand,
             model: listing.phone.model,
             storage: listing.phone.storage,
+            ram: listing.phone.ram || '4GB',
+            color: listing.phone.color || 'Black',
             condition: listing.condition,
+            hasBox: listing.accessories?.includes('box') || false,
+            hasWarranty: listing.phone.warranty?.hasWarranty || false,
+            launchDate: '2023-01', // Default launch date - backend will handle this
+            retailPrice: 50000, // Default retail price - backend will fetch from WhatMobile
+            ptaApproved: true, // Default PTA status for Pakistan market
           },
           listing.description
         );
@@ -307,7 +314,7 @@ export default function CreateListingPage() {
     setError('');
 
     // Map accessories enum to object format expected by backend
-    const accessoriesMap: Record<string, any> = {
+    const accessoriesMap: Record<string, { box: boolean; charger: boolean; cable: boolean; earphones: boolean; case: boolean; screenProtector: boolean }> = {
       'complete-box': { box: true, charger: false, cable: true, earphones: false, case: false, screenProtector: false },
       'cable-only': { box: false, charger: false, cable: true, earphones: false, case: false, screenProtector: false },
       'device-only': { box: false, charger: false, cable: false, earphones: false, case: false, screenProtector: false },
@@ -406,7 +413,7 @@ export default function CreateListingPage() {
         </motion.div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Images Section */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
@@ -685,7 +692,7 @@ export default function CreateListingPage() {
                     label={info.label}
                     selected={watch('condition') === key}
                     onClick={() => {
-                      setValue('condition', key as any);
+                      setValue('condition', key as 'excellent' | 'good' | 'fair' | 'poor');
                       setSelectedCondition(key as keyof typeof CONDITION_INFO);
                     }}
                   />
@@ -821,7 +828,7 @@ export default function CreateListingPage() {
                 icon={info.icon}
                 label={info.label}
                 selected={watch('displayQuality') === key}
-                onClick={() => setValue('displayQuality', key as any)}
+                onClick={() => setValue('displayQuality', key as 'flawless' | 'minor-scratches' | 'noticeable-wear' | 'cracked')}
               />
             ))}
           </div>

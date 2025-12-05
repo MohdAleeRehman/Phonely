@@ -27,37 +27,82 @@ text_analysis_task:
 
 pricing_analysis_task:
   description: >
+    NOTE: This task CANNOT complete without calling tools.
+    If you do not call tools, you FAIL.
+
     Determine fair market price for {brand} {model} ({storage}, {age_months} months old, launched {launch_date}).
-    Original retail: {retail_price} PKR. PTA Approved: {pta_approved}.
+    PTA Approved: {pta_approved}.
     
-    **IMPORTANT PRICING GUIDELINES:**
-    1. Start with retail price depreciation:
-       - Year 1: 25% depreciation
-       - Year 2: 20% depreciation  
-       - Year 3+: 15% depreciation per year
+    **MANDATORY TOOL USAGE - YOU CANNOT COMPLETE THIS TASK WITHOUT CALLING TOOLS**:
     
-    2. Apply condition adjustments from vision analysis:
-       - Excellent (9-10): No additional reduction
-       - Good (7-8): Reduce by 10-15%
-       - Fair (5-6): Reduce by 20-30%
-       - Poor (3-4): Reduce by 35-50%
+    **STEP 1 (MUST EXECUTE FIRST):**
+    Call "WhatMobile Pakistan Info" tool with EXACT parameters:
+    - brand: "{brand}"
+    - model: "{model}"
     
-    3. **PTA Status Impact (CRITICAL for Pakistan market):**
-       - If PTA Approved (pta_approved=true): Use calculated price
-       - If Non-PTA (pta_approved=false): Apply 30-40% reduction from PTA price
-       - Non-PTA phones cannot use SIM cards legally in Pakistan, significantly reducing value
+    Wait for tool result showing "Retail Price: PKR XXXXX"
+    Extract this number and use it (NOT any other price source).
+    If tool fails completely, use fallback: {retail_price} PKR
     
-    4. Market reality check:
-       - Aim for middle-ground pricing (not too high, not too low)
-       - Target 15-18K PKR range for mid-range phones (adjust proportionally for high-end)
-       - Consider Pakistani purchasing power and local market conditions
-       - Cross-reference with OLX/PriceOye data for similar models
+    **STEP 2 (MUST EXECUTE SECOND):**
+    Call "OLX Market Scraper" tool with EXACT parameters:
+    - brand: "{brand}"  
+    - model: "{model}"
+    - storage: "{storage}"
     
-    Provide realistic, competitive prices that balance seller satisfaction with buyer appeal.
-    NO pricing_breakdown, reasoning, or market_insights fields.
+    Wait for tool result showing actual OLX listings with prices.
+    Calculate average of listed prices. If no listings found, note in your reasoning.
+    
+    **STEP 3: DEPRECIATION CALCULATION**
+    Budget phones (under 40K): 30% year 1, 25% year 2, 20% year 3+
+    Mid-range (40-100K): 25% year 1, 20% year 2, 15% year 3+  
+    Flagship (100K+): 20% year 1, 15% year 2, 12% year 3+
+    
+    Age: {age_months} months = {age_months}/12 years
+    
+    **STEP 4: CONDITION ADJUSTMENT**
+    Excellent (9-10): No reduction
+    Good (7-8): -10 to -15%
+    Fair (5-6): -20 to -30%
+    Poor (3-4): -35 to -50%
+    
+    **STEP 5: PTA STATUS**
+    PTA Approved: Use calculated price
+    Non-PTA: -30 to -40%
+    
+    **STEP 6: FINAL PRICE RANGE - CRITICAL ADJUSTMENTS**
+    Compare your calculated depreciated price with OLX average:
+    
+    **IF OLX shows mostly new/sealed phones (24K+):**
+    - Your phone is {age_months} months old (USED, not new!)
+    - Reduce by additional 20-25% below OLX average for used condition
+    - Example: OLX avg 25K → Your price should be 18-20K
+    
+    **IF OLX shows similar used condition phones:**
+    - Price within 2-3K of OLX average
+    
+    **REALITY CHECK:**
+    - Budget phones: Buyers want deals, not premium prices
+    - {age_months} months old = significant depreciation already happened
+    - Pakistani market: Aggressive pricing wins (price to sell in 1-2 weeks)
+    - Your final price should be 30-40% below NEW retail price for used phones
+    
+    **OUTPUT FORMAT:**
+    After calling all tools and calculating the price, return ONLY this JSON:
+    {{
+      "suggested_min_price": INTEGER,
+      "suggested_max_price": INTEGER,
+      "market_average": INTEGER,
+      "confidence_level": "low"|"medium"|"high",
+      "pta_impact_applied": BOOLEAN
+    }}
+    
+    DO NOT include tool calls, tool outputs, or any other text in your final answer.
+    ONLY return the pricing JSON above, nothing else.
     
   expected_output: >
-    Clean JSON object with: suggested_min_price (integer PKR), suggested_max_price (integer PKR), market_average (integer PKR), confidence_level (string: low/medium/high), pta_impact_applied (boolean).
+    Clean JSON object with ONLY these fields: suggested_min_price (integer PKR), suggested_max_price (integer PKR), market_average (integer PKR), confidence_level (string: low/medium/high), pta_impact_applied (boolean).
+    NO tool syntax, NO additional JSON objects, NO explanatory text.
   agent: pricing_agent
   context:
     - vision_analysis_task

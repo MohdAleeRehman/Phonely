@@ -5,7 +5,19 @@ export const inspectionService = {
   startInspection: async (
     listingId: string,
     images: Array<{ url: string; type?: string; order?: number }>,
-    phoneDetails: { brand: string; model: string; storage: string; condition: string },
+    phoneDetails: { 
+      brand: string; 
+      model: string; 
+      storage: string; 
+      ram: string;
+      color: string;
+      condition: string;
+      hasBox: boolean;
+      hasWarranty: boolean;
+      launchDate: string;
+      retailPrice: number;
+      ptaApproved: boolean;
+    },
     description: string
   ) => {
     const response = await api.post<{

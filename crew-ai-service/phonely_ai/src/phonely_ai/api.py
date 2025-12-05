@@ -12,7 +12,7 @@ from loguru import logger
 import httpx
 from datetime import datetime
 
-from phonely_ai.main import run_inspection
+from phonely_ai.langgraph_orchestrator import run_inspection
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -57,8 +57,9 @@ async def root():
         "service": "Phonely AI Service",
         "version": "2.0.0",
         "status": "running",
-        "engine": "CrewAI + GPT-5.1",
-        "agents": ["Vision Agent", "Text Agent", "Pricing Agent"]
+        "engine": "LangGraph + LangChain + CrewAI (gpt-5.1)",
+        "agents": ["Vision Agent", "Text Agent", "Pricing Agent"],
+        "tools": ["WhatMobile Pakistan", "OLX Market Scraper (Selenium)", "GSM Arena", "PriceOye"]
     }
 
 
@@ -67,7 +68,7 @@ async def health():
     """Health check endpoint"""
     return {
         "status": "healthy",
-        "engine": "CrewAI + GPT-5.1",
+        "engine": "LangGraph + LangChain + CrewAI (gpt-5.1)",
         "timestamp": datetime.now().isoformat()
     }
 
@@ -110,9 +111,11 @@ async def process_inspection(request: InspectionRequest):
         brand = pd.get("brand", "Unknown")
         model = pd.get("model", "Unknown")
         
-        # Prepare inspection data
+        # Prepare inspection data for LangGraph orchestrator
         inspection_data = {
             "images": request.images,
+            "image_urls": ", ".join(request.images),  # LangGraph expects comma-separated string
+            "num_images": len(request.images),
             "brand": brand,
             "model": model,
             "description": request.description,
@@ -131,59 +134,59 @@ async def process_inspection(request: InspectionRequest):
         logger.info(f"   Images: {len(request.images)} images")
         logger.info(f"   Description: {request.description[:50]}...")
         
-        # Run CrewAI inspection
-        crew_result = run_inspection(inspection_data)
+        # Run LangGraph orchestrated inspection
+        result = run_inspection(inspection_data)
         
         # Calculate processing time
         end_time = datetime.now()
         processing_time = (end_time - start_time).total_seconds() * 1000  # Convert to ms
         
-        # Parse CrewAI output
-        try:
-            import json
-            # CrewAI returns a dict with {"results": CrewOutput}
-            crew_output = crew_result.get("results")
+        # Extract results from LangGraph response
+        vision_result = result.get('results', {}).get('vision_analysis', {})
+        text_result = result.get('results', {}).get('text_analysis', {})
+        pricing_result = result.get('results', {}).get('pricing_analysis', {})
+        
+        logger.info(f"✅ Inspection completed: {result.get('status', 'unknown')}")
+        logger.info(f"   Tools executed: {', '.join(result.get('tools_executed', []))}")
+        logger.info(f"   Pricing: PKR {pricing_result.get('suggested_min_price', 0):,}-{pricing_result.get('suggested_max_price', 0):,}")
+        
+        # Fallback if any analysis is missing
+        if not vision_result:
+            vision_result = {
+                "condition_score": 7.5,
+                "condition": "Good",
+                "detected_issues": ["Unable to analyze images"],
+                "authenticity": {"score": 85, "is_authentic": True}
+            }
+        
+        if not text_result:
+            text_result = {
+                "description_quality": "fair",
+                "completeness": 50,
+                "missing_information": ["Unable to analyze description"]
+            }
+        
+        if not pricing_result:
+            # Fallback pricing based on retail price
+            retail_price = inspection_data.get("retail_price", 50000)
+            age_months = inspection_data.get("age_months", 12)
+            depreciation_factor = max(0.4, 1 - (age_months / 12 * 0.35))  # 35% year 1 for C2C
+            estimated_price = int(retail_price * depreciation_factor)
             
-            # Access all task outputs from CrewAI
-            # crew_output.tasks_output is a list of TaskOutput objects
-            vision_result = None
-            text_result = None
-            pricing_result = None
-            
-            if hasattr(crew_output, 'tasks_output') and crew_output.tasks_output:
-                for task_output in crew_output.tasks_output:
-                    # Parse each task's JSON output
-                    try:
-                        task_json = json.loads(task_output.raw)
-                        
-                        # Identify which task this is by checking fields
-                        if "condition_score" in task_json:
-                            vision_result = task_json
-                        elif "description_quality" in task_json:
-                            text_result = task_json
-                        elif "suggested_min_price" in task_json:
-                            pricing_result = task_json
-                    except:
-                        continue
-            
-            # Fallback: if we couldn't get all three, use final output
-            if not pricing_result:
-                final_output = crew_output.raw if hasattr(crew_output, 'raw') else str(crew_output)
-                pricing_result = json.loads(final_output)
-            
-            logger.debug(f"Vision result: {vision_result is not None}")
-            logger.debug(f"Text result: {text_result is not None}")
-            logger.debug(f"Pricing result: {pricing_result is not None}")
-            
-            # Structure results in backend's expected format
-            parsed_results = {
-                "vision_analysis": vision_result or {
-                    "condition_score": 7.5,
-                    "condition": "good",
-                    "detected_issues": [],
-                    "authenticity": {"score": 85, "is_authentic": True}
-                },
-                "text_analysis": text_result or {
+            pricing_result = {
+                "suggested_min_price": int(estimated_price * 0.9),
+                "suggested_max_price": int(estimated_price * 1.1),
+                "market_average": estimated_price,
+                "confidence_level": "low",
+                "pta_impact_applied": False
+            }
+        
+        # Structure results in backend's expected format
+        parsed_results = {
+            "vision_analysis": vision_result,
+            "text_analysis": text_result,
+            "pricing_analysis": pricing_result
+        }
                     "description_quality": "good",
                     "completeness": 70,
                     "missing_information": []
@@ -194,43 +197,26 @@ async def process_inspection(request: InspectionRequest):
                     "market_average": 22500,
                     "confidence_level": "medium"
                 }
-            }
-            
-        except Exception as e:
-            logger.warning(f"Failed to parse CrewAI output: {e}, using fallback")
-            # Fallback: create structure from raw output
-            parsed_results = {
-                "vision_analysis": {
-                    "condition_score": 7.5,
-                    "condition": "good",
-                    "detected_issues": [],
-                    "authenticity": {"score": 85, "is_authentic": True}
-                },
-                "text_analysis": {
-                    "description_quality": "good",
-                    "completeness": 70,
-                    "missing_information": []
-                },
-                "pricing_analysis": {
-                    "suggested_min_price": 20000,
-                    "suggested_max_price": 25000,
-                    "market_average": 22500,
-                    "confidence_level": "medium"
-                }
-            }
         
         # Prepare results for callback in backend's expected format
         callback_data = {
-            "status": "completed",
+            "status": result.get("status", "completed"),
             "results": parsed_results,
-            "processing_time": {
+            "processing_time": result.get("processing_time", {
                 "total": round(processing_time, 2),
-                "visionAgent": round(processing_time * 0.5, 2),
-                "textAgent": round(processing_time * 0.1, 2),
-                "pricingAgent": round(processing_time * 0.4, 2)
-            }
+                "visionAgent": round(processing_time * 0.3, 2),
+                "textAgent": round(processing_time * 0.2, 2),
+                "pricingAgent": round(processing_time * 0.5, 2)
+            }),
+            "tools_executed": result.get("tools_executed", []),
+            "retries": result.get("retries", {"vision": 0, "text": 0, "pricing": 0})
         }
         
+        logger.success(f"✅ Inspection {request.inspection_id} completed successfully")
+        logger.info(f"   Processing time: {processing_time:.2f}ms")
+        
+        # Send callback to backend
+        await send_callback(request.inspection_id, callback_data)
         # Send callback to backend
         await send_callback(request.inspection_id, callback_data)
         

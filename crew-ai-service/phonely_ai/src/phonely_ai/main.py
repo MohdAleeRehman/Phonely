@@ -5,14 +5,18 @@ import json
 from datetime import datetime
 from typing import Dict, Any
 
-from phonely_ai.crew import PhonelyAi
+# NEW: Use LangGraph orchestrator instead of CrewAI-only
+from phonely_ai.langgraph_orchestrator import run_inspection as langgraph_run_inspection
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 
 def run_inspection(inspection_data: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Run phone inspection with CrewAI agents.
+    Run phone inspection with LangGraph + LangChain + CrewAI hybrid architecture.
+    
+    This replaces the old CrewAI-only approach which had issues with Claude
+    simulating tool responses instead of actually executing them.
     
     Args:
         inspection_data: Dictionary containing:
@@ -27,47 +31,35 @@ def run_inspection(inspection_data: Dict[str, Any]) -> Dict[str, Any]:
             - has_warranty: Boolean
             - launch_date: Launch date (YYYY-MM)
             - retail_price: Original retail price
+            - age_months: Age in months
+            - pta_approved: PTA status
     
     Returns:
         Dictionary with vision, text, and pricing analysis results
     """
     
-    # Prepare inputs for CrewAI tasks
-    inputs = {
-        # Vision task inputs
-        "num_images": len(inspection_data.get("images", [])),
-        "image_urls": "\n".join([f"- {url}" for url in inspection_data.get("images", [])]),
+    # Convert API format to LangGraph format
+    langgraph_inputs = {
         "brand": inspection_data.get("brand", "Unknown"),
         "model": inspection_data.get("model", "Unknown"),
-        
-        # Text task inputs
-        "description": inspection_data.get("description", "No description provided"),
         "storage": inspection_data.get("storage", "Unknown"),
         "ram": inspection_data.get("ram", "Unknown"),
         "color": inspection_data.get("color", "Unknown"),
-        "has_box": "Yes" if inspection_data.get("has_box") else "No",
-        "has_warranty": "Yes" if inspection_data.get("has_warranty") else "No",
-        
-        # Pricing task inputs
+        "age_months": inspection_data.get("age_months", 0),
         "launch_date": inspection_data.get("launch_date", "Unknown"),
-        "age_months": inspection_data.get("age_months", "Unknown"),
-        "retail_price": inspection_data.get("retail_price", "Unknown"),
-        "vision_results": "Will be provided by vision agent",
-        "market_data": "Will be fetched from OLX",
+        "retail_price": inspection_data.get("retail_price", 0),
+        "pta_approved": inspection_data.get("pta_approved", True),
+        "has_box": inspection_data.get("has_box", False),
+        "has_warranty": inspection_data.get("has_warranty", False),
+        "description": inspection_data.get("description", "No description provided"),
+        "image_urls": ",".join(inspection_data.get("images", [])),
+        "num_images": len(inspection_data.get("images", [])),
     }
     
     try:
-        # Run the CrewAI crew
-        result = PhonelyAi().crew().kickoff(inputs=inputs)
-        
-        # Parse and structure the results
-        return {
-            "status": "success",
-            "results": result,
-            "processing_time": {
-                "total": 0  # CrewAI will track this
-            }
-        }
+        # Run LangGraph orchestration (tools WILL be executed)
+        result = langgraph_run_inspection(langgraph_inputs)
+        return result
     except Exception as e:
         return {
             "status": "error",
