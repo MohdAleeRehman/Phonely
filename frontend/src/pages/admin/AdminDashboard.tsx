@@ -205,7 +205,7 @@ export default function AdminDashboard() {
                     {stats?.recentListings && stats.recentListings.length > 0 ? (
                       stats.recentListings.map((listing: Listing) => (
                       <div key={listing._id} className="flex items-center gap-3 pb-3 border-b last:border-0">
-                        <div className="h-10 w-10 rounded-lg bg-gray-200 overflow-hidden flex-shrink-0">
+                        <div className="h-10 w-10 rounded-lg bg-gray-200 overflow-hidden shrink-0">
                           {listing.images?.[0] ? (
                             (() => {
                               const first = listing.images[0];
@@ -390,7 +390,7 @@ export default function AdminDashboard() {
                       <tr key={listing._id} className="hover:bg-gray-50">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
-                            <div className="h-12 w-12 rounded-lg bg-gray-200 overflow-hidden flex-shrink-0">
+                            <div className="h-12 w-12 rounded-lg bg-gray-200 overflow-hidden shrink-0">
                               {listing.images?.[0] ? (
                                 (() => {
                                   const first = listing.images[0];

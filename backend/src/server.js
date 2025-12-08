@@ -111,13 +111,18 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Socket.IO connection handling
+// Track user connections: userId -> socketId
+const userSockets = new Map();
+
 io.on('connection', (socket) => {
-  console.log(`🔌 Client connected: ${socket.id}`);
+  // Register user socket connection
+  socket.on('register-user', (userId) => {
+    userSockets.set(userId.toString(), socket.id);
+  });
 
   // Join chat room
   socket.on('join-chat', (chatId) => {
     socket.join(`chat:${chatId}`);
-    console.log(`User ${socket.id} joined chat ${chatId}`);
   });
 
   // Send message
@@ -140,9 +145,20 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
+    // Remove user from tracking
+    for (const [userId, socketId] of userSockets.entries()) {
+      if (socketId === socket.id) {
+        userSockets.delete(userId);
+        console.log(`User ${userId} unregistered`);
+        break;
+      }
+    }
     console.log(`❌ Client disconnected: ${socket.id}`);
   });
 });
+
+// Make userSockets available to controllers
+app.set('userSockets', userSockets);
 
 // 404 handler
 app.use(notFound);

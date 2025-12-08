@@ -115,20 +115,48 @@ chatSchema.methods.addMessage = function (senderId, content, type = 'text', meta
 };
 
 // Method to mark messages as read
-chatSchema.methods.markAsRead = function (userId) {
-  const unreadMessages = this.messages.filter(
-    (msg) =>
-      msg.sender.toString() !== userId.toString() &&
-      !msg.readBy.some((read) => read.user.toString() === userId.toString())
-  );
+chatSchema.methods.markAsRead = async function (userId) {
+  const maxRetries = 3;
+  let attempt = 0;
 
-  unreadMessages.forEach((msg) => {
-    msg.readBy.push({ user: userId, readAt: new Date() });
-  });
+  while (attempt < maxRetries) {
+    try {
+      // Get fresh copy to avoid version conflicts
+      const freshChat = await this.constructor.findById(this._id);
+      
+      if (!freshChat) {
+        throw new Error('Chat not found');
+      }
 
-  this.unreadCount.set(userId.toString(), 0);
+      const unreadMessages = freshChat.messages.filter(
+        (msg) =>
+          msg.sender.toString() !== userId.toString() &&
+          !msg.readBy.some((read) => read.user.toString() === userId.toString())
+      );
 
-  return this.save();
+      // If no unread messages, just return without saving
+      if (unreadMessages.length === 0 && freshChat.unreadCount.get(userId.toString()) === 0) {
+        return freshChat;
+      }
+
+      unreadMessages.forEach((msg) => {
+        msg.readBy.push({ user: userId, readAt: new Date() });
+      });
+
+      freshChat.unreadCount.set(userId.toString(), 0);
+
+      return await freshChat.save();
+    } catch (error) {
+      if (error.name === 'VersionError' && attempt < maxRetries - 1) {
+        attempt++;
+        console.log(`⚠️ VersionError on markAsRead, retry ${attempt}/${maxRetries}`);
+        // Wait a bit before retrying
+        await new Promise(resolve => setTimeout(resolve, 100 * attempt));
+        continue;
+      }
+      throw error;
+    }
+  }
 };
 
 // Static method to find or create a chat

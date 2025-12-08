@@ -13,21 +13,47 @@ if (import.meta.env.VITE_API_URL) {
 
 class SocketService {
   private socket: Socket | null = null;
+  private connectionCount = 0;
+  private currentUserId: string | null = null;
 
-  connect(token: string) {
-    if (this.socket?.connected) return;
+  connect(token: string, userId: string) {
+    // Increment connection counter
+    this.connectionCount++;
+    this.currentUserId = userId;
+    
+    if (this.socket?.connected) {
+      // Re-register user in case socket reconnected
+      this.socket.emit('register-user', userId);
+      return;
+    }
+
+    // Clean up any existing socket before creating new one
+    if (this.socket) {
+      this.socket.removeAllListeners();
+      this.socket.disconnect();
+    }
 
     this.socket = io(SOCKET_URL, {
       auth: { token },
-      transports: ['websocket'],
+      transports: ['websocket', 'polling'], // Allow fallback to polling
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5,
     });
 
     this.socket.on('connect', () => {
-      console.log('✅ Socket connected');
+      // Register user with their socket
+      if (this.currentUserId) {
+        this.socket?.emit('register-user', this.currentUserId);
+      }
     });
 
-    this.socket.on('disconnect', () => {
-      console.log('❌ Socket disconnected');
+    this.socket.on('disconnect', (reason) => {
+      console.log('Socket disconnected:', reason);
+    });
+
+    this.socket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error.message);
     });
 
     this.socket.on('error', (error) => {
@@ -36,9 +62,17 @@ class SocketService {
   }
 
   disconnect() {
-    if (this.socket) {
-      this.socket.disconnect();
-      this.socket = null;
+    // Decrement connection counter
+    this.connectionCount--;
+    
+    // Only actually disconnect when no more components need the connection
+    if (this.connectionCount <= 0) {
+      this.connectionCount = 0;
+      if (this.socket) {
+        this.socket.removeAllListeners();
+        this.socket.disconnect();
+        this.socket = null;
+      }
     }
   }
 
@@ -64,6 +98,10 @@ class SocketService {
 
   onStopTyping(callback: (data: { chatId: string; userId: string }) => void) {
     this.socket?.on('stop-typing', callback);
+  }
+
+  onMessagesRead(callback: (data: { chatId: string; userId: string }) => void) {
+    this.socket?.on('messages-read', callback);
   }
 
   emitTyping(chatId: string) {

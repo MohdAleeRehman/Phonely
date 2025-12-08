@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AnimatePresence } from 'framer-motion';
+import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
 
 // Pages (we'll create these)
@@ -17,6 +18,9 @@ import ListingDetailPage from './pages/listings/ListingDetailPage';
 import ChatPage from './pages/chat/ChatPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import FAQPage from './pages/FAQPage';
+import TermsOfServicePage from './pages/TermsOfServicePage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 
 // Layouts
 import MainLayout from './layouts/MainLayout';
@@ -81,6 +85,9 @@ function AnimatedRoutes() {
           <Route path="/" element={<HomePage />} />
           <Route path="/listings" element={<ListingsPage />} />
           <Route path="/listings/:id" element={<ListingDetailPage />} />
+          <Route path="/faq" element={<FAQPage />} />
+          <Route path="/terms" element={<TermsOfServicePage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
         </Route>
 
         {/* Auth Routes */}
@@ -159,6 +166,32 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+              borderRadius: '10px',
+              padding: '16px',
+            },
+            success: {
+              duration: 4000,
+              iconTheme: {
+                primary: '#10b981',
+                secondary: '#fff',
+              },
+            },
+            error: {
+              duration: 5000,
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
         <AnimatedRoutes />
       </BrowserRouter>
     </QueryClientProvider>

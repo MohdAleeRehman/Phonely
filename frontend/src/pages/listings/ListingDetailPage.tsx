@@ -32,7 +32,10 @@ export default function ListingDetailPage() {
 
   const contactMutation = useMutation({
     mutationFn: () => chatService.createChat(id!),
-    onSuccess: (chat) => {
+    onSuccess: async (chat) => {
+      // Invalidate chats to refresh the list
+      await queryClient.invalidateQueries({ queryKey: ['chats'] });
+      // Navigate to the chat page with the new chat ID
       navigate(`/chat/${chat._id}`);
     },
   });
@@ -490,7 +493,7 @@ export default function ListingDetailPage() {
               )}
 
               {/* Accessories */}
-              {listing.accessories && listing.accessories.length > 0 && (
+              {listing.accessories && Object.values(listing.accessories).some(val => val) && (
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -504,12 +507,24 @@ export default function ListingDetailPage() {
                     </span>
                   </h2>
                   <div className="grid grid-cols-2 gap-3">
-                    {listing.accessories.map((accessory: string, index: number) => (
-                      <div key={index} className="bg-white rounded-lg p-3 border-2 border-indigo-200 flex items-center gap-2">
-                        <span className="text-green-600">✅</span>
-                        <span className="text-gray-700 font-medium">{accessory}</span>
-                      </div>
-                    ))}
+                    {Object.entries(listing.accessories)
+                      .filter(([, value]) => value)
+                      .map(([key]) => {
+                        const labels: Record<string, string> = {
+                          box: 'Original Box',
+                          charger: 'Charger',
+                          cable: 'Cable',
+                          earphones: 'Earphones',
+                          case: 'Case',
+                          screenProtector: 'Screen Protector'
+                        };
+                        return (
+                          <div key={key} className="bg-white rounded-lg p-3 border-2 border-indigo-200 flex items-center gap-2">
+                            <span className="text-green-600">✅</span>
+                            <span className="text-gray-700 font-medium">{labels[key] || key}</span>
+                          </div>
+                        );
+                      })}
                   </div>
                 </motion.div>
               )}

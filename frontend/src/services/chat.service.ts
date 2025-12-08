@@ -1,9 +1,9 @@
 import api from './api';
-import type { Chat, Message, PaginatedResponse } from '../types';
+import type { Chat, Message, ChatResponse } from '../types';
 
 export const chatService = {
   getChats: async () => {
-    const response = await api.get<PaginatedResponse<Chat>>('/chats');
+    const response = await api.get<ChatResponse>('/chats');
     return response.data;
   },
 
@@ -24,13 +24,20 @@ export const chatService = {
   sendMessage: async (chatId: string, message: string) => {
     const response = await api.post<{ status: string; data: { message: Message } }>(
       `/chats/${chatId}/messages`,
-      { message }
+      { content: message }
     );
     return response.data.data.message;
   },
 
   markAsRead: async (chatId: string) => {
-    const response = await api.patch(`/chats/${chatId}/read`);
+    const response = await api.put(`/chats/${chatId}/read`);
     return response.data;
+  },
+
+  getUnreadCount: async () => {
+    const response = await api.get<{ status: string; data: { unreadCount: number } }>(
+      '/chats/unread-count'
+    );
+    return response.data.data.unreadCount;
   },
 };

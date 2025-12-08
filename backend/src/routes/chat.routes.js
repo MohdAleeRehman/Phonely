@@ -1,13 +1,29 @@
 import express from 'express';
 import { protect } from '../middleware/auth.middleware.js';
 import {
+  createOrGetChat,
   getMyChats,
   getChatById,
   sendMessage,
   markAsRead,
+  getUnreadCount,
 } from '../controllers/chat.controller.js';
 
 const router = express.Router();
+
+/**
+ * @route   GET /api/v1/chats/unread-count
+ * @desc    Get total unread message count
+ * @access  Private
+ */
+router.get('/unread-count', protect, getUnreadCount);
+
+/**
+ * @route   POST /api/v1/chats
+ * @desc    Create or get existing chat for a listing
+ * @access  Private
+ */
+router.post('/', protect, createOrGetChat);
 
 /**
  * @route   GET /api/v1/chats

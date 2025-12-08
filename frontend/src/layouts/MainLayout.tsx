@@ -1,12 +1,47 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
+import { chatService } from '../services/chat.service';
+import { socketService } from '../services/socket.service';
 
 export default function MainLayout() {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, logout, token } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const queryClient = useQueryClient();
+
+  // Fetch unread count
+  const { data: unreadCount = 0 } = useQuery({
+    queryKey: ['unreadCount'],
+    queryFn: chatService.getUnreadCount,
+    enabled: isAuthenticated,
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
+
+  // Listen for new messages to update badge in real-time
+  useEffect(() => {
+    if (!isAuthenticated || !user || !token) return;
+
+    const userId = user._id || user.id;
+    if (!userId) return;
+
+    // Connect socket if not already connected
+    socketService.connect(token, userId);
+
+    // Listen for new messages to update unread count
+    const handleNewMessage = () => {
+      // Invalidate unread count to refetch
+      queryClient.invalidateQueries({ queryKey: ['unreadCount'] });
+    };
+
+    socketService.onNewMessage(handleNewMessage);
+
+    return () => {
+      socketService.off('new-message');
+    };
+  }, [isAuthenticated, user, token, queryClient]);
 
   return (
     <div className="min-h-screen flex flex-col bg-linear-to-br from-gray-50 via-white to-primary-50/20">
@@ -36,6 +71,15 @@ export default function MainLayout() {
                   </Link>
                   <Link to="/chat" className="px-4 py-2 text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 relative">
                     💬 Chat
+                    {unreadCount > 0 && (
+                      <motion.span
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+                      >
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </motion.span>
+                    )}
                   </Link>
                   <Link to="/profile" className="px-4 py-2 text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 flex items-center space-x-2">
                     <div className="w-8 h-8 rounded-full bg-linear-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white text-sm font-bold">
@@ -85,8 +129,17 @@ export default function MainLayout() {
                     <Link to="/listings/create" className="text-primary-600 font-semibold py-2">
                       ✨ Sell Phone
                     </Link>
-                    <Link to="/chat" className="text-gray-700 hover:text-primary-600 py-2">
+                    <Link to="/chat" className="text-gray-700 hover:text-primary-600 py-2 relative inline-flex items-center">
                       💬 Chat
+                      {unreadCount > 0 && (
+                        <motion.span
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="ml-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+                        >
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </motion.span>
+                      )}
                     </Link>
                     <Link to="/profile" className="text-gray-700 hover:text-primary-600 py-2">
                       👤 {user?.name}
@@ -161,10 +214,8 @@ export default function MainLayout() {
             <div>
               <h4 className="font-bold mb-4 text-white">Support</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">Help Center</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">Safety Tips</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">Contact Us</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">FAQs</a></li>
+                <li><Link to="/faq" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">FAQs</Link></li>
+                <li><a href="mailto:support@phonely.com.pk" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">Contact Us</a></li>
               </ul>
             </div>
 
@@ -189,9 +240,8 @@ export default function MainLayout() {
           <div className="mt-8 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-400 text-sm">© 2025 Phonely. All rights reserved. Made with 💙 in Pakistan</p>
             <div className="flex space-x-6 text-sm">
-              <a href="#" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">Privacy Policy</a>
-              <a href="#" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">Terms of Service</a>
-              <a href="#" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">Cookie Policy</a>
+              <Link to="/privacy" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">Privacy Policy</Link>
+              <Link to="/terms" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">Terms of Service</Link>
             </div>
           </div>
         </div>

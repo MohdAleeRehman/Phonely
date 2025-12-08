@@ -1,5 +1,6 @@
 export interface User {
   _id: string;
+  id?: string; // Some responses include id instead of _id
   name: string;
   email: string;
   phone: string;
@@ -89,7 +90,14 @@ export interface Listing {
     backCondition?: string;
     cameraCondition?: string;
   };
-  accessories?: string[];
+  accessories?: {
+    box?: boolean;
+    charger?: boolean;
+    cable?: boolean;
+    earphones?: boolean;
+    case?: boolean;
+    screenProtector?: boolean;
+  };
   batteryHealth?: {
     percentage?: number;
     cycleCount?: number;
@@ -149,20 +157,30 @@ export interface CreateListingData {
 export interface Chat {
   _id: string;
   listing: Listing | string;
-  buyer: User | string;
-  seller: User | string;
-  lastMessage?: string;
-  lastMessageAt?: string;
-  unreadCount: number;
+  participants: (User | string)[];
+  messages?: Message[]; // Messages are embedded in the chat document
+  lastMessage?: {
+    content: string;
+    sender: User | string;
+    createdAt: string;
+  };
+  unreadCount?: Record<string, number>;
+  status: 'active' | 'archived' | 'blocked';
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface Message {
   _id: string;
   chat: string;
-  sender: User;
-  message: string;
+  sender: User | string;
+  content: string;
+  message?: string; // Deprecated, keeping for backward compatibility
   read: boolean;
+  readBy?: Array<{
+    user: string;
+    readAt: string;
+  }>;
   createdAt: string;
 }
 
@@ -220,5 +238,13 @@ export interface PaginatedResponse<T> {
       totalPages: number;
       totalItems: number;
     };
+  };
+}
+
+export interface ChatResponse {
+  status: string;
+  results: number;
+  data: {
+    chats: Chat[];
   };
 }

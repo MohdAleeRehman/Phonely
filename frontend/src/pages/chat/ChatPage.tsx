@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { chatService } from '../../services/chat.service';
 import { socketService } from '../../services/socket.service';
 import { useAuthStore } from '../../store/authStore';
@@ -13,19 +14,28 @@ export default function ChatPage() {
   const { user, token } = useAuthStore();
   const queryClient = useQueryClient();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isInitialMount = useRef(true);
   
   const [selectedChat, setSelectedChat] = useState<string | null>(chatId || null);
   const [messageText, setMessageText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Update selected chat when URL changes
+  useEffect(() => {
+    if (chatId) {
+      setSelectedChat(chatId);
+    }
+  }, [chatId]);
+
   // Fetch all chats
   const { data: chatsResponse, isLoading: chatsLoading } = useQuery({
     queryKey: ['chats'],
     queryFn: chatService.getChats,
+    refetchOnMount: true,
   });
 
-  const chats = chatsResponse?.data?.listings || [];
+  const chats = (chatsResponse?.data?.chats || []) as Chat[];
 
   // Fetch messages for selected chat
   const { data: chatData, isLoading: messagesLoading } = useQuery({
@@ -50,47 +60,137 @@ export default function ChatPage() {
     mutationFn: chatService.markAsRead,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['chats'] });
+      queryClient.invalidateQueries({ queryKey: ['unreadCount'] });
     },
   });
 
-  // Socket.IO setup
+  // Socket.IO setup - only connect once per user session
   useEffect(() => {
-    if (user && token) {
-      socketService.connect(token);
+    if (!user || !token) return;
 
-      // Listen for new messages
-      socketService.onNewMessage((message: Message) => {
-        // Update chat messages
-        queryClient.setQueryData(['chat', message.chat], (oldData: ChatData | undefined) => {
-          if (!oldData) return oldData;
-          return {
-            ...oldData,
-            messages: [...oldData.messages, message],
-          };
-        });
+    const userId = user._id || user.id;
+    if (!userId) return;
 
-        // Update chats list
-        queryClient.invalidateQueries({ queryKey: ['chats'] });
-      });
-
-      // Listen for typing indicators
-      socketService.onTyping((data: { chatId: string; userId: string }) => {
-        if (data.chatId === selectedChat && data.userId !== user._id) {
-          setIsTyping(true);
-        }
-      });
-
-      socketService.onStopTyping((data: { chatId: string; userId: string }) => {
-        if (data.chatId === selectedChat && data.userId !== user._id) {
-          setIsTyping(false);
-        }
-      });
-
-      return () => {
-        socketService.disconnect();
-      };
+    // Only actually connect on first real mount (not React Strict Mode's remount)
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      socketService.connect(token, userId);
     }
-  }, [user, token, queryClient, selectedChat]);
+
+    // Don't disconnect on cleanup in dev mode
+    return () => {
+      // Only disconnect if component is truly unmounting (not React Strict Mode)
+      // In production, this will work normally
+      if (import.meta.env.PROD) {
+        socketService.disconnect();
+      }
+    };
+  }, [user, token]); // Only reconnect if user/token changes
+
+  // Socket message listeners - separate effect
+  useEffect(() => {
+    if (!user) return;
+
+    // Listen for new messages
+    const handleNewMessage = (message: Message) => {
+      // Auto-mark as read if this is the currently open chat and message is from another user
+      const senderId = typeof message.sender === 'string' ? message.sender : message.sender.id || message.sender._id;
+      const currentUserId = user._id || user.id;
+      
+      if (message.chat === selectedChat && senderId !== currentUserId) {
+        // Automatically mark as read
+        markAsReadMutation.mutate(message.chat);
+      }
+      
+      // Update chat messages for the specific chat
+      const updated = queryClient.setQueryData(['chat', message.chat], (oldData: ChatData | undefined) => {
+        if (!oldData) {
+          return oldData;
+        }
+        
+        // Check if message already exists to avoid duplicates
+        const messageExists = oldData.chat.messages?.some(m => m._id === message._id);
+        if (messageExists) {
+          return oldData;
+        }
+        
+        const updatedData = {
+          ...oldData,
+          chat: {
+            ...oldData.chat,
+            messages: [...(oldData.chat.messages || []), message],
+          },
+        };
+        return updatedData;
+      });
+      
+      // If no cache data was found, invalidate to trigger refetch
+      if (!updated) {
+        queryClient.invalidateQueries({ queryKey: ['chat', message.chat] });
+      }
+
+      // Update chats list
+      queryClient.invalidateQueries({ queryKey: ['chats'] });
+
+      // Invalidate unread count
+      queryClient.invalidateQueries({ queryKey: ['unreadCount'] });
+
+      // Show notification if message is from another user and chat is not currently selected
+      if (senderId !== currentUserId && message.chat !== selectedChat) {
+        // Get sender name
+        let senderName = 'Someone';
+        if (typeof message.sender === 'object' && message.sender.name) {
+          senderName = message.sender.name;
+        }
+        
+        toast.success(`New message from ${senderName}`, {
+          duration: 4000,
+          position: 'top-right',
+          icon: '💬',
+        });
+      }
+    };
+
+    // Listen for typing indicators
+    const handleTyping = (data: { chatId: string; userId: string }) => {
+      if (data.chatId === selectedChat && data.userId !== user._id) {
+        setIsTyping(true);
+      }
+    };
+
+    const handleStopTyping = (data: { chatId: string; userId: string }) => {
+      if (data.chatId === selectedChat && data.userId !== user._id) {
+        setIsTyping(false);
+      }
+    };
+
+    // Listen for messages being read by other user
+    const handleMessagesRead = (data: { chatId: string; userId: string }) => {
+      // Invalidate unread count to update badges
+      queryClient.invalidateQueries({ queryKey: ['unreadCount'] });
+      
+      // Invalidate chats list to update sidebar
+      queryClient.invalidateQueries({ queryKey: ['chats'] });
+      
+      // Update current chat data if it's the one that was read
+      if (data.chatId === selectedChat) {
+        queryClient.invalidateQueries({ queryKey: ['chat', data.chatId] });
+      }
+    };
+
+    socketService.onNewMessage(handleNewMessage);
+    socketService.onTyping(handleTyping);
+    socketService.onStopTyping(handleStopTyping);
+    socketService.onMessagesRead(handleMessagesRead);
+
+    // Cleanup listeners on unmount
+    return () => {
+      socketService.off('new-message');
+      socketService.off('typing');
+      socketService.off('stop-typing');
+      socketService.off('messages-read');
+    };
+  }, [user, queryClient, selectedChat]);
 
   // Join/leave chat rooms
   useEffect(() => {
@@ -108,7 +208,7 @@ export default function ChatPage() {
   // Auto scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatData?.messages]);
+  }, [chatData?.chat?.messages]);
 
   // Handle typing indicator
   const handleTyping = () => {
@@ -146,13 +246,25 @@ export default function ChatPage() {
   };
 
   const getOtherUser = (chat: Chat) => {
-    if (typeof chat.buyer !== 'string' && chat.buyer._id !== user?._id) {
-      return chat.buyer;
+    if (!user) {
+      console.warn('User not loaded yet');
+      return null;
     }
-    if (typeof chat.seller !== 'string') {
-      return chat.seller;
+    // Get user ID - handle both _id and id properties
+    const currentUserId = user._id || user.id;
+    if (!currentUserId) {
+      console.error('User object has no _id or id property:', user);
+      return null;
     }
-    return null;
+    // Find the other participant (not the current user)
+    const otherParticipant = chat.participants?.find(
+      (p) => {
+        if (typeof p === 'string') return false;
+        const participantId = p._id || p.id;
+        return participantId !== currentUserId;
+      }
+    );
+    return typeof otherParticipant !== 'string' ? otherParticipant : null;
   };
 
   const getListing = (chat: Chat) => {
@@ -160,6 +272,10 @@ export default function ChatPage() {
   };
 
   if (chatsLoading) {
+    return <Loading fullScreen />;
+  }
+
+  if (!user) {
     return <Loading fullScreen />;
   }
 
@@ -246,23 +362,27 @@ export default function ChatPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
                         <p className="font-semibold truncate">{otherUser.name}</p>
-                        {chat.unreadCount > 0 && (
-                          <motion.span
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="bg-linear-to-r from-primary-600 to-primary-800 text-white text-xs font-bold px-2 py-0.5 rounded-full"
-                          >
-                            {chat.unreadCount}
-                          </motion.span>
-                        )}
+                        {(() => {
+                          const userId = user?._id || user?.id;
+                          const unreadCount = userId && chat.unreadCount ? (chat.unreadCount[userId] || 0) : 0;
+                          return unreadCount > 0 ? (
+                            <motion.span
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-5 text-center"
+                            >
+                              {unreadCount}
+                            </motion.span>
+                          ) : null;
+                        })()}
                       </div>
                       <p className="text-sm text-gray-600 truncate">{listing.title}</p>
                       <p className="text-sm font-semibold text-primary-600">
                         PKR {listing.price.toLocaleString()}
                       </p>
-                      {chat.lastMessage && (
+                      {chat.lastMessage?.content && (
                         <p className="text-sm text-gray-500 truncate mt-1">
-                          {chat.lastMessage}
+                          {chat.lastMessage.content}
                         </p>
                       )}
                     </div>
@@ -307,10 +427,12 @@ export default function ChatPage() {
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messagesLoading ? (
                 <Loading />
-              ) : chatData.messages && chatData.messages.length > 0 ? (
+              ) : chatData?.chat?.messages && chatData.chat.messages.length > 0 ? (
                 <>
-                  {chatData.messages.map((message: Message) => {
-                    const isOwnMessage = message.sender._id === user?._id;
+                  {chatData.chat.messages.map((message: Message) => {
+                    const currentUserId = user._id || user.id;
+                    const senderId = typeof message.sender === 'string' ? message.sender : (message.sender._id || message.sender.id);
+                    const isOwnMessage = senderId === currentUserId;
 
                     return (
                       <motion.div
@@ -326,17 +448,30 @@ export default function ChatPage() {
                               : 'bg-white text-gray-900'
                           }`}
                         >
-                          <p className="whitespace-pre-wrap wrap-break-word">{message.message}</p>
-                          <p
-                            className={`text-xs mt-1 ${
-                              isOwnMessage ? 'text-primary-100' : 'text-gray-500'
-                            }`}
-                          >
-                            {new Date(message.createdAt).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </p>
+                          <p className="whitespace-pre-wrap wrap-break-word">{message.content}</p>
+                          <div className="flex items-center justify-between gap-2 mt-1">
+                            <p
+                              className={`text-xs ${
+                                isOwnMessage ? 'text-primary-100' : 'text-gray-500'
+                              }`}
+                            >
+                              {new Date(message.createdAt).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </p>
+                            {isOwnMessage && (
+                              <span className="text-xs">
+                                {message.readBy && message.readBy.length > 1 ? (
+                                  // Read by recipient (blue double tick)
+                                  <span className="text-blue-300" title="Read">✓✓</span>
+                                ) : (
+                                  // Delivered but not read (gray double tick)
+                                  <span className={isOwnMessage ? 'text-primary-200' : 'text-gray-400'} title="Delivered">✓✓</span>
+                                )}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </motion.div>
                     );
