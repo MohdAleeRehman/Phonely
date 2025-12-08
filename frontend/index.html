@@ -26,18 +26,36 @@
     
     <title>Phonely - Your Trusted Phone Marketplace</title>
     
-    <!-- Critical inline CSS for initial render -->
+    <!-- Critical inline CSS for initial render - optimized for LCP -->
     <style>
-      /* Prevent flash of unstyled content */
-      #root { min-height: 100vh; }
-      body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; background: #f9fafb; color: #111827; }
-      /* Loading spinner styles */
-      .animate-spin { animation: spin 1s linear infinite; }
-      @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      /* Reset and base styles */
+      *,::before,::after{box-sizing:border-box;border:0 solid}
+      html{line-height:1.5;-webkit-text-size-adjust:100%;tab-size:4;font-family:system-ui,-apple-system,sans-serif}
+      body{margin:0;padding:0;line-height:inherit;background:#f9fafb;color:#111827}
+      #root{min-height:100vh;display:flex;flex-direction:column}
+      
+      /* Critical layout for hero section */
+      .hero-section{position:relative;overflow:hidden;background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#a855f7 100%);color:#fff;min-height:60vh}
+      .hero-content{max-width:80rem;margin:0 auto;padding:6rem 1rem;text-align:center}
+      .hero-title{font-size:3rem;font-weight:900;line-height:1.2;margin:0 0 1rem}
+      @media(min-width:768px){.hero-title{font-size:4.5rem}}
+      
+      /* Loading spinner */
+      .animate-spin{animation:spin 1s linear infinite}
+      @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+      
+      /* Prevent FOUC */
+      .loading-fallback{display:flex;align-items:center;justify-content:center;min-height:100vh}
+      .spinner{width:3rem;height:3rem;border:3px solid #e5e7eb;border-top-color:#667eea;border-radius:50%}
     </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Initial loading state to prevent blank screen -->
+      <div class="loading-fallback">
+        <div class="spinner animate-spin"></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
