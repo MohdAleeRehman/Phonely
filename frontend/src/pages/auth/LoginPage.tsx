@@ -22,6 +22,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const {
     register,
@@ -59,7 +60,7 @@ export default function LoginPage() {
       const token = authResponse.token;
       const refreshToken = authResponse.refreshToken;
       
-      login(user, token, refreshToken);
+      login(user, token, refreshToken, rememberMe);
       navigate('/');
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
@@ -147,6 +148,20 @@ export default function LoginPage() {
               <span className="grayscale opacity-70">⚠️</span> {errors.password.message}
             </p>
           )}
+        </div>
+
+        {/* Keep me logged in checkbox */}
+        <div className="flex items-center">
+          <input
+            id="rememberMe"
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+            className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded cursor-pointer"
+          />
+          <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700 cursor-pointer select-none">
+            Keep me logged in (7 days)
+          </label>
         </div>
 
         <motion.button

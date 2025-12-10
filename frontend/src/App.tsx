@@ -3,6 +3,10 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
+import { useActivityTracker } from './hooks/useActivityTracker';
+import SessionTimeoutWarning from './components/common/SessionTimeoutWarning';
+import { useActivityTracker } from './hooks/useActivityTracker';
+import SessionTimeoutWarning from './components/common/SessionTimeoutWarning';
 
 // Layouts (keep these eager loaded as they're used on every route)
 import MainLayout from './layouts/MainLayout';
@@ -81,6 +85,7 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
 
 // Animated Routes Component
 function AnimatedRoutes() {
+  useActivityTracker(); // Track user activity for session management
   const location = useLocation();
   
   return (
@@ -172,6 +177,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <SessionTimeoutWarning />
         <Toaster
           position="top-right"
           toastOptions={{
