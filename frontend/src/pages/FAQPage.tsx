@@ -34,7 +34,7 @@ const faqs: FAQItem[] = [
   {
     category: 'Selling',
     question: 'How long does it take to list my phone?',
-    answer: 'About 2 minutes! Upload 9 clear photos, fill in basic details (brand, model, storage, condition), and our AI will analyze everything. You\'ll get instant pricing recommendations based on current market data from OLX, WhatMobile, and PriceOye.'
+    answer: 'About 2 minutes! Upload 9 clear photos, fill in basic details (brand, model, storage, condition), and our AI will analyze everything. You\'ll get instant pricing recommendations based on current market data.'
   },
   {
     category: 'Selling',

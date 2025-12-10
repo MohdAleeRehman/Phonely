@@ -26,6 +26,7 @@ import inspectionRoutes from './routes/inspection.routes.js';
 import chatRoutes from './routes/chat.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import reportRoutes from './routes/report.routes.js';
 import testRoutes from './routes/test.routes.js';
 
 // Get directory name in ES modules
@@ -104,6 +105,7 @@ app.use(`/api/${API_VERSION}/inspections`, inspectionRoutes);
 app.use(`/api/${API_VERSION}/chats`, chatRoutes);
 app.use(`/api/${API_VERSION}/upload`, uploadRoutes);
 app.use(`/api/${API_VERSION}/admin`, adminRoutes);
+app.use(`/api/${API_VERSION}/reports`, reportRoutes);
 
 // Test routes (development only - remove in production)
 if (process.env.NODE_ENV === 'development') {
