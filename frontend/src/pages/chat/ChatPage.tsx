@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -8,6 +8,8 @@ import { socketService } from '../../services/socket.service';
 import { useAuthStore } from '../../store/authStore';
 import type { Chat, Message, ChatData } from '../../types';
 import Loading from '../../components/common/Loading';
+import MessageBubble from '../../components/chat/MessageBubble';
+import ChatSkeleton from '../../components/chat/ChatSkeleton';
 
 export default function ChatPage() {
   const { chatId } = useParams<{ chatId?: string }>();
@@ -92,7 +94,7 @@ export default function ChatPage() {
     if (!user) return;
 
     // Listen for new messages
-    const handleNewMessage = (message: Message) => {
+    const handleNewMessage = useCallback((message: Message) => {
       // Auto-mark as read if this is the currently open chat and message is from another user
       const senderId = typeof message.sender === 'string' ? message.sender : message.sender.id || message.sender._id;
       const currentUserId = user._id || user.id;
@@ -149,23 +151,25 @@ export default function ChatPage() {
           icon: '💬',
         });
       }
-    };
+    }, [user, selectedChat, markAsReadMutation, queryClient]);
 
     // Listen for typing indicators
-    const handleTyping = (data: { chatId: string; userId: string }) => {
+    const handleTypingEvent = useCallback((data: { chatId: string; userId: string }) => {
       if (data.chatId === selectedChat && data.userId !== user._id) {
         setIsTyping(true);
       }
     };
 
-    const handleStopTyping = (data: { chatId: string; userId: string }) => {
+    }, [selectedChat, user]);
+
+    const handleStopTypingEvent = useCallback((data: { chatId: string; userId: string }) => {
       if (data.chatId === selectedChat && data.userId !== user._id) {
         setIsTyping(false);
       }
-    };
+    }, [selectedChat, user]);
 
     // Listen for messages being read by other user
-    const handleMessagesRead = (data: { chatId: string; userId: string }) => {
+    const handleMessagesRead = useCallback((data: { chatId: string; userId: string }) => {
       // Invalidate unread count to update badges
       queryClient.invalidateQueries({ queryKey: ['unreadCount'] });
       
@@ -176,11 +180,11 @@ export default function ChatPage() {
       if (data.chatId === selectedChat) {
         queryClient.invalidateQueries({ queryKey: ['chat', data.chatId] });
       }
-    };
+    }, [selectedChat, queryClient]);
 
     socketService.onNewMessage(handleNewMessage);
-    socketService.onTyping(handleTyping);
-    socketService.onStopTyping(handleStopTyping);
+    socketService.onTyping(handleTypingEvent);
+    socketService.onStopTyping(handleStopTypingEvent);
     socketService.onMessagesRead(handleMessagesRead);
 
     // Cleanup listeners on unmount
@@ -210,8 +214,8 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatData?.chat?.messages]);
 
-  // Handle typing indicator
-  const handleTyping = () => {
+  // Handle typing indicator with debounce (300ms)
+  const handleTyping = useCallback(() => {
     if (selectedChat) {
       socketService.emitTyping(selectedChat);
       
@@ -221,11 +225,11 @@ export default function ChatPage() {
       
       typingTimeoutRef.current = setTimeout(() => {
         socketService.emitStopTyping(selectedChat);
-      }, 2000);
+      }, 3000); // Stop typing after 3 seconds of inactivity
     }
-  };
+  }, [selectedChat]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = useCallback(() => {
     if (messageText.trim() && selectedChat) {
       // Send via REST API
       sendMessageMutation.mutate({
@@ -235,8 +239,14 @@ export default function ChatPage() {
 
       // Also send via Socket.IO for real-time delivery
       socketService.sendMessage(selectedChat, messageText.trim());
+      
+      // Clear typing timeout
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        socketService.emitStopTyping(selectedChat);
+      }
     }
-  };
+  }, [messageText, selectedChat, sendMessageMutation]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -426,7 +436,7 @@ export default function ChatPage() {
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messagesLoading ? (
-                <Loading />
+                <ChatSkeleton />
               ) : chatData?.chat?.messages && chatData.chat.messages.length > 0 ? (
                 <>
                   {chatData.chat.messages.map((message: Message) => {
@@ -435,45 +445,11 @@ export default function ChatPage() {
                     const isOwnMessage = senderId === currentUserId;
 
                     return (
-                      <motion.div
+                      <MessageBubble
                         key={message._id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div
-                          className={`max-w-sm px-4 py-2 rounded-2xl shadow-sm ${
-                            isOwnMessage
-                              ? 'bg-linear-to-r from-primary-600 to-primary-700 text-white'
-                              : 'bg-white text-gray-900'
-                          }`}
-                        >
-                          <p className="whitespace-pre-wrap wrap-break-word">{message.content}</p>
-                          <div className="flex items-center justify-between gap-2 mt-1">
-                            <p
-                              className={`text-xs ${
-                                isOwnMessage ? 'text-primary-100' : 'text-gray-500'
-                              }`}
-                            >
-                              {new Date(message.createdAt).toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })}
-                            </p>
-                            {isOwnMessage && (
-                              <span className="text-xs">
-                                {message.readBy && message.readBy.length > 1 ? (
-                                  // Read by recipient (blue double tick)
-                                  <span className="text-blue-300" title="Read">✓✓</span>
-                                ) : (
-                                  // Delivered but not read (gray double tick)
-                                  <span className={isOwnMessage ? 'text-primary-200' : 'text-gray-400'} title="Delivered">✓✓</span>
-                                )}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </motion.div>
+                        message={message}
+                        isOwnMessage={isOwnMessage}
+                      />
                     );
                   })}
                   <div ref={messagesEndRef} />
