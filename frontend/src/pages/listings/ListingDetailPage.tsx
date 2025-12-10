@@ -8,6 +8,7 @@ import { useAuthStore } from '../../store/authStore';
 import Loading from '../../components/common/Loading';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import ReportModal from '../../components/common/ReportModal';
+import AIInspectionReport from '../../components/listings/AIInspectionReport';
 
 export default function ListingDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -512,71 +513,11 @@ export default function ListingDetailPage() {
               )}
 
               {/* AI Inspection Report */}
-              {listing.inspectionReport && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="card bg-linear-to-br from-green-50 to-green-100 border-2 border-green-200"
-                >
-                  <h2 className="text-xl font-bold mb-4">
-                    <span className="mr-2">🤖</span>
-                    <span className="bg-linear-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">
-                      AI Inspection Report
-                    </span>
-                  </h2>
-                  
-                  <div className="grid gap-4">
-                    {/* Condition Score */}
-                    <div className="bg-white rounded-xl p-4 border-2 border-green-200">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-700 font-medium">📊 Condition Score</span>
-                        <span className="text-2xl font-bold text-primary-600">{listing.inspectionReport.conditionScore}/10</span>
-                      </div>
-                      <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${(listing.inspectionReport.conditionScore / 10) * 100}%` }}
-                          transition={{ delay: 0.7, duration: 1 }}
-                          className="h-full bg-linear-to-r from-primary-500 to-purple-500"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Authenticity Score */}
-                    <div className="bg-white rounded-xl p-4 border-2 border-green-200">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-700 font-medium">🔒 Authenticity</span>
-                        <span className="text-2xl font-bold text-green-600">{listing.inspectionReport.authenticityScore}/100</span>
-                      </div>
-                      <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${listing.inspectionReport.authenticityScore}%` }}
-                          transition={{ delay: 0.9, duration: 1 }}
-                          className="h-full bg-linear-to-r from-green-500 to-teal-500"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Detected Issues */}
-                    {listing.inspectionReport.detectedIssues && listing.inspectionReport.detectedIssues.length > 0 && (
-                      <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4">
-                        <p className="text-sm font-bold text-yellow-800 mb-2 flex items-center gap-2">
-                          <span>⚠️</span> Detected Issues:
-                        </p>
-                        <ul className="space-y-2">
-                          {listing.inspectionReport.detectedIssues.map((issue, index) => (
-                            <li key={index} className="text-sm flex items-start gap-2 bg-white rounded-lg p-2 border border-yellow-200">
-                              <span className="text-yellow-600 mt-0.5">•</span>
-                              <span className="text-gray-700">{issue}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
+              {listing.inspectionReport?.reportId && (
+                <AIInspectionReport 
+                  inspectionId={listing.inspectionReport.reportId} 
+                  listingPrice={listing.price}
+                />
               )}
 
               {/* Description */}
