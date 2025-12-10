@@ -209,13 +209,28 @@ export default function ListingDetailPage() {
                     </motion.span>
                   )}
                 </div>
-                <div className="flex items-end gap-4 mb-3">
+                <div className="flex items-end gap-4 mb-3 flex-wrap">
                   <p className="text-5xl font-bold bg-linear-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
                     PKR {listing.price.toLocaleString()}
                   </p>
                   <span className={`px-4 py-2 rounded-full text-sm font-bold ${conditionColor} border-2`}>
                     {listing.condition}
                   </span>
+                  {listing.priceNegotiable && (
+                    <span className="px-4 py-2 rounded-full text-sm font-bold bg-blue-50 text-blue-700 border-2 border-blue-200">
+                      💬 Negotiable
+                    </span>
+                  )}
+                  {listing.ptaApproved && (
+                    <span className="px-4 py-2 rounded-full text-sm font-bold bg-green-50 text-green-700 border-2 border-green-200">
+                      ✅ PTA Approved
+                    </span>
+                  )}
+                  {!listing.ptaApproved && (
+                    <span className="px-4 py-2 rounded-full text-sm font-bold bg-red-50 text-red-700 border-2 border-red-200">
+                      ❌ Non-PTA
+                    </span>
+                  )}
                 </div>
                 {listing.priceRange && (
                   <div className="bg-linear-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl p-3">
@@ -307,6 +322,194 @@ export default function ListingDetailPage() {
                   </div>
                 </div>
               </motion.div>
+
+              {/* Warranty Details */}
+              {listing.phone.warranty?.hasWarranty && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.45 }}
+                  className="card bg-linear-to-br from-emerald-50 to-emerald-100 border-2 border-emerald-200"
+                >
+                  <h2 className="text-xl font-bold mb-4">
+                    <span className="mr-2">✅</span>
+                    <span className="bg-linear-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                      Warranty Information
+                    </span>
+                  </h2>
+                  <div className="space-y-3">
+                    <div className="bg-white rounded-lg p-4 border border-emerald-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-gray-600 text-sm mb-1">Warranty Type</p>
+                          <p className="font-bold text-lg capitalize">{listing.phone.warranty.type}</p>
+                        </div>
+                        <div className="bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-bold">
+                          Active
+                        </div>
+                      </div>
+                    </div>
+                    {listing.phone.warranty.expiryDate && (
+                      <div className="bg-white rounded-lg p-4 border border-emerald-200">
+                        <p className="text-gray-600 text-sm mb-1">Valid Until</p>
+                        <p className="font-bold text-lg">
+                          {new Date(listing.phone.warranty.expiryDate).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Battery Health & Condition Details */}
+              {(listing.conditionDetails?.batteryHealth || listing.conditionDetails?.screenCondition || listing.conditionDetails?.bodyCondition) && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="card bg-linear-to-br from-purple-50 to-purple-100 border-2 border-purple-200"
+                >
+                  <h2 className="text-xl font-bold mb-4">
+                    <span className="mr-2">🔋</span>
+                    <span className="bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                      Device Condition
+                    </span>
+                  </h2>
+                  
+                  <div className="space-y-4">
+                    {/* Battery Health */}
+                    {listing.conditionDetails?.batteryHealth && (
+                      <div className="bg-white rounded-xl p-4 border-2 border-purple-200">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-gray-700 font-medium flex items-center gap-2">
+                            <span>🔋</span> Battery Health
+                          </span>
+                          <span className={`text-2xl font-bold ${
+                            listing.conditionDetails.batteryHealth >= 80 ? 'text-green-600' :
+                            listing.conditionDetails.batteryHealth >= 60 ? 'text-yellow-600' :
+                            'text-red-600'
+                          }`}>
+                            {listing.conditionDetails.batteryHealth}%
+                          </span>
+                        </div>
+                        <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${listing.conditionDetails.batteryHealth}%` }}
+                            transition={{ delay: 0.6, duration: 1 }}
+                            className={`h-full ${
+                              listing.conditionDetails.batteryHealth >= 80 ? 'bg-green-500' :
+                              listing.conditionDetails.batteryHealth >= 60 ? 'bg-yellow-500' :
+                              'bg-red-500'
+                            }`}
+                          />
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">
+                          {listing.conditionDetails.batteryHealth >= 80 ? '✓ Excellent battery condition' :
+                           listing.conditionDetails.batteryHealth >= 60 ? '⚠ Battery showing wear' :
+                           '⚠ Consider battery replacement'}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Screen Condition */}
+                    {listing.conditionDetails?.screenCondition && (
+                      <div className="bg-white rounded-lg p-4 border border-purple-200">
+                        <p className="text-gray-600 text-sm mb-1 flex items-center gap-2">
+                          <span>📱</span> Screen Condition
+                        </p>
+                        <p className="font-bold text-lg capitalize">{listing.conditionDetails.screenCondition}</p>
+                      </div>
+                    )}
+
+                    {/* Body Condition */}
+                    {listing.conditionDetails?.bodyCondition && (
+                      <div className="bg-white rounded-lg p-4 border border-purple-200">
+                        <p className="text-gray-600 text-sm mb-1 flex items-center gap-2">
+                          <span>📦</span> Body Condition
+                        </p>
+                        <p className="font-bold text-lg capitalize">{listing.conditionDetails.bodyCondition}</p>
+                      </div>
+                    )}
+
+                    {/* Display Quality */}
+                    {listing.conditionDetails?.displayQuality && (
+                      <div className="bg-white rounded-lg p-4 border border-purple-200">
+                        <p className="text-gray-600 text-sm mb-1 flex items-center gap-2">
+                          <span>✨</span> Display Quality
+                        </p>
+                        <p className="font-bold text-lg capitalize flex items-center gap-2">
+                          {listing.conditionDetails.displayQuality === 'flawless' && '💎 Flawless'}
+                          {listing.conditionDetails.displayQuality === 'minor-scratches' && '✓ Minor Scratches'}
+                          {listing.conditionDetails.displayQuality === 'noticeable-wear' && '⚠ Noticeable Wear'}
+                          {listing.conditionDetails.displayQuality === 'cracked' && '❌ Cracked'}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* All Features Working */}
+                    {listing.conditionDetails?.allFeaturesWorking !== undefined && (
+                      <div className="bg-white rounded-lg p-4 border border-purple-200">
+                        <p className="text-gray-600 text-sm mb-1 flex items-center gap-2">
+                          <span>⚙️</span> Functionality Status
+                        </p>
+                        <p className={`font-bold text-lg ${listing.conditionDetails.allFeaturesWorking ? 'text-green-600' : 'text-orange-600'}`}>
+                          {listing.conditionDetails.allFeaturesWorking ? '✅ All Features Working' : '⚠️ Some Issues Present'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Functional Issues */}
+              {listing.conditionDetails?.functionalIssues && listing.conditionDetails.functionalIssues.length > 0 && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.55 }}
+                  className="card bg-linear-to-br from-orange-50 to-orange-100 border-2 border-orange-200"
+                >
+                  <h2 className="text-xl font-bold mb-4">
+                    <span className="mr-2">⚠️</span>
+                    <span className="bg-linear-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                      Known Issues
+                    </span>
+                  </h2>
+                  <div className="space-y-2">
+                    {listing.conditionDetails.functionalIssues.map((issue, index) => (
+                      <div key={index} className="bg-white rounded-lg p-3 border border-orange-200 flex items-start gap-3">
+                        <span className="text-orange-600 text-lg mt-0.5">⚠️</span>
+                        <span className="text-gray-700 font-medium">{issue}</span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Additional Notes */}
+              {listing.conditionDetails?.additionalNotes && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="card bg-linear-to-br from-gray-50 to-gray-100 border-2 border-gray-200"
+                >
+                  <h2 className="text-xl font-bold mb-4">
+                    <span className="mr-2">📝</span>
+                    <span className="bg-linear-to-r from-gray-600 to-gray-800 bg-clip-text text-transparent">
+                      Additional Notes
+                    </span>
+                  </h2>
+                  <div className="bg-white rounded-lg p-4 border border-gray-200">
+                    <p className="text-gray-700 whitespace-pre-wrap">{listing.conditionDetails.additionalNotes}</p>
+                  </div>
+                </motion.div>
+              )}
 
               {/* AI Inspection Report */}
               {listing.inspectionReport && (
