@@ -7,6 +7,7 @@ import { chatService } from '../../services/chat.service';
 import { useAuthStore } from '../../store/authStore';
 import Loading from '../../components/common/Loading';
 import ErrorMessage from '../../components/common/ErrorMessage';
+import ReportModal from '../../components/common/ReportModal';
 
 export default function ListingDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -15,6 +16,8 @@ export default function ListingDetailPage() {
   const { user } = useAuthStore();
   const [selectedImage, setSelectedImage] = useState(0);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportTarget, setReportTarget] = useState<{ type: 'user' | 'listing'; id: string; name: string } | null>(null);
 
   const { data: listing, isLoading, error, refetch } = useQuery({
     queryKey: ['listing', id],
@@ -230,6 +233,21 @@ export default function ListingDetailPage() {
                         <span>⚠️</span> Above suggested price range
                       </p>
                     )}
+                  </div>
+                )}
+
+                {/* Report Listing Button */}
+                {!isOwner && user && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <button
+                      onClick={() => {
+                        setReportTarget({ type: 'listing', id: listing._id, name: listing.title });
+                        setShowReportModal(true);
+                      }}
+                      className="text-sm text-red-600 hover:text-red-700 font-medium flex items-center gap-2"
+                    >
+                      <span>🚨</span> Report this listing
+                    </button>
                   </div>
                 )}
               </div>
@@ -546,12 +564,23 @@ export default function ListingDetailPage() {
                   <div className="w-16 h-16 bg-linear-to-br from-primary-400 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold border-4 border-white shadow-lg">
                     {listing.seller.name.charAt(0).toUpperCase()}
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <p className="font-bold text-lg">{listing.seller.name}</p>
                     <p className="text-gray-600 text-sm flex items-center gap-1">
                       <span>📍</span> {listing.location.city}
                     </p>
                   </div>
+                  {!isOwner && user && (
+                    <button
+                      onClick={() => {
+                        setReportTarget({ type: 'user', id: listing.seller._id, name: listing.seller.name });
+                        setShowReportModal(true);
+                      }}
+                      className="text-sm text-red-600 hover:text-red-700 font-medium flex items-center gap-1 px-3 py-2 rounded-lg border border-red-200 hover:bg-red-50 transition-colors"
+                    >
+                      <span>🚨</span> Report
+                    </button>
+                  )}
                 </div>
 
                 {!isOwner && (
@@ -638,6 +667,20 @@ export default function ListingDetailPage() {
             </div>
           </motion.div>
         </div>
+      )}
+
+      {/* Report Modal */}
+      {showReportModal && reportTarget && (
+        <ReportModal
+          isOpen={showReportModal}
+          onClose={() => {
+            setShowReportModal(false);
+            setReportTarget(null);
+          }}
+          reportType={reportTarget.type}
+          targetId={reportTarget.id}
+          targetName={reportTarget.name}
+        />
       )}
     </div>
   );
