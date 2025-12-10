@@ -1,5 +1,4 @@
-import asyncHandler from 'express-async-handler';
-import AppError from '../utils/appError.js';
+import { asyncHandler, AppError } from './error.middleware.js';
 
 /**
  * Middleware to check if user has admin role

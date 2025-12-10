@@ -112,6 +112,14 @@ class SocketService {
     this.socket?.emit('stop-typing', chatId);
   }
 
+  sharePhoneNumber(chatId: string, phoneNumber: string) {
+    this.socket?.emit('share-phone', { chatId, phoneNumber });
+  }
+
+  onPhoneShared(callback: (data: { chatId: string; userId: string; phoneNumber: string }) => void) {
+    this.socket?.on('phone-shared', callback);
+  }
+
   off(event: string) {
     this.socket?.off(event);
   }

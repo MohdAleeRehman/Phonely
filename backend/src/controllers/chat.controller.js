@@ -288,3 +288,216 @@ export const markAsRead = asyncHandler(async (req, res) => {
     message: 'Messages marked as read',
   });
 });
+
+/**
+ * @desc    Send price offer in chat
+ * @route   POST /api/v1/chats/:id/offer
+ * @access  Private
+ */
+export const sendOffer = asyncHandler(async (req, res) => {
+  const { offerPrice, message } = req.body;
+
+  if (!offerPrice || offerPrice <= 0) {
+    throw new AppError('Valid offer price is required', 400);
+  }
+
+  const chat = await Chat.findById(req.params.id).populate('listing', 'title price seller');
+
+  if (!chat) {
+    throw new AppError('Chat not found', 404);
+  }
+
+  // Check if user is a participant
+  if (!chat.participants.some((p) => p.toString() === req.user._id.toString())) {
+    throw new AppError('Not authorized to access this chat', 403);
+  }
+
+  // Create offer message
+  const offerMessage = {
+    sender: req.user._id,
+    content: message || `Offering ${offerPrice} for ${chat.listing.title}`,
+    type: 'offer',
+    metadata: {
+      offerPrice,
+      offerStatus: 'pending',
+    },
+    readBy: [
+      {
+        user: req.user._id,
+        readAt: new Date(),
+      },
+    ],
+    createdAt: new Date(),
+  };
+
+  chat.messages.push(offerMessage);
+
+  // Update last message
+  chat.lastMessage = {
+    content: offerMessage.content,
+    sender: req.user._id,
+    createdAt: offerMessage.createdAt,
+  };
+
+  // Increment unread count for other participant
+  chat.participants.forEach((participantId) => {
+    if (participantId.toString() !== req.user._id.toString()) {
+      const currentCount = chat.unreadCount.get(participantId.toString()) || 0;
+      chat.unreadCount.set(participantId.toString(), currentCount + 1);
+    }
+  });
+
+  await chat.save();
+
+  // Populate the new message
+  await chat.populate('messages.sender', 'name avatar');
+  const newMessage = chat.messages[chat.messages.length - 1];
+
+  // Emit socket event
+  const io = req.app.get('io');
+  io.to(`chat:${chat._id}`).emit('new-message', {
+    ...newMessage.toObject(),
+    chat: chat._id,
+  });
+
+  res.status(201).json({
+    status: 'success',
+    data: {
+      message: newMessage,
+    },
+  });
+});
+
+/**
+ * @desc    Respond to price offer (accept/reject)
+ * @route   PATCH /api/v1/chats/:chatId/offer/:messageId
+ * @access  Private
+ */
+export const respondToOffer = asyncHandler(async (req, res) => {
+  const { chatId, messageId } = req.params;
+  const { status, counterOffer } = req.body;
+
+  if (!['accepted', 'rejected', 'countered'].includes(status)) {
+    throw new AppError('Invalid response status', 400);
+  }
+
+  if (status === 'countered' && (!counterOffer || counterOffer <= 0)) {
+    throw new AppError('Valid counter offer is required', 400);
+  }
+
+  const chat = await Chat.findById(chatId).populate('listing', 'title seller');
+
+  if (!chat) {
+    throw new AppError('Chat not found', 404);
+  }
+
+  // Check if user is a participant
+  if (!chat.participants.some((p) => p.toString() === req.user._id.toString())) {
+    throw new AppError('Not authorized to access this chat', 403);
+  }
+
+  // Find the offer message
+  const offerMessage = chat.messages.id(messageId);
+
+  if (!offerMessage) {
+    throw new AppError('Offer message not found', 404);
+  }
+
+  if (offerMessage.type !== 'offer') {
+    throw new AppError('This is not an offer message', 400);
+  }
+
+  // Can't respond to your own offer
+  if (offerMessage.sender.toString() === req.user._id.toString()) {
+    throw new AppError('Cannot respond to your own offer', 400);
+  }
+
+  // Can't respond to already responded offer
+  if (offerMessage.metadata.offerStatus !== 'pending') {
+    throw new AppError('This offer has already been responded to', 400);
+  }
+
+  // Update offer status
+  offerMessage.metadata.offerStatus = status;
+
+  // Add system message about the response
+  let systemMessage;
+  if (status === 'accepted') {
+    systemMessage = {
+      sender: req.user._id,
+      content: `Accepted offer of ${offerMessage.metadata.offerPrice}`,
+      type: 'system',
+      readBy: [{ user: req.user._id, readAt: new Date() }],
+      createdAt: new Date(),
+    };
+  } else if (status === 'rejected') {
+    systemMessage = {
+      sender: req.user._id,
+      content: `Rejected offer of ${offerMessage.metadata.offerPrice}`,
+      type: 'system',
+      readBy: [{ user: req.user._id, readAt: new Date() }],
+      createdAt: new Date(),
+    };
+  } else if (status === 'countered') {
+    // Create a new counter offer message
+    systemMessage = {
+      sender: req.user._id,
+      content: `Counter offer: ${counterOffer}`,
+      type: 'offer',
+      metadata: {
+        offerPrice: counterOffer,
+        offerStatus: 'pending',
+      },
+      readBy: [{ user: req.user._id, readAt: new Date() }],
+      createdAt: new Date(),
+    };
+  }
+
+  if (systemMessage) {
+    chat.messages.push(systemMessage);
+
+    // Update last message
+    chat.lastMessage = {
+      content: systemMessage.content,
+      sender: req.user._id,
+      createdAt: systemMessage.createdAt,
+    };
+
+    // Increment unread count for other participant
+    chat.participants.forEach((participantId) => {
+      if (participantId.toString() !== req.user._id.toString()) {
+        const currentCount = chat.unreadCount.get(participantId.toString()) || 0;
+        chat.unreadCount.set(participantId.toString(), currentCount + 1);
+      }
+    });
+  }
+
+  await chat.save();
+
+  // Populate sender info
+  await chat.populate('messages.sender', 'name avatar');
+
+  // Emit socket event
+  const io = req.app.get('io');
+  io.to(`chat:${chat._id}`).emit('offer-response', {
+    chatId: chat._id,
+    messageId: offerMessage._id,
+    status,
+    counterOffer: status === 'countered' ? counterOffer : undefined,
+  });
+
+  if (systemMessage) {
+    const newMessage = chat.messages[chat.messages.length - 1];
+    io.to(`chat:${chat._id}`).emit('new-message', {
+      ...newMessage.toObject(),
+      chat: chat._id,
+    });
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      message: 'Offer response sent successfully',
+    },
+  });
+});

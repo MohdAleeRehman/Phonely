@@ -27,6 +27,7 @@ import chatRoutes from './routes/chat.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import reportRoutes from './routes/report.routes.js';
+import ratingRoutes from './routes/rating.routes.js';
 import testRoutes from './routes/test.routes.js';
 
 // Get directory name in ES modules
@@ -106,6 +107,7 @@ app.use(`/api/${API_VERSION}/chats`, chatRoutes);
 app.use(`/api/${API_VERSION}/upload`, uploadRoutes);
 app.use(`/api/${API_VERSION}/admin`, adminRoutes);
 app.use(`/api/${API_VERSION}/reports`, reportRoutes);
+app.use(`/api/${API_VERSION}/ratings`, ratingRoutes);
 
 // Test routes (development only - remove in production)
 if (process.env.NODE_ENV === 'development') {
@@ -144,6 +146,29 @@ io.on('connection', (socket) => {
   socket.on('leave-chat', (chatId) => {
     socket.leave(`chat:${chatId}`);
     console.log(`User ${socket.id} left chat ${chatId}`);
+  });
+
+  // Share phone number
+  socket.on('share-phone', (data) => {
+    const { chatId, phoneNumber } = data;
+    
+    // Get user ID from socket registration
+    let userId;
+    for (const [uid, socketId] of userSockets.entries()) {
+      if (socketId === socket.id) {
+        userId = uid;
+        break;
+      }
+    }
+
+    // Broadcast to chat room (other participants will receive it)
+    socket.to(`chat:${chatId}`).emit('phone-shared', {
+      chatId,
+      userId,
+      phoneNumber,
+    });
+
+    console.log(`📱 Phone number shared in chat ${chatId}`);
   });
 
   socket.on('disconnect', () => {

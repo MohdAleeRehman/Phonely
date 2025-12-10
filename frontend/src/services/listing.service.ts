@@ -86,4 +86,14 @@ export const listingService = {
     // Backend returns array of image objects, we return the first URL
     return response.data.data.images[0].url;
   },
+
+  getChatParticipants: async (listingId: string) => {
+    const response = await api.get(`/listings/${listingId}/chat-participants`);
+    return response.data.data.participants;
+  },
+
+  markAsSold: async (listingId: string, data: { soldTo?: string; soldOutside?: boolean }) => {
+    const response = await api.patch(`/listings/${listingId}/sold`, data);
+    return response.data;
+  },
 };

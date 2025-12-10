@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { listingService } from '../../services/listing.service';
 import { inspectionService } from '../../services/inspection.service';
@@ -57,12 +57,21 @@ const STEPS = [
 
 export default function CreateListingPage() {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const isEditMode = Boolean(id);
   const [currentStep, setCurrentStep] = useState(1);
   const [images, setImages] = useState<Array<{ url: string; type: string }>>([]);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [error, setError] = useState('');
   const [selectedCondition, setSelectedCondition] = useState<string>('');
   const [selectedIssues, setSelectedIssues] = useState<string[]>([]);
+
+  // Fetch existing listing if in edit mode
+  const { data: existingListing, isLoading: isLoadingListing } = useQuery({
+    queryKey: ['listing', id],
+    queryFn: () => listingService.getListingById(id!),
+    enabled: isEditMode,
+  });
 
   const imageTypes = [
     { type: 'front', label: '📱 Front View', description: 'Full front view with screen off' },
@@ -92,6 +101,7 @@ export default function CreateListingPage() {
     watch,
     setValue,
     trigger,
+    reset,
   } = useForm<ListingFormData>({
     resolver: zodResolver(listingSchema),
     defaultValues: {
@@ -100,8 +110,69 @@ export default function CreateListingPage() {
       ptaApproved: true,
       allFeaturesWorking: true,
       accessories: 'device-only',
-      batteryHealth: 80,
       issues: [],
+    },
+  });
+
+  // Load existing listing data when in edit mode
+  useEffect(() => {
+    if (isEditMode && existingListing) {
+      // Set form values
+      reset({
+        title: existingListing.title,
+        description: existingListing.description,
+        price: existingListing.price,
+        priceNegotiable: existingListing.priceNegotiable,
+        brand: existingListing.phone.brand,
+        model: existingListing.phone.model,
+        storage: existingListing.phone.storage,
+        condition: existingListing.condition,
+        ram: existingListing.phone.ram,
+        color: existingListing.phone.color,
+        imei: existingListing.phone.imei,
+        warranty: existingListing.phone.warranty?.hasWarranty,
+        ptaApproved: existingListing.ptaApproved,
+        batteryHealth: existingListing.conditionDetails?.batteryHealth,
+        displayQuality: existingListing.conditionDetails?.displayQuality as any,
+        allFeaturesWorking: existingListing.conditionDetails?.allFeaturesWorking,
+        issues: existingListing.conditionDetails?.functionalIssues || [],
+        additionalNotes: existingListing.conditionDetails?.additionalNotes,
+        accessories: existingListing.accessories?.box 
+          ? 'complete-box' 
+          : existingListing.accessories?.cable 
+          ? 'cable-only' 
+          : 'device-only',
+        address: existingListing.location.address || existingListing.location.area || '',
+        city: existingListing.location.city,
+        latitude: existingListing.location.coordinates?.coordinates?.[1],
+        longitude: existingListing.location.coordinates?.coordinates?.[0],
+      });
+
+      // Set images
+      const loadedImages = existingListing.images.map((img: any) => ({
+        url: typeof img === 'string' ? img : img.url,
+        type: typeof img === 'object' && img.type ? img.type : 'front',
+      }));
+      setImages(loadedImages);
+
+      // Set condition and issues
+      setSelectedCondition(existingListing.condition);
+      setSelectedIssues(existingListing.conditionDetails?.functionalIssues || []);
+    }
+  }, [isEditMode, existingListing, reset]);
+
+  const updateMutation = useMutation({
+    mutationFn: (data: any) => listingService.updateListing(id!, data),
+    onSuccess: (listing) => {
+      navigate(`/listings/${id}`, { 
+        state: { 
+          message: 'listing_updated',
+          listingTitle: listing.title
+        } 
+      });
+    },
+    onError: () => {
+      setError('Failed to update listing. Please try again.');
     },
   });
 
@@ -243,7 +314,8 @@ export default function CreateListingPage() {
       condition: data.condition,
       ptaApproved: data.ptaApproved,
       conditionDetails: {
-        batteryHealth: data.batteryHealth || undefined,
+        // Only include batteryHealth for Apple devices
+        ...(data.brand === 'Apple' && data.batteryHealth ? { batteryHealth: data.batteryHealth } : {}),
         displayQuality: data.displayQuality || undefined,
         allFeaturesWorking: data.allFeaturesWorking !== undefined ? data.allFeaturesWorking : true,
         functionalIssues: data.issues && data.issues.length > 0 ? data.issues : [],
@@ -274,8 +346,21 @@ export default function CreateListingPage() {
       })),
     };
 
-    createMutation.mutate(listingData);
+    if (isEditMode) {
+      updateMutation.mutate(listingData);
+    } else {
+      createMutation.mutate(listingData);
+    }
   };
+
+  // Show loading state when fetching existing listing
+  if (isEditMode && isLoadingListing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -305,17 +390,19 @@ export default function CreateListingPage() {
         className="text-center mb-8"
       >
         <h1 className="text-4xl md:text-5xl font-bold mb-3">
-          <span className="mr-2">💰</span>
+          <span className="mr-2">{isEditMode ? '✏️' : '💰'}</span>
           <span className="bg-linear-to-r from-primary-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Sell Your Phone
+            {isEditMode ? 'Edit Your Listing' : 'Sell Your Phone'}
           </span>
         </h1>
         <p className="text-gray-600 text-lg">
-          Fill in the deets and our AI will verify your phone's condition ✨
+          {isEditMode ? 'Update your listing details' : 'Fill in the deets and our AI will verify your phone\'s condition ✨'}
         </p>
-        <p className="text-sm text-gray-500 mt-2">
-          Get the best price, no cap! 🔥
-        </p>
+        {!isEditMode && (
+          <p className="text-sm text-gray-500 mt-2">
+            Get the best price, no cap! 🔥
+          </p>
+        )}
       </motion.div>
 
       {error && (
@@ -414,19 +501,19 @@ export default function CreateListingPage() {
           ) : (
             <button
               type="submit"
-              disabled={createMutation.isPending}
+              disabled={createMutation.isPending || updateMutation.isPending}
               className="px-8 py-3 bg-linear-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {createMutation.isPending ? (
+              {(createMutation.isPending || updateMutation.isPending) ? (
                 <span className="flex items-center gap-2">
                   <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Creating...
+                  {isEditMode ? 'Updating...' : 'Creating...'}
                 </span>
               ) : (
-                '🚀 Create Listing'
+                isEditMode ? '✅ Update Listing' : '🚀 Create Listing'
               )}
             </button>
           )}
@@ -434,7 +521,7 @@ export default function CreateListingPage() {
       </form>
 
       {/* Submitting Loading Modal */}
-      {createMutation.isPending && (
+      {(createMutation.isPending || updateMutation.isPending) && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}

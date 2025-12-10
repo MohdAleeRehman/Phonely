@@ -8,6 +8,9 @@ interface MessageBubbleProps {
 }
 
 const MessageBubble = memo(({ message, isOwnMessage }: MessageBubbleProps) => {
+  const isPhoneMessage = message.type === 'phone';
+  const isOfferMessage = message.type === 'offer';
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -16,12 +19,16 @@ const MessageBubble = memo(({ message, isOwnMessage }: MessageBubbleProps) => {
     >
       <div
         className={`max-w-sm px-4 py-2 rounded-2xl shadow-sm ${
-          isOwnMessage
+          isPhoneMessage
+            ? 'bg-green-50 border-2 border-green-200 text-gray-900'
+            : isOfferMessage
+            ? 'bg-blue-50 border-2 border-blue-200 text-gray-900'
+            : isOwnMessage
             ? 'bg-linear-to-r from-primary-600 to-primary-700 text-white'
             : 'bg-white text-gray-900'
         }`}
       >
-        <p className="whitespace-pre-wrap wrap-break-word">{message.content}</p>
+        <p className="whitespace-pre-wrap wrap-break-word font-medium">{message.content}</p>
         <div className="flex items-center justify-between gap-2 mt-1">
           <p
             className={`text-xs ${

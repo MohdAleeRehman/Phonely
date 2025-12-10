@@ -63,6 +63,7 @@ export interface Phone {
 export interface Location {
   city: string;
   area?: string;
+  address?: string;
   coordinates?: {
     type: 'Point';
     coordinates: [number, number]; // [longitude, latitude]
@@ -74,6 +75,8 @@ export interface Listing {
   title: string;
   description: string;
   price: number;
+  priceNegotiable?: boolean;
+  ptaApproved?: boolean;
   condition: 'excellent' | 'good' | 'fair' | 'poor';
   phone: Phone;
   images: Array<string | { url: string; type?: string; order?: number }>;
@@ -89,6 +92,15 @@ export interface Listing {
     bodyCondition?: string;
     backCondition?: string;
     cameraCondition?: string;
+  };
+  conditionDetails?: {
+    batteryHealth?: number;
+    screenCondition?: string;
+    bodyCondition?: string;
+    displayQuality?: 'flawless' | 'minor-scratches' | 'noticeable-wear' | 'cracked';
+    allFeaturesWorking?: boolean;
+    functionalIssues?: string[];
+    additionalNotes?: string;
   };
   accessories?: {
     box?: boolean;
@@ -176,6 +188,13 @@ export interface Message {
   sender: User | string;
   content: string;
   message?: string; // Deprecated, keeping for backward compatibility
+  type?: 'text' | 'image' | 'offer' | 'system' | 'phone';
+  metadata?: {
+    offerPrice?: number;
+    offerStatus?: 'pending' | 'accepted' | 'rejected' | 'countered';
+    imageUrl?: string;
+    phoneNumber?: string;
+  };
   read: boolean;
   readBy?: Array<{
     user: string;

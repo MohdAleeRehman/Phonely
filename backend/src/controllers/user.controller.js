@@ -158,7 +158,7 @@ export const getMyListings = asyncHandler(async (req, res) => {
  */
 export const getUserById = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id).select(
-    'name avatar location verified verificationBadge ratings activeListings soldItems createdAt'
+    'name avatar location verified verificationBadge ratings activeListings soldItems createdAt isActive'
   );
 
   if (!user || !user.isActive) {

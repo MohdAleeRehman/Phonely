@@ -10,6 +10,8 @@ import {
   searchListings,
   getNearbyListings,
   getSwipeFeed,
+  markAsSold,
+  getChatParticipants,
 } from '../controllers/listing.controller.js';
 
 const router = express.Router();
@@ -100,5 +102,19 @@ router.delete('/:id', protect, deleteListing);
  * @access  Private
  */
 router.post('/:id/like', protect, toggleLike);
+
+/**
+ * @route   PATCH /api/v1/listings/:id/sold
+ * @desc    Mark listing as sold
+ * @access  Private (owner only)
+ */
+router.patch('/:id/sold', protect, markAsSold);
+
+/**
+ * @route   GET /api/v1/listings/:id/chat-participants
+ * @desc    Get chat participants for a listing
+ * @access  Private (owner only)
+ */
+router.get('/:id/chat-participants', protect, getChatParticipants);
 
 export default router;

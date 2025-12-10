@@ -1,8 +1,12 @@
 export default function ChatSkeleton() {
+  // Pre-calculate widths to avoid Math.random() during render
+  const widths = [60, 75, 55, 80, 70];
+  const showSecondLine = [true, false, true, true, false];
+
   return (
     <div className="p-4 space-y-4 animate-pulse">
       {/* Loading message bubbles */}
-      {[1, 2, 3, 4, 5].map((i) => (
+      {[1, 2, 3, 4, 5].map((i, index) => (
         <div
           key={i}
           className={`flex ${i % 2 === 0 ? 'justify-end' : 'justify-start'}`}
@@ -11,10 +15,10 @@ export default function ChatSkeleton() {
             className={`max-w-sm rounded-2xl p-4 ${
               i % 2 === 0 ? 'bg-primary-200' : 'bg-gray-200'
             }`}
-            style={{ width: `${Math.random() * 40 + 40}%` }}
+            style={{ width: `${widths[index]}%` }}
           >
             <div className="h-4 bg-gray-300 rounded mb-2" />
-            {Math.random() > 0.5 && (
+            {showSecondLine[index] && (
               <div className="h-4 bg-gray-300 rounded w-3/4" />
             )}
           </div>

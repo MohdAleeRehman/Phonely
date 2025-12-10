@@ -1,5 +1,6 @@
 import express from 'express';
-import { protect, admin } from '../middleware/auth.middleware.js';
+import { protect } from '../middleware/auth.middleware.js';
+import { requireAdmin } from '../middleware/rbac.middleware.js';
 import {
   createReport,
   getMyReports,
@@ -16,7 +17,7 @@ router.post('/', protect, createReport);
 router.get('/my-reports', protect, getMyReports);
 
 // Admin routes
-router.get('/', protect, admin, getAllReports);
-router.put('/:id', protect, admin, updateReportStatus);
+router.get('/', protect, requireAdmin, getAllReports);
+router.put('/:id', protect, requireAdmin, updateReportStatus);
 
 export default router;

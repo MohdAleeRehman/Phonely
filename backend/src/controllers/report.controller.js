@@ -1,4 +1,4 @@
-import asyncHandler from 'express-async-handler';
+import { asyncHandler, AppError } from '../middleware/error.middleware.js';
 import Report from '../models/Report.model.js';
 
 /**
@@ -12,23 +12,23 @@ export const createReport = asyncHandler(async (req, res) => {
   // Validation
   if (!reportType || !reason || !description) {
     res.status(400);
-    throw new Error('Please provide all required fields');
+    throw new AppError('Please provide all required fields');
   }
 
   if (reportType === 'user' && !reportedUser) {
     res.status(400);
-    throw new Error('Please provide the user to report');
+    throw new AppError('Please provide the user to report');
   }
 
   if (reportType === 'listing' && !reportedListing) {
     res.status(400);
-    throw new Error('Please provide the listing to report');
+    throw new AppError('Please provide the listing to report');
   }
 
   // Prevent self-reporting
   if (reportType === 'user' && reportedUser === req.user._id.toString()) {
     res.status(400);
-    throw new Error('You cannot report yourself');
+    throw new AppError('You cannot report yourself');
   }
 
   // Check for duplicate reports (same reporter, same target, within 24 hours)
@@ -40,7 +40,7 @@ export const createReport = asyncHandler(async (req, res) => {
 
   if (existingReport) {
     res.status(400);
-    throw new Error('You have already reported this. Please wait for review.');
+    throw new AppError('You have already reported this. Please wait for review.');
   }
 
   const report = await Report.create({
@@ -106,7 +106,7 @@ export const updateReportStatus = asyncHandler(async (req, res) => {
 
   if (!report) {
     res.status(404);
-    throw new Error('Report not found');
+    throw new AppError('Report not found');
   }
 
   report.status = status || report.status;

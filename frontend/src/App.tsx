@@ -5,8 +5,6 @@ import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
 import { useActivityTracker } from './hooks/useActivityTracker';
 import SessionTimeoutWarning from './components/common/SessionTimeoutWarning';
-import { useActivityTracker } from './hooks/useActivityTracker';
-import SessionTimeoutWarning from './components/common/SessionTimeoutWarning';
 
 // Layouts (keep these eager loaded as they're used on every route)
 import MainLayout from './layouts/MainLayout';
@@ -24,6 +22,7 @@ const CreateListingPage = lazy(() => import('./pages/listings/CreateListingPage'
 const ListingDetailPage = lazy(() => import('./pages/listings/ListingDetailPage'));
 const ChatPage = lazy(() => import('./pages/chat/ChatPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const PublicProfilePage = lazy(() => import('./pages/PublicProfilePage'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const FAQPage = lazy(() => import('./pages/FAQPage'));
 const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
@@ -96,6 +95,7 @@ function AnimatedRoutes() {
             <Route path="/" element={<HomePage />} />
             <Route path="/listings" element={<ListingsPage />} />
             <Route path="/listings/:id" element={<ListingDetailPage />} />
+            <Route path="/profile/:userId" element={<PublicProfilePage />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/terms" element={<TermsOfServicePage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
@@ -124,6 +124,14 @@ function AnimatedRoutes() {
             />
             <Route
               path="/listings/create"
+              element={
+                <ProtectedRoute>
+                  <CreateListingPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/listings/:id/edit"
               element={
                 <ProtectedRoute>
                   <CreateListingPage />

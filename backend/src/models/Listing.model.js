@@ -184,6 +184,19 @@ const listingSchema = new mongoose.Schema(
       default: 'draft',
       index: true,
     },
+    soldTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
+    soldOutside: {
+      type: Boolean,
+      default: false,
+    },
+    soldAt: {
+      type: Date,
+      default: null,
+    },
     visibility: {
       type: String,
       enum: ['public', 'private', 'hidden'],
@@ -254,6 +267,15 @@ listingSchema.index({
 listingSchema.virtual('age').get(function () {
   return Math.floor((Date.now() - this.createdAt) / (1000 * 60 * 60 * 24));
 });
+
+// Virtual to expose metrics.views as views for backward compatibility
+listingSchema.virtual('views').get(function () {
+  return this.metrics?.views || 0;
+});
+
+// Ensure virtuals are included in JSON
+listingSchema.set('toJSON', { virtuals: true });
+listingSchema.set('toObject', { virtuals: true });
 
 // Method to increment view count
 listingSchema.methods.incrementViews = function () {

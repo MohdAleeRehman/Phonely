@@ -9,6 +9,7 @@ import Loading from '../../components/common/Loading';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import ReportModal from '../../components/common/ReportModal';
 import AIInspectionReport from '../../components/listings/AIInspectionReport';
+import { MarkAsSoldModal } from '../../components/listing/MarkAsSoldModal';
 
 export default function ListingDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +20,7 @@ export default function ListingDetailPage() {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportTarget, setReportTarget] = useState<{ type: 'user' | 'listing'; id: string; name: string } | null>(null);
+  const [showMarkAsSold, setShowMarkAsSold] = useState(false);
 
   const { data: listing, isLoading, error, refetch } = useQuery({
     queryKey: ['listing', id],
@@ -59,7 +61,10 @@ export default function ListingDetailPage() {
     );
   }
 
-  const isOwner = user?._id === listing.seller._id;
+  // Check ownership - handle both _id and id fields, and seller as object or string
+  const userId = user?._id || user?.id;
+  const sellerId = typeof listing.seller === 'object' ? (listing.seller._id || listing.seller.id) : listing.seller;
+  const isOwner = userId === sellerId;
   
   const imageTypeLabels: Record<string, string> = {
     'front': '📱 Front',
@@ -192,8 +197,8 @@ export default function ListingDetailPage() {
             >
               {/* Title and Price */}
               <div className="card bg-linear-to-br from-white to-gray-50 border-2 border-primary-100">
-                <div className="flex items-start justify-between mb-3">
-                  <h1 className="text-3xl font-bold">
+                <div className="flex flex-col gap-3 mb-4">
+                  <h1 className="text-4xl font-bold text-gray-900 leading-tight">
                     <span className="bg-linear-to-r from-primary-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                       {listing.title}
                     </span>
@@ -203,56 +208,58 @@ export default function ListingDetailPage() {
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ delay: 0.5, type: "spring" }}
-                      className="flex items-center gap-1 text-sm text-green-600 bg-green-50 px-3 py-1.5 rounded-full font-medium border-2 border-green-200"
+                      className="flex items-center gap-2 text-base text-green-600 bg-green-50 px-4 py-2 rounded-full font-semibold border-2 border-green-200 w-fit"
                     >
-                      <span className="text-lg">✅</span>
+                      <span className="text-xl">✅</span>
                       AI Verified
                     </motion.span>
                   )}
                 </div>
-                <div className="flex items-end gap-4 mb-3 flex-wrap">
+                <div className="flex items-end gap-3 mb-4 flex-wrap">
                   <p className="text-5xl font-bold bg-linear-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
                     PKR {listing.price.toLocaleString()}
                   </p>
-                  <span className={`px-4 py-2 rounded-full text-sm font-bold ${conditionColor} border-2`}>
+                  <span className={`px-5 py-2.5 rounded-full text-base font-bold ${conditionColor} border-2 capitalize`}>
                     {listing.condition}
                   </span>
                   {listing.priceNegotiable && (
-                    <span className="px-4 py-2 rounded-full text-sm font-bold bg-blue-50 text-blue-700 border-2 border-blue-200">
+                    <span className="px-5 py-2.5 rounded-full text-base font-bold bg-blue-50 text-blue-700 border-2 border-blue-200">
                       💬 Negotiable
                     </span>
                   )}
                   {listing.ptaApproved && (
-                    <span className="px-4 py-2 rounded-full text-sm font-bold bg-green-50 text-green-700 border-2 border-green-200">
+                    <span className="px-5 py-2.5 rounded-full text-base font-bold bg-green-50 text-green-700 border-2 border-green-200">
                       ✅ PTA Approved
                     </span>
                   )}
                   {!listing.ptaApproved && (
-                    <span className="px-4 py-2 rounded-full text-sm font-bold bg-red-50 text-red-700 border-2 border-red-200">
+                    <span className="px-5 py-2.5 rounded-full text-base font-bold bg-red-50 text-red-700 border-2 border-red-200">
                       ❌ Non-PTA
                     </span>
                   )}
                 </div>
                 {listing.priceRange && (
-                  <div className="bg-linear-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl p-3">
-                    <p className="text-sm font-medium text-gray-700 mb-1">💰 AI Suggested Price Range</p>
-                    <p className="text-lg font-bold text-primary-600">
+                  <div className="bg-linear-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl p-4">
+                    <p className="text-base font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <span className="text-xl">💰</span> AI Suggested Price Range
+                    </p>
+                    <p className="text-2xl font-bold text-primary-600">
                       PKR {listing.priceRange.min.toLocaleString()} - {listing.priceRange.max.toLocaleString()}
                     </p>
                     {listing.price < listing.priceRange.min && (
-                      <p className="text-sm text-green-600 font-medium mt-1 flex items-center gap-1">
-                        <span>🔥</span> Great deal! Below market value
+                      <p className="text-base text-green-600 font-semibold mt-2 flex items-center gap-2">
+                        <span className="text-lg">🔥</span> Great deal! Below market value
                       </p>
                     )}
                     {listing.price > listing.priceRange.max && (
-                      <p className="text-sm text-orange-600 font-medium mt-1 flex items-center gap-1">
+                      <p className="text-base text-orange-600 font-semibold mt-2 flex items-center gap-2">
                         <span>⚠️</span> Above suggested price range
                       </p>
                     )}
                   </div>
                 )}
 
-                {/* Report Listing Button */}
+                {/* Report Listing Button - Only show if not owner and user is logged in */}
                 {!isOwner && user && (
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <button
@@ -382,8 +389,8 @@ export default function ListingDetailPage() {
                   </h2>
                   
                   <div className="space-y-4">
-                    {/* Battery Health */}
-                    {listing.conditionDetails?.batteryHealth && (
+                    {/* Battery Health - Apple Only */}
+                    {listing.phone?.brand === 'Apple' && listing.conditionDetails?.batteryHealth && (
                       <div className="bg-white rounded-xl p-4 border-2 border-purple-200">
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-gray-700 font-medium flex items-center gap-2">
@@ -513,7 +520,7 @@ export default function ListingDetailPage() {
               )}
 
               {/* AI Inspection Report */}
-              {listing.inspectionReport?.reportId && (
+              {listing.inspectionReport?.reportId && typeof listing.inspectionReport.reportId === 'string' && (
                 <AIInspectionReport 
                   inspectionId={listing.inspectionReport.reportId} 
                   listingPrice={listing.price}
@@ -705,11 +712,19 @@ export default function ListingDetailPage() {
                   </span>
                 </h2>
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-16 h-16 bg-linear-to-br from-primary-400 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold border-4 border-white shadow-lg">
+                  <button
+                    onClick={() => navigate(`/profile/${listing.seller._id}`)}
+                    className="w-16 h-16 bg-linear-to-br from-primary-400 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold border-4 border-white shadow-lg hover:scale-105 transition-transform cursor-pointer"
+                  >
                     {listing.seller.name.charAt(0).toUpperCase()}
-                  </div>
+                  </button>
                   <div className="flex-1">
-                    <p className="font-bold text-lg">{listing.seller.name}</p>
+                    <button
+                      onClick={() => navigate(`/profile/${listing.seller._id}`)}
+                      className="font-bold text-lg hover:text-primary-600 transition-colors text-left"
+                    >
+                      {listing.seller.name}
+                    </button>
                     <p className="text-gray-600 text-sm flex items-center gap-1">
                       <span>📍</span> {listing.location.city}
                     </p>
@@ -722,7 +737,7 @@ export default function ListingDetailPage() {
                       }}
                       className="text-sm text-red-600 hover:text-red-700 font-medium flex items-center gap-1 px-3 py-2 rounded-lg border border-red-200 hover:bg-red-50 transition-colors"
                     >
-                      <span>🚨</span> Report
+                      <span>🚨</span> Report User
                     </button>
                   )}
                 </div>
@@ -749,6 +764,19 @@ export default function ListingDetailPage() {
                         <span>💬</span> Contact Seller
                       </span>
                     )}
+                  </motion.button>
+                )}
+
+                {isOwner && listing.status === 'active' && (
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setShowMarkAsSold(true)}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-bold shadow-lg transition-colors mb-3"
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <span>✅</span> Mark as Sold
+                    </span>
                   </motion.button>
                 )}
 
@@ -824,6 +852,16 @@ export default function ListingDetailPage() {
           reportType={reportTarget.type}
           targetId={reportTarget.id}
           targetName={reportTarget.name}
+        />
+      )}
+
+      {/* Mark as Sold Modal */}
+      {showMarkAsSold && (
+        <MarkAsSoldModal
+          isOpen={showMarkAsSold}
+          onClose={() => setShowMarkAsSold(false)}
+          listingId={id!}
+          listingTitle={listing.title}
         />
       )}
     </div>

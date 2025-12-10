@@ -155,8 +155,12 @@ export const getListingById = asyncHandler(async (req, res) => {
     throw new AppError('Listing not found', 404);
   }
 
-  // Increment view count (don't await to not block response)
-  listing.incrementViews();
+  // Increment view count asynchronously (in background)
+  Listing.findByIdAndUpdate(
+    req.params.id,
+    { $inc: { 'metrics.views': 1 } },
+    { new: false }
+  ).catch((err) => console.error('Failed to increment view count:', err));
 
   res.status(200).json({
     status: 'success',
@@ -374,6 +378,103 @@ export const getSwipeFeed = asyncHandler(async (req, res) => {
     results: listings.length,
     data: {
       listings,
+    },
+  });
+});
+
+/**
+ * @desc    Mark listing as sold
+ * @route   PATCH /api/v1/listings/:id/sold
+ * @access  Private (owner only)
+ */
+export const markAsSold = asyncHandler(async (req, res) => {
+  const { soldTo, soldOutside } = req.body;
+
+  const listing = await Listing.findById(req.params.id);
+
+  if (!listing) {
+    throw new AppError('Listing not found', 404);
+  }
+
+  // Check ownership
+  if (listing.seller.toString() !== req.user._id.toString()) {
+    throw new AppError('Not authorized to update this listing', 403);
+  }
+
+  // Check if already sold
+  if (listing.status === 'sold') {
+    throw new AppError('This listing is already marked as sold', 400);
+  }
+
+  // Update listing
+  listing.status = 'sold';
+  listing.soldAt = new Date();
+
+  if (soldOutside) {
+    listing.soldOutside = true;
+    listing.soldTo = null;
+  } else if (soldTo) {
+    listing.soldTo = soldTo;
+    listing.soldOutside = false;
+  }
+
+  await listing.save();
+
+  // Populate soldTo for response
+  await listing.populate('soldTo', 'name avatar');
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Listing marked as sold',
+    data: {
+      listing,
+    },
+  });
+});
+
+/**
+ * @desc    Get chat participants for a listing
+ * @route   GET /api/v1/listings/:id/chat-participants
+ * @access  Private (owner only)
+ */
+export const getChatParticipants = asyncHandler(async (req, res) => {
+  const listing = await Listing.findById(req.params.id);
+
+  if (!listing) {
+    throw new AppError('Listing not found', 404);
+  }
+
+  // Check ownership
+  if (listing.seller.toString() !== req.user._id.toString()) {
+    throw new AppError('Not authorized to access this resource', 403);
+  }
+
+  // Get all chats for this listing
+  const Chat = (await import('../models/Chat.model.js')).default;
+  const chats = await Chat.find({ listing: req.params.id })
+    .populate('participants', 'name avatar');
+
+  // Extract unique participants (excluding the seller)
+  const participantsMap = new Map();
+  chats.forEach((chat) => {
+    chat.participants.forEach((participant) => {
+      const participantId = participant._id.toString();
+      if (participantId !== req.user._id.toString()) {
+        participantsMap.set(participantId, {
+          _id: participant._id,
+          name: participant.name,
+          avatar: participant.avatar,
+        });
+      }
+    });
+  });
+
+  const participants = Array.from(participantsMap.values());
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      participants,
     },
   });
 });

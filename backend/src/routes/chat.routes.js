@@ -7,6 +7,8 @@ import {
   sendMessage,
   markAsRead,
   getUnreadCount,
+  sendOffer,
+  respondToOffer,
 } from '../controllers/chat.controller.js';
 
 const router = express.Router();
@@ -52,5 +54,19 @@ router.post('/:id/messages', protect, sendMessage);
  * @access  Private
  */
 router.put('/:id/read', protect, markAsRead);
+
+/**
+ * @route   POST /api/v1/chats/:id/offer
+ * @desc    Send a price offer in chat
+ * @access  Private
+ */
+router.post('/:id/offer', protect, sendOffer);
+
+/**
+ * @route   PATCH /api/v1/chats/:chatId/offer/:messageId
+ * @desc    Respond to a price offer (accept/reject/counter)
+ * @access  Private
+ */
+router.patch('/:chatId/offer/:messageId', protect, respondToOffer);
 
 export default router;

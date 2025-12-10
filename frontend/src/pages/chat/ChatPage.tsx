@@ -10,6 +10,9 @@ import type { Chat, Message, ChatData } from '../../types';
 import Loading from '../../components/common/Loading';
 import MessageBubble from '../../components/chat/MessageBubble';
 import ChatSkeleton from '../../components/chat/ChatSkeleton';
+import PriceOfferModal from '../../components/chat/PriceOfferModal';
+import SharePhoneModal from '../../components/chat/SharePhoneModal';
+import OfferMessage from '../../components/chat/OfferMessage';
 
 export default function ChatPage() {
   const { chatId } = useParams<{ chatId?: string }>();
@@ -21,6 +24,8 @@ export default function ChatPage() {
   const [selectedChat, setSelectedChat] = useState<string | null>(chatId || null);
   const [messageText, setMessageText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [showPriceOffer, setShowPriceOffer] = useState(false);
+  const [showSharePhone, setShowSharePhone] = useState(false);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Update selected chat when URL changes
@@ -89,98 +94,96 @@ export default function ChatPage() {
     };
   }, [user, token]); // Only reconnect if user/token changes
 
+  // Socket message handlers defined at component level
+  const handleNewMessage = useCallback((message: Message) => {
+    if (!user) return;
+    
+    // Auto-mark as read if this is the currently open chat and message is from another user
+    const senderId = typeof message.sender === 'string' ? message.sender : message.sender.id || message.sender._id;
+    const currentUserId = user._id || user.id;
+    
+    if (message.chat === selectedChat && senderId !== currentUserId) {
+      // Automatically mark as read
+      markAsReadMutation.mutate(message.chat);
+    }
+    
+    // Update chat messages for the specific chat
+    const updated = queryClient.setQueryData(['chat', message.chat], (oldData: ChatData | undefined) => {
+      if (!oldData) {
+        return oldData;
+      }
+      
+      // Check if message already exists to avoid duplicates
+      const messageExists = oldData.chat.messages?.some(m => m._id === message._id);
+      if (messageExists) {
+        return oldData;
+      }
+      
+      const updatedData = {
+        ...oldData,
+        chat: {
+          ...oldData.chat,
+          messages: [...(oldData.chat.messages || []), message],
+        },
+      };
+      return updatedData;
+    });
+    
+    // If no cache data was found, invalidate to trigger refetch
+    if (!updated) {
+      queryClient.invalidateQueries({ queryKey: ['chat', message.chat] });
+    }
+
+    // Update chats list
+    queryClient.invalidateQueries({ queryKey: ['chats'] });
+
+    // Invalidate unread count
+    queryClient.invalidateQueries({ queryKey: ['unreadCount'] });
+
+    // Show notification if message is from another user and chat is not currently selected
+    if (senderId !== currentUserId && message.chat !== selectedChat) {
+      // Get sender name
+      let senderName = 'Someone';
+      if (typeof message.sender === 'object' && message.sender.name) {
+        senderName = message.sender.name;
+      }
+      
+      toast.success(`New message from ${senderName}`, {
+        duration: 4000,
+        position: 'top-right',
+        icon: '💬',
+      });
+    }
+  }, [user, selectedChat, markAsReadMutation, queryClient]);
+
+  const handleTypingEvent = useCallback((data: { chatId: string; userId: string }) => {
+    if (data.chatId === selectedChat && data.userId !== user?._id) {
+      setIsTyping(true);
+    }
+  }, [selectedChat, user]);
+
+  const handleStopTypingEvent = useCallback((data: { chatId: string; userId: string }) => {
+    if (data.chatId === selectedChat && data.userId !== user?._id) {
+      setIsTyping(false);
+    }
+  }, [selectedChat, user]);
+
+  const handleMessagesRead = useCallback((data: { chatId: string; userId: string }) => {
+    // Invalidate unread count to update badges
+    queryClient.invalidateQueries({ queryKey: ['unreadCount'] });
+    
+    // Invalidate chats list to update sidebar
+    queryClient.invalidateQueries({ queryKey: ['chats'] });
+    
+    // Update current chat data if it's the one that was read
+    if (data.chatId === selectedChat) {
+      queryClient.invalidateQueries({ queryKey: ['chat', data.chatId] });
+    }
+  }, [selectedChat, queryClient]);
+
   // Socket message listeners - separate effect
   useEffect(() => {
     if (!user) return;
-
-    // Listen for new messages
-    const handleNewMessage = useCallback((message: Message) => {
-      // Auto-mark as read if this is the currently open chat and message is from another user
-      const senderId = typeof message.sender === 'string' ? message.sender : message.sender.id || message.sender._id;
-      const currentUserId = user._id || user.id;
-      
-      if (message.chat === selectedChat && senderId !== currentUserId) {
-        // Automatically mark as read
-        markAsReadMutation.mutate(message.chat);
-      }
-      
-      // Update chat messages for the specific chat
-      const updated = queryClient.setQueryData(['chat', message.chat], (oldData: ChatData | undefined) => {
-        if (!oldData) {
-          return oldData;
-        }
-        
-        // Check if message already exists to avoid duplicates
-        const messageExists = oldData.chat.messages?.some(m => m._id === message._id);
-        if (messageExists) {
-          return oldData;
-        }
-        
-        const updatedData = {
-          ...oldData,
-          chat: {
-            ...oldData.chat,
-            messages: [...(oldData.chat.messages || []), message],
-          },
-        };
-        return updatedData;
-      });
-      
-      // If no cache data was found, invalidate to trigger refetch
-      if (!updated) {
-        queryClient.invalidateQueries({ queryKey: ['chat', message.chat] });
-      }
-
-      // Update chats list
-      queryClient.invalidateQueries({ queryKey: ['chats'] });
-
-      // Invalidate unread count
-      queryClient.invalidateQueries({ queryKey: ['unreadCount'] });
-
-      // Show notification if message is from another user and chat is not currently selected
-      if (senderId !== currentUserId && message.chat !== selectedChat) {
-        // Get sender name
-        let senderName = 'Someone';
-        if (typeof message.sender === 'object' && message.sender.name) {
-          senderName = message.sender.name;
-        }
-        
-        toast.success(`New message from ${senderName}`, {
-          duration: 4000,
-          position: 'top-right',
-          icon: '💬',
-        });
-      }
-    }, [user, selectedChat, markAsReadMutation, queryClient]);
-
-    // Listen for typing indicators
-    const handleTypingEvent = useCallback((data: { chatId: string; userId: string }) => {
-      if (data.chatId === selectedChat && data.userId !== user._id) {
-        setIsTyping(true);
-      }
-    };
-
-    }, [selectedChat, user]);
-
-    const handleStopTypingEvent = useCallback((data: { chatId: string; userId: string }) => {
-      if (data.chatId === selectedChat && data.userId !== user._id) {
-        setIsTyping(false);
-      }
-    }, [selectedChat, user]);
-
-    // Listen for messages being read by other user
-    const handleMessagesRead = useCallback((data: { chatId: string; userId: string }) => {
-      // Invalidate unread count to update badges
-      queryClient.invalidateQueries({ queryKey: ['unreadCount'] });
-      
-      // Invalidate chats list to update sidebar
-      queryClient.invalidateQueries({ queryKey: ['chats'] });
-      
-      // Update current chat data if it's the one that was read
-      if (data.chatId === selectedChat) {
-        queryClient.invalidateQueries({ queryKey: ['chat', data.chatId] });
-      }
-    }, [selectedChat, queryClient]);
 
     socketService.onNewMessage(handleNewMessage);
     socketService.onTyping(handleTypingEvent);
@@ -194,7 +197,7 @@ export default function ChatPage() {
       socketService.off('stop-typing');
       socketService.off('messages-read');
     };
-  }, [user, queryClient, selectedChat]);
+  }, [user, handleNewMessage, handleTypingEvent, handleStopTypingEvent, handleMessagesRead]);
 
   // Join/leave chat rooms
   useEffect(() => {
@@ -323,8 +326,8 @@ export default function ChatPage() {
       </div>
 
       {/* Sidebar - Conversation List */}
-      <div className="w-80 border-r bg-white/90 backdrop-blur-sm overflow-y-auto relative z-10">
-        <div className="p-4 border-b bg-white/80 backdrop-blur-sm">
+      <div className="w-80 border-r-2 border-gray-200 bg-white/90 backdrop-blur-sm overflow-y-auto relative z-10 shadow-lg">
+        <div className="p-4 border-b-2 border-gray-200 bg-white/80 backdrop-blur-sm">
           <h2 className="text-2xl font-black flex items-center gap-2">
             <span>💬</span> <span className="bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">Messages</span>
           </h2>
@@ -444,6 +447,18 @@ export default function ChatPage() {
                     const senderId = typeof message.sender === 'string' ? message.sender : (message.sender._id || message.sender.id);
                     const isOwnMessage = senderId === currentUserId;
 
+                    // Render OfferMessage for offer type
+                    if (message.type === 'offer') {
+                      return (
+                        <OfferMessage
+                          key={message._id}
+                          message={message}
+                          chatId={selectedChat}
+                          isOwnMessage={isOwnMessage}
+                        />
+                      );
+                    }
+
                     return (
                       <MessageBubble
                         key={message._id}
@@ -480,8 +495,28 @@ export default function ChatPage() {
               )}
             </div>
 
+            {/* Action Buttons */}
+            <div className="bg-white/90 backdrop-blur-sm border-t border-gray-200 px-4 py-2">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowPriceOffer(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors border border-blue-200 font-medium"
+                >
+                  <span className="text-lg">💰</span>
+                  <span>Make Offer</span>
+                </button>
+                <button
+                  onClick={() => setShowSharePhone(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg transition-colors border border-green-200 font-medium"
+                >
+                  <span className="text-lg">📱</span>
+                  <span>Share Number</span>
+                </button>
+              </div>
+            </div>
+
             {/* Message Input */}
-            <div className="bg-white/90 backdrop-blur-sm border-t p-4">
+            <div className="bg-white/90 backdrop-blur-sm border-t border-gray-200 p-4">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -529,6 +564,25 @@ export default function ChatPage() {
           </motion.div>
         )}
       </div>
+
+      {/* Modals */}
+      {selectedChat && chatData?.chat && typeof chatData.chat.listing === 'object' && (
+        <>
+          <PriceOfferModal
+            isOpen={showPriceOffer}
+            onClose={() => setShowPriceOffer(false)}
+            chatId={selectedChat}
+            listing={chatData.chat.listing}
+          />
+          <SharePhoneModal
+            isOpen={showSharePhone}
+            onClose={() => setShowSharePhone(false)}
+            chatId={selectedChat}
+            recipientName={getOtherUser(chatData.chat)?.name || 'User'}
+            userPhone={user?.phone || ''}
+          />
+        </>
+      )}
     </div>
   );
 }

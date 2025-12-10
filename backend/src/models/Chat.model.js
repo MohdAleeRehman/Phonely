@@ -29,7 +29,7 @@ const chatSchema = new mongoose.Schema(
         },
         type: {
           type: String,
-          enum: ['text', 'image', 'offer', 'system'],
+          enum: ['text', 'image', 'offer', 'system', 'phone'],
           default: 'text',
         },
         metadata: {
@@ -41,6 +41,8 @@ const chatSchema = new mongoose.Schema(
           },
           // For image messages
           imageUrl: String,
+          // For phone messages
+          phoneNumber: String,
         },
         readBy: [
           {
