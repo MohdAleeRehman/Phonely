@@ -125,7 +125,7 @@ async def process_inspection(request: InspectionRequest):
             "has_box": pd.get("hasBox", False),
             "has_warranty": pd.get("hasWarranty", False),
             "launch_date": pd.get("launchDate", "2023-01"),
-            "retail_price": pd.get("retailPrice", 50000),
+            "retail_price": pd.get("retailPrice", 0),  # 0 = AI will fetch from WhatMobile/PriceOye tools
             "age_months": calculate_age_months(pd.get("launchDate", "2023-01")),
             "pta_approved": pd.get("ptaApproved", True)  # PTA status for Pakistan market
         }
@@ -166,9 +166,18 @@ async def process_inspection(request: InspectionRequest):
                 "missing_information": ["Unable to analyze description"]
             }
         
-        if not pricing_result:
-            # Fallback pricing based on retail price
-            retail_price = inspection_data.get("retail_price", 50000)
+        if not pricing_result or pricing_result.get("confidence_level") == "low":
+            # Fallback pricing - use WhatMobile/PriceOye data if available
+            # If retail_price is 0 or too low, the pricing agent should have fetched actual price
+            retail_price = inspection_data.get("retail_price", 0)
+            
+            # If retail price is 0 or suspiciously low, log warning
+            if retail_price < 10000:
+                logger.warning(f"⚠️  Retail price too low ({retail_price}), pricing agent should fetch actual price")
+                logger.warning(f"⚠️  This may result in inaccurate pricing estimates")
+                # Use minimum realistic price for budget phones
+                retail_price = 30000
+            
             age_months = inspection_data.get("age_months", 12)
             depreciation_factor = max(0.4, 1 - (age_months / 12 * 0.35))  # 35% year 1 for C2C
             estimated_price = int(retail_price * depreciation_factor)
@@ -180,6 +189,7 @@ async def process_inspection(request: InspectionRequest):
                 "confidence_level": "low",
                 "pta_impact_applied": False
             }
+            logger.warning(f"⚠️  Using fallback pricing: PKR {pricing_result['suggested_min_price']:,}-{pricing_result['suggested_max_price']:,}")
         
         # Structure results in backend's expected format
         parsed_results = {

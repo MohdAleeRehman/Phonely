@@ -97,21 +97,74 @@ HTML CONTENT (first 5000 chars):
         print(f"🚀 WHATMOBILE TOOL ACTUALLY CALLED: {brand} {model}")
         print(f"🔍 Tool execution started at: {datetime.now().isoformat()}")
         try:
-            # Normalize search - WhatMobile uses underscores in URLs
-            # Example: Samsung_Galaxy-A06
-            model_normalized = model.replace(" ", "_").replace("Galaxy ", "Galaxy-")
-            search_term = f"{brand}_{model_normalized}"
-            
-            # Try direct URL pattern
-            url = f"https://www.whatmobile.com.pk/{search_term}"
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
             
-            response = requests.get(url, headers=headers, timeout=10)
+            # WhatMobile URL patterns:
+            # - Brand uses underscores: Apple_, Samsung_, Vivo_
+            # - Model uses hyphens: Galaxy-A55, iPhone-15-Pro-Max
+            # - Some have "5G" suffix, some don't
+            # - Some have storage (512GB), some don't
+            # - Galaxy models: "Galaxy " → "Galaxy-"
             
-            # If direct URL fails, try search
-            if response.status_code != 200:
+            # Generate multiple URL variations to try
+            url_variations = []
+            
+            # Clean model name
+            model_clean = model.strip()
+            
+            # Replace "Galaxy " with "Galaxy-" for Samsung
+            if "Galaxy" in model_clean:
+                model_clean = model_clean.replace("Galaxy ", "Galaxy-")
+            
+            # Replace spaces with hyphens in model
+            model_hyphenated = model_clean.replace(" ", "-")
+            
+            # Build base URL: Brand_Model
+            base_url = f"{brand}_{model_hyphenated}"
+            
+            # Variation 1: Exact as provided
+            url_variations.append(base_url)
+            
+            # Variation 2: Without storage suffix (remove 128GB, 256GB, 512GB, etc)
+            model_no_storage = re.sub(r'-?\d+(GB|TB)', '', model_hyphenated, flags=re.IGNORECASE)
+            if model_no_storage != model_hyphenated:
+                url_variations.append(f"{brand}_{model_no_storage}")
+            
+            # Variation 3: With "5G" if not present
+            if '5G' not in model_hyphenated.upper():
+                url_variations.append(f"{brand}_{model_hyphenated}-5G")
+                if model_no_storage != model_hyphenated:
+                    url_variations.append(f"{brand}_{model_no_storage}-5G")
+            
+            # Variation 4: Without "5G" if present
+            if '5G' in model_hyphenated.upper():
+                model_no_5g = re.sub(r'-?5G', '', model_hyphenated, flags=re.IGNORECASE).rstrip('-')
+                url_variations.append(f"{brand}_{model_no_5g}")
+            
+            # Try each URL variation
+            response = None
+            url = None
+            
+            for variation in url_variations:
+                test_url = f"https://www.whatmobile.com.pk/{variation}"
+                print(f"🔍 Trying URL: {test_url}")
+                try:
+                    test_response = requests.get(test_url, headers=headers, timeout=10)
+                    if test_response.status_code == 200:
+                        # Verify it's not a 404 page disguised as 200
+                        if 'not found' not in test_response.text.lower()[:500]:
+                            response = test_response
+                            url = test_url
+                            print(f"✅ Found at: {test_url}")
+                            break
+                except:
+                    continue
+            
+            # If all direct URLs fail, try search
+            if not response or response.status_code != 200:
+                print(f"⚠️  Direct URLs failed, trying search...")
                 search_url = f"https://www.whatmobile.com.pk/search?search={brand}+{model}"
                 response = requests.get(search_url, headers=headers, timeout=10)
                 
@@ -148,13 +201,47 @@ HTML CONTENT (first 5000 chars):
             
             # Fallback: Try HTML price elements
             if not retail_price:
-                price_elem = soup.find('span', class_='PriceFont') or soup.find('div', class_='price')
-                if price_elem:
-                    price_text = price_elem.text.strip()
-                    # Extract number from "Rs. 27,000" or "PKR 27000"
-                    price_match = re.search(r'(\d{1,3}(?:,\d{3})*)', price_text)
-                    if price_match:
-                        retail_price = int(price_match.group(1).replace(',', ''))
+                # Strategy 1: Find text that says "{model} price in Pakistan is Rs. XXX"
+                # This is the most reliable as it's the main price statement
+                page_text = soup.get_text()
+                
+                # Create a flexible pattern that matches the model name + price statement
+                # Example: "Samsung Galaxy A55 price in Pakistan is Rs. 139,999"
+                model_pattern = re.escape(model[:20])  # Use first 20 chars of model name
+                price_statement_match = re.search(
+                    rf'{model_pattern}.*?price in Pakistan is Rs\.\s*(\d{{1,3}}(?:,\d{{3}})*)',
+                    page_text,
+                    re.IGNORECASE | re.DOTALL
+                )
+                if price_statement_match:
+                    retail_price = int(price_statement_match.group(1).replace(',', ''))
+                    print(f"💰 Found price via main statement: PKR {retail_price:,}")
+                
+                # Strategy 2: Look in the specifications table for "Price in Rs: XXX"
+                if not retail_price:
+                    # Find all table cells
+                    table_cells = soup.find_all(['td', 'th'])
+                    for cell in table_cells:
+                        cell_text = cell.get_text()
+                        if 'Price in Rs:' in cell_text or 'Price in PKR:' in cell_text:
+                            price_match = re.search(r'(\d{1,3}(?:,\d{3})*)', cell_text)
+                            if price_match:
+                                retail_price = int(price_match.group(1).replace(',', ''))
+                                print(f"💰 Found price via specs table: PKR {retail_price:,}")
+                                break
+                
+                # Strategy 3: Last resort - PriceFont span (but validate it's a reasonable phone price)
+                if not retail_price:
+                    price_elem = soup.find('span', class_='PriceFont') or soup.find('div', class_='price')
+                    if price_elem:
+                        price_text = price_elem.text.strip()
+                        price_match = re.search(r'Rs\.?\s*(\d{1,3}(?:,\d{3})*)', price_text)
+                        if price_match:
+                            potential_price = int(price_match.group(1).replace(',', ''))
+                            # Sanity check: phone prices are typically > 10,000 PKR
+                            if potential_price >= 10000:
+                                retail_price = potential_price
+                                print(f"💰 Found price via PriceFont: PKR {retail_price:,}")
             
             if retail_price:
                 result += f"💰 Retail Price: PKR {retail_price:,}\n"

@@ -1,6 +1,6 @@
 """
 OLX Market Data Scraper Tool for CrewAI
-Scrapes current market prices for used phones from OLX Pakistan using Selenium
+Scrapes current market prices for used phones from OLX Pakistan using Playwright
 """
 
 from crewai.tools import BaseTool
@@ -14,15 +14,9 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-# Selenium imports
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
-from webdriver_manager.chrome import ChromeDriverManager
+# Playwright imports (better for cloud servers)
+from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeout
+import asyncio
 
 
 class OLXScraperInput(BaseModel):
@@ -74,12 +68,29 @@ class OLXScraperTool(BaseTool):
         model: str,
         storage: Optional[str] = None
     ) -> str:
-        """Run OLX scraping with Selenium"""
+        """Run OLX scraping with Playwright async in a separate thread"""
         print(f"🚀 OLX SCRAPER ACTUALLY CALLED: {brand} {model} {storage or ''}")
         print(f"🔍 OLX execution started at: {datetime.now().isoformat()}")
         
         try:
-            result = self._scrape_olx_selenium(brand, model, storage)
+            # Run async function in a separate thread to avoid event loop conflicts
+            import concurrent.futures
+            
+            def run_async_in_thread():
+                """Run the async function in a new event loop in a separate thread"""
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                try:
+                    result = loop.run_until_complete(self._scrape_olx_async(brand, model, storage))
+                    return result
+                finally:
+                    loop.close()
+            
+            # Execute in thread pool to avoid uvloop conflicts
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(run_async_in_thread)
+                result = future.result(timeout=60)  # 60 second timeout
+            
             return json.dumps(result, indent=2)
         except Exception as e:
             import traceback
@@ -91,13 +102,13 @@ class OLXScraperTool(BaseTool):
                 "message": "Failed to scrape OLX. Using fallback pricing."
             })
 
-    def _scrape_olx_selenium(
+    async def _scrape_olx_async(
         self,
         brand: str,
         model: str,
         storage: Optional[str] = None
     ) -> Dict[str, Any]:
-        """Scrape OLX Pakistan using Selenium for JavaScript rendering"""
+        """Scrape OLX Pakistan using Playwright async API"""
         
         # Build search query
         query = f"{brand} {model}"
@@ -111,89 +122,79 @@ class OLXScraperTool(BaseTool):
         print(f"🔍 OLX: Searching for '{query}'")
         print(f"🔗 URL: {search_url}")
         
-        driver = None
         try:
-            # Setup Chrome options for headless mode with anti-detection
-            chrome_options = Options()
-            chrome_options.add_argument('--headless=new')  # Use new headless mode
-            chrome_options.add_argument('--no-sandbox')
-            chrome_options.add_argument('--disable-dev-shm-usage')
-            chrome_options.add_argument('--disable-gpu')
-            chrome_options.add_argument('--disable-blink-features=AutomationControlled')  # Hide automation
-            chrome_options.add_argument('--window-size=1920,1080')
-            chrome_options.add_argument('--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
-            chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-            chrome_options.add_experimental_option('useAutomationExtension', False)
-            
-            # Initialize driver with webdriver-manager
-            print("🔧 OLX: Initializing Chrome driver...")
-            service = Service(ChromeDriverManager().install())
-            driver = webdriver.Chrome(service=service, options=chrome_options)
-            
-            # Execute CDP commands to hide webdriver
-            driver.execute_cdp_cmd('Network.setUserAgentOverride', {
-                "userAgent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            })
-            driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-            
-            # Load page
-            print(f"📄 OLX: Loading page...")
-            driver.get(search_url)
-            
-            # Wait for page to load with multiple strategies
-            print("⏳ OLX: Waiting for listings to render...")
-            try:
-                # Wait for article cards (actual OLX structure)
-                WebDriverWait(driver, 15).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, "_617daaaa"))
+            # Initialize Playwright async (much better for cloud servers!)
+            print("🔧 OLX: Initializing Playwright browser...")
+            async with async_playwright() as p:
+                # Launch browser with headless mode
+                browser = await p.chromium.launch(
+                    headless=True,
+                    args=[
+                        '--no-sandbox',
+                        '--disable-setuid-sandbox',
+                        '--disable-dev-shm-usage',
+                        '--disable-blink-features=AutomationControlled'
+                    ]
                 )
-                print("✅ OLX: Listings loaded successfully")
-            except TimeoutException:
-                print("⚠️  OLX: Timeout waiting for listings, continuing anyway...")
-            
-            # Scroll to trigger lazy loading
-            driver.execute_script("window.scrollTo(0, 1000);")
-            time.sleep(2)
-            driver.execute_script("window.scrollTo(0, 0);")
-            time.sleep(1)
-            
-            # Get page source after JavaScript rendering
-            page_source = driver.page_source
-            soup = BeautifulSoup(page_source, 'html.parser')
-            
-            # Extract listings (actual OLX structure uses article elements)
-            listings = []
-            listing_cards = soup.find_all('article', class_='_617daaaa')
-            
-            print(f"🔍 OLX: Found {len(listing_cards)} listing cards")
-            
-            # If no results with storage, try without storage
-            if len(listing_cards) == 0 and storage:
-                print(f"⚠️  OLX: No results with storage '{storage}', trying without...")
-                driver.quit()
                 
-                # Retry without storage
-                query_no_storage = f"{brand} {model}"
-                search_url_no_storage = f"{base_url}/mobile-phones_c1453/q-{query_no_storage.replace(' ', '-')}"
+                # Create context with real browser-like settings
+                context = await browser.new_context(
+                    user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    viewport={'width': 1920, 'height': 1080}
+                )
                 
-                # Reinitialize driver
-                service = Service(ChromeDriverManager().install())
-                driver = webdriver.Chrome(service=service, options=chrome_options)
-                driver.execute_cdp_cmd('Network.setUserAgentOverride', {
-                    "userAgent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-                })
-                driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+                # Create page
+                page = await context.new_page()
                 
-                driver.get(search_url_no_storage)
-                time.sleep(3)
-                driver.execute_script("window.scrollTo(0, 1000);")
-                time.sleep(2)
+                # Load page (use domcontentloaded instead of networkidle - faster and more reliable)
+                print(f"📄 OLX: Loading page...")
+                await page.goto(search_url, wait_until='domcontentloaded', timeout=45000)
                 
-                page_source = driver.page_source
+                # Wait for listings to render
+                print("⏳ OLX: Waiting for listings to render...")
+                try:
+                    await page.wait_for_selector('article._617daaaa', timeout=20000)
+                    print("✅ OLX: Listings loaded successfully")
+                except PlaywrightTimeout:
+                    print("⚠️  OLX: Timeout waiting for listings, continuing anyway...")
+                
+                # Give JavaScript time to fully render
+                await asyncio.sleep(2)
+                
+                # Scroll to trigger lazy loading
+                await page.evaluate("window.scrollTo(0, 1000)")
+                await asyncio.sleep(2)
+                await page.evaluate("window.scrollTo(0, 0)")
+                await asyncio.sleep(1)
+                
+                # Get page HTML after JavaScript rendering
+                page_source = await page.content()
                 soup = BeautifulSoup(page_source, 'html.parser')
+            
+                # Extract listings (actual OLX structure uses article elements)
+                listings = []
                 listing_cards = soup.find_all('article', class_='_617daaaa')
-                search_url = search_url_no_storage
-                print(f"🔍 OLX: Found {len(listing_cards)} listing cards (without storage)")
+                
+                print(f"🔍 OLX: Found {len(listing_cards)} listing cards")
+                
+                # If no results with storage, try without storage
+                if len(listing_cards) == 0 and storage:
+                    print(f"⚠️  OLX: No results with storage '{storage}', trying without...")
+                    
+                    # Retry without storage
+                    query_no_storage = f"{brand} {model}"
+                    search_url_no_storage = f"{base_url}/mobile-phones_c1453/q-{query_no_storage.replace(' ', '-')}"
+                    
+                    await page.goto(search_url_no_storage, wait_until='domcontentloaded', timeout=45000)
+                    await asyncio.sleep(3)
+                    await page.evaluate("window.scrollTo(0, 1000)")
+                    await asyncio.sleep(2)
+                    
+                    page_source = await page.content()
+                    soup = BeautifulSoup(page_source, 'html.parser')
+                    listing_cards = soup.find_all('article', class_='_617daaaa')
+                    search_url = search_url_no_storage
+                    print(f"🔍 OLX: Found {len(listing_cards)} listing cards (without storage)")
             
             for card in listing_cards[:10]:  # Limit to 10 listings
                 try:
@@ -237,6 +238,7 @@ class OLXScraperTool(BaseTool):
                     print(f"⚠️  Failed to parse listing: {e}")
                     continue
             
+            # After processing all listings, prepare result
             result = {
                 "source": "OLX Pakistan",
                 "query": query,
@@ -249,10 +251,15 @@ class OLXScraperTool(BaseTool):
             self._save_tool_log(brand, model, storage or "N/A", search_url, page_source, result)
             
             print(f"✅ OLX: Extracted {len(listings)} valid listings")
+            
+            # Close browser
+            await browser.close()
+            print("🔒 OLX: Browser closed")
+            
             return result
             
         except Exception as e:
-            print(f"❌ OLX Selenium error: {e}")
+            print(f"❌ OLX Playwright error: {e}")
             import traceback
             traceback.print_exc()
             return {
@@ -260,7 +267,3 @@ class OLXScraperTool(BaseTool):
                 "listings": [],
                 "search_url": search_url
             }
-        finally:
-            if driver:
-                driver.quit()
-                print("🔒 OLX: Browser closed")

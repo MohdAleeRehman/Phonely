@@ -133,7 +133,7 @@ export default function CreateListingPage() {
         warranty: existingListing.phone.warranty?.hasWarranty,
         ptaApproved: existingListing.ptaApproved,
         batteryHealth: existingListing.conditionDetails?.batteryHealth,
-        displayQuality: existingListing.conditionDetails?.displayQuality as any,
+        displayQuality: existingListing.conditionDetails?.displayQuality as 'flawless' | 'minor-scratches' | 'noticeable-wear' | 'cracked' | undefined,
         allFeaturesWorking: existingListing.conditionDetails?.allFeaturesWorking,
         issues: existingListing.conditionDetails?.functionalIssues || [],
         additionalNotes: existingListing.conditionDetails?.additionalNotes,
@@ -149,7 +149,7 @@ export default function CreateListingPage() {
       });
 
       // Set images
-      const loadedImages = existingListing.images.map((img: any) => ({
+      const loadedImages = existingListing.images.map((img: string | { url: string; type?: string }) => ({
         url: typeof img === 'string' ? img : img.url,
         type: typeof img === 'object' && img.type ? img.type : 'front',
       }));
@@ -162,7 +162,7 @@ export default function CreateListingPage() {
   }, [isEditMode, existingListing, reset]);
 
   const updateMutation = useMutation({
-    mutationFn: (data: any) => listingService.updateListing(id!, data),
+    mutationFn: (data: Parameters<typeof listingService.updateListing>[1]) => listingService.updateListing(id!, data),
     onSuccess: (listing) => {
       navigate(`/listings/${id}`, { 
         state: { 
@@ -205,8 +205,8 @@ export default function CreateListingPage() {
             condition: listing.condition,
             hasBox: listing.accessories?.box || false,
             hasWarranty: listing.phone.warranty?.hasWarranty || false,
-            launchDate: '2023-01', // Default launch date - backend will handle this
-            retailPrice: 50000, // Default retail price - backend will fetch from WhatMobile
+            launchDate: '2023-01', // AI service will fetch actual launch date from WhatMobile/GSMArena
+            retailPrice: 0, // AI service will fetch actual retail price from WhatMobile/PriceOye
             ptaApproved: true, // Default PTA status for Pakistan market
           },
           listing.description

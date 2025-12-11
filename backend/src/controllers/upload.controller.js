@@ -63,8 +63,9 @@ export const uploadImages = asyncHandler(async (req, res) => {
         );
       }
 
-      // Optimize image with Sharp
+      // Optimize image with Sharp - rotate() auto-fixes orientation from EXIF
       const optimizedBuffer = await sharp(imageBuffer)
+        .rotate() // Auto-rotate based on EXIF orientation (fixes mobile camera issues)
         .resize(1200, 1200, {
           fit: 'inside',
           withoutEnlargement: true,
