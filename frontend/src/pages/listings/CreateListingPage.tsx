@@ -218,13 +218,9 @@ export default function CreateListingPage() {
         // Continue anyway - inspection can fail but listing is created
       }
 
-      // Navigate to homepage with success message
-      navigate('/', { 
-        state: { 
-          message: 'listing_submitted',
-          listingTitle: listing.title
-        } 
-      });
+      // Show confirmation screen with listing details
+      setCurrentStep(5); // Move to confirmation step
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     onError: () => {
       setError('Failed to create listing. Please try again.');
@@ -467,57 +463,174 @@ export default function CreateListingPage() {
                 setValue={setValue as never}
               />
             )}
+
+            {/* Step 5: Success Confirmation Screen */}
+            {currentStep === 5 && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-12 space-y-8"
+              >
+                {/* Success Animation */}
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                  className="w-32 h-32 mx-auto mb-6 bg-linear-to-br from-green-400 via-emerald-500 to-teal-600 rounded-full flex items-center justify-center shadow-2xl"
+                >
+                  <span className="text-6xl">✅</span>
+                </motion.div>
+
+                {/* Success Message */}
+                <div>
+                  <h2 className="text-4xl font-black mb-3">
+                    <span className="bg-linear-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                      Listing Submitted Successfully!
+                    </span>
+                  </h2>
+                  <p className="text-xl text-gray-600 mb-2">
+                    Your phone is now live on Phonely 🎉
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Listing ID: <span className="font-mono bg-gray-100 px-2 py-1 rounded">{createMutation.data?._id || 'Processing...'}</span>
+                  </p>
+                </div>
+
+                {/* What's Next Section */}
+                <div className="card bg-linear-to-br from-primary-50 via-purple-50 to-pink-50 border-2 border-primary-200 max-w-2xl mx-auto">
+                  <h3 className="text-2xl font-bold mb-6 flex items-center justify-center gap-2">
+                    <span>🤖</span>
+                    <span>What Happens Next?</span>
+                  </h3>
+                  
+                  <div className="grid md:grid-cols-3 gap-6 text-left">
+                    <div className="space-y-2">
+                      <div className="text-4xl mb-2">🔍</div>
+                      <h4 className="font-bold text-lg">AI Inspection</h4>
+                      <p className="text-sm text-gray-600">
+                        Our AI is analyzing your photos and verifying the condition (takes 30-60 seconds)
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="text-4xl mb-2">💰</div>
+                      <h4 className="font-bold text-lg">Price Verification</h4>
+                      <p className="text-sm text-gray-600">
+                        AI checks current market prices and suggests optimal pricing
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="text-4xl mb-2">👥</div>
+                      <h4 className="font-bold text-lg">Go Live</h4>
+                      <p className="text-sm text-gray-600">
+                        Your listing appears to buyers immediately with AI trust score
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tips Section */}
+                <div className="card bg-blue-50 border-2 border-blue-200 max-w-xl mx-auto">
+                  <h3 className="text-xl font-bold mb-4 flex items-center justify-center gap-2">
+                    <span>💡</span>
+                    <span>Pro Tips</span>
+                  </h3>
+                  <ul className="text-left space-y-2 text-sm text-gray-700">
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-500 mt-1">✓</span>
+                      <span>Check your email - buyers may contact you directly</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-500 mt-1">✓</span>
+                      <span>Respond quickly to inquiries for better visibility</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-500 mt-1">✓</span>
+                      <span>AI trust score updates within 1 minute - refresh your listing page</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-500 mt-1">✓</span>
+                      <span>You can edit your listing anytime from "My Listings"</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
+                  <motion.button
+                    onClick={() => navigate('/listings')}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="btn-secondary px-8 py-4 text-lg"
+                  >
+                    🔍 Browse All Listings
+                  </motion.button>
+                  
+                  <motion.button
+                    onClick={() => navigate('/')}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="btn-primary px-8 py-4 text-lg"
+                  >
+                    🏠 Go to Homepage
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
           </motion.div>
         </AnimatePresence>
 
-        {/* Navigation Buttons */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="flex justify-between gap-4 pt-6"
-        >
-          <button
-            type="button"
-            onClick={handleBack}
-            disabled={currentStep === 1}
-            className={`px-6 py-3 rounded-xl font-semibold transition-all ${
-              currentStep === 1
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200 shadow-md hover:shadow-lg'
-            }`}
+        {/* Navigation Buttons - Hide on confirmation screen */}
+        {currentStep < 5 && (
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="flex justify-between gap-4 pt-6"
           >
-            ← Back
-          </button>
-
-          {currentStep < STEPS.length ? (
             <button
               type="button"
-              onClick={handleNext}
-              className="px-8 py-3 bg-linear-to-r from-primary-500 to-purple-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105"
+              onClick={handleBack}
+              disabled={currentStep === 1}
+              className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+                currentStep === 1
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200 shadow-md hover:shadow-lg'
+              }`}
             >
-              Next →
+              ← Back
             </button>
-          ) : (
-            <button
-              type="submit"
-              disabled={createMutation.isPending || updateMutation.isPending}
-              className="px-8 py-3 bg-linear-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            >
-              {(createMutation.isPending || updateMutation.isPending) ? (
-                <span className="flex items-center gap-2">
-                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  {isEditMode ? 'Updating...' : 'Creating...'}
-                </span>
-              ) : (
-                isEditMode ? '✅ Update Listing' : '🚀 Create Listing'
-              )}
-            </button>
-          )}
-        </motion.div>
+
+            {currentStep < STEPS.length ? (
+              <button
+                type="button"
+                onClick={handleNext}
+                className="px-8 py-3 bg-linear-to-r from-primary-500 to-purple-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105"
+              >
+                Next →
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={createMutation.isPending || updateMutation.isPending}
+                className="px-8 py-3 bg-linear-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                {(createMutation.isPending || updateMutation.isPending) ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    {isEditMode ? 'Updating...' : 'Creating...'}
+                  </span>
+                ) : (
+                  isEditMode ? '✅ Update Listing' : '🚀 Create Listing'
+                )}
+              </button>
+            )}
+          </motion.div>
+        )}
       </form>
 
       {/* Submitting Loading Modal */}

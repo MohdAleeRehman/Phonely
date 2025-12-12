@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useState, useMemo } from 'react';
 import type { UseFormRegister, FieldErrors, UseFormWatch, UseFormSetValue } from 'react-hook-form';
 import { ButtonCard } from '../../common/ButtonCard';
 
@@ -46,6 +47,25 @@ export default function AccessoriesAndLocationStep({
   watch,
   setValue,
 }: AccessoriesAndLocationStepProps) {
+  const [citySearch, setCitySearch] = useState('');
+  const [cityFocused, setCityFocused] = useState(false);
+
+  // Filter cities based on search
+  const filteredCitiesByProvince = useMemo(() => {
+    if (!citySearch) return CITIES_BY_PROVINCE;
+
+    const filtered: Record<string, string[]> = {};
+    Object.entries(CITIES_BY_PROVINCE).forEach(([province, cities]) => {
+      const matchedCities = cities.filter(city =>
+        city.toLowerCase().includes(citySearch.toLowerCase())
+      );
+      if (matchedCities.length > 0) {
+        filtered[province] = matchedCities;
+      }
+    });
+    return filtered;
+  }, [citySearch]);
+
   return (
     <motion.div
       initial={{ y: 20, opacity: 0 }}
@@ -95,22 +115,59 @@ export default function AccessoriesAndLocationStep({
 
         <div className="space-y-4">
           {/* City */}
-          <div>
+          <div className="relative">
             <label className="block text-sm font-bold text-gray-700 mb-2">
               City *
             </label>
-            <select {...register('city')} className="input-field">
-              <option value="">Select City</option>
-              {Object.entries(CITIES_BY_PROVINCE).map(([province, cities]) => (
-                <optgroup key={province} label={province}>
-                  {cities.map((city) => (
-                    <option key={city} value={city}>
-                      {city}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
+            
+            {/* Hidden input for form registration */}
+            <input type="hidden" {...register('city')} />
+            
+            {/* Search input (not part of form) */}
+            <input
+              type="text"
+              placeholder="🔍 Search or select city..."
+              value={(watch('city') as string) || citySearch}
+              onChange={(e) => {
+                setCitySearch(e.target.value);
+                setValue('city', '');
+              }}
+              onFocus={() => setCityFocused(true)}
+              onBlur={() => setTimeout(() => setCityFocused(false), 200)}
+              className="input-field"
+            />
+            
+            {/* Dropdown */}
+            {cityFocused && (
+              <div className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto border-2 border-gray-300 rounded-lg bg-white shadow-lg">
+                {Object.keys(filteredCitiesByProvince).length > 0 ? (
+                  Object.entries(filteredCitiesByProvince).map(([province, cities]) => (
+                    <div key={province}>
+                      <div className="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-50 sticky top-0 border-b">
+                        {province}
+                      </div>
+                      {cities.map((city) => (
+                        <button
+                          key={city}
+                          type="button"
+                          onClick={() => { 
+                            setValue('city', city); 
+                            setCitySearch(''); 
+                            setCityFocused(false);
+                          }}
+                          className="w-full text-left px-4 py-2.5 hover:bg-primary-50 text-sm border-b border-gray-100 last:border-0 transition-colors"
+                        >
+                          {city}
+                        </button>
+                      ))}
+                    </div>
+                  ))
+                ) : (
+                  <div className="px-4 py-3 text-sm text-gray-500">No cities found matching "{citySearch}"</div>
+                )}
+              </div>
+            )}
+            
             {errors.city && (
               <p className="text-red-600 text-sm mt-1">{errors.city.message as string}</p>
             )}
