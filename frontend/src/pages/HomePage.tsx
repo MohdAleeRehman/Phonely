@@ -63,131 +63,120 @@ export default function HomePage() {
         )}
       </AnimatePresence>
 
-      {/* Hero Section - Gen Z Style */}
-      <section className="relative overflow-hidden bg-linear-to-br from-primary-600 via-primary-700 to-purple-800 text-white">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-primary-300 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
-          <div className="absolute top-40 right-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl animate-pulse animation-delay-2000"></div>
-          <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl animate-pulse animation-delay-4000"></div>
+      {/* Hero Section - #F2F2F2 (Section 1) */}
+      <section className="relative overflow-hidden" style={{ backgroundColor: '#F2F2F2' }}>
+        {/* Subtle pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-20 left-10 w-96 h-96 bg-primary-600 rounded-full mix-blend-multiply filter blur-3xl"></div>
+          <div className="absolute top-40 right-10 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl"></div>
+          <div className="absolute bottom-20 left-1/2 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl"></div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
-          <div className="text-center space-y-8 animate-slide-up">
-            {/* Emoji Header */}
-            <div className="text-6xl md:text-8xl animate-bounce">📱</div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+          <div className="text-center space-y-6 animate-slide-up">
+            {/* Logo with tagline - clean on light background */}
+            <div className="flex justify-center">
+              <img src="/phonely-logo-with-tagline-no-bg.png" alt="Phonely - Your trusted phone marketplace" className="h-56 md:h-64" />
+            </div>
             
-            <h1 className="text-5xl md:text-7xl font-black leading-tight">
+            <h1 className="text-5xl md:text-7xl font-black leading-tight text-gray-900 -mt-16">
               Buy & Sell Phones
               <br />
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-yellow-300 to-pink-400">
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-600 to-purple-700">
                 Like Never Before
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-100 max-w-2xl mx-auto font-medium">
-              AI-powered authenticity checks 🤖 • Real-time chat 💬 • 
-              <br className="hidden md:block" />
-              Secure transactions 🔒 • Best deals in Pakistan 🇵🇰
-            </p>
+            <div className="flex flex-wrap justify-center gap-4 md:gap-6 max-w-4xl mx-auto">
+              <div className="flex items-center gap-2 text-lg md:text-xl text-gray-700 font-medium">
+                <span>🤖</span>
+                <span>AI-powered authenticity checks</span>
+              </div>
+              <div className="flex items-center gap-2 text-lg md:text-xl text-gray-700 font-medium">
+                <span>💬</span>
+                <span>Real-time chat</span>
+              </div>
+              <div className="flex items-center gap-2 text-lg md:text-xl text-gray-700 font-medium">
+                <span>🔒</span>
+                <span>Secure transactions</span>
+              </div>
+              <div className="flex items-center gap-2 text-lg md:text-xl text-gray-700 font-medium">
+                <span>🇵🇰</span>
+                <span>Best deals in Pakistan</span>
+              </div>
+            </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
               <Link 
                 to="/listings" 
-                className="px-8 py-4 bg-white text-primary-700 rounded-full font-bold text-lg hover:scale-105 transition-transform duration-200 shadow-2xl hover:shadow-primary-400/50 flex items-center space-x-2"
+                className="px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white rounded-full font-bold text-lg hover:scale-105 transition-all duration-200 shadow-xl hover:shadow-2xl flex items-center space-x-2"
               >
                 <span>🔍</span>
                 <span>Browse Phones</span>
               </Link>
               <Link 
                 to="/listings/create" 
-                className="px-8 py-4 bg-linear-to-r from-yellow-400 to-orange-500 text-gray-900 rounded-full font-bold text-lg hover:scale-105 transition-transform duration-200 shadow-2xl hover:shadow-yellow-400/50 flex items-center space-x-2"
+                className="px-8 py-4 bg-linear-to-r from-yellow-400 to-orange-500 text-gray-900 rounded-full font-bold text-lg hover:scale-105 transition-all duration-200 shadow-xl hover:shadow-2xl flex items-center space-x-2"
               >
                 <span>✨</span>
                 <span>Sell Now</span>
               </Link>
             </div>
 
-            {/* Trust Badges */}
-            <div className="flex flex-wrap justify-center gap-8 pt-8">
-              <div className="flex items-center space-x-2">
-                <span className="text-3xl">✅</span>
-                <span className="text-sm font-semibold">AI Verified</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-3xl">🔒</span>
-                <span className="text-sm font-semibold">100% Secure</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-3xl">⚡</span>
-                <span className="text-sm font-semibold">Instant Chat</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-3xl">🇵🇰</span>
-                <span className="text-sm font-semibold">Made in Pakistan</span>
-              </div>
-            </div>
           </div>
-        </div>
-
-        {/* Wave Divider */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="white"/>
-          </svg>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 bg-white">
+      {/* What Makes Us Different Section - Gradient (Section 2) */}
+      <section className="py-16 bg-linear-to-r from-primary-600 via-purple-700 to-pink-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="space-y-2"
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col items-center space-y-3"
             >
-              <div className="text-4xl md:text-5xl font-black text-primary-600">50K+</div>
-              <div className="text-gray-600 font-medium">Phones Listed</div>
+              <span className="text-5xl">🎯</span>
+              <span className="text-xl font-bold text-white">No Middleman Fees</span>
+              <p className="text-sm text-gray-100">Direct buyer-seller connection</p>
             </motion.div>
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="space-y-2"
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.05 }}
+              className="flex flex-col items-center space-y-3"
             >
-              <div className="text-4xl md:text-5xl font-black text-primary-600">25K+</div>
-              <div className="text-gray-600 font-medium">Happy Users</div>
+              <span className="text-5xl">📊</span>
+              <span className="text-xl font-bold text-white">Price Transparency</span>
+              <p className="text-sm text-gray-100">AI-powered fair pricing</p>
             </motion.div>
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="space-y-2"
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              className="flex flex-col items-center space-y-3"
             >
-              <div className="text-4xl md:text-5xl font-black text-primary-600">98%</div>
-              <div className="text-gray-600 font-medium">Success Rate</div>
+              <span className="text-5xl">🔍</span>
+              <span className="text-xl font-bold text-white">Smart Search Filters</span>
+              <p className="text-sm text-gray-100">Find exactly what you need</p>
             </motion.div>
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-              className="space-y-2"
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.15 }}
+              className="flex flex-col items-center space-y-3"
             >
-              <div className="text-4xl md:text-5xl font-black text-primary-600">24/7</div>
-              <div className="text-gray-600 font-medium">Support</div>
+              <span className="text-5xl">🆓</span>
+              <span className="text-xl font-bold text-white">Free to Use</span>
+              <p className="text-sm text-gray-100">No listing fees, no hidden charges</p>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-linear-to-b from-white to-gray-50">
+      {/* Features Section - #F2F2F2 (Section 3) */}
+      <section className="py-20" style={{ backgroundColor: '#F2F2F2' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 animate-slide-up">
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
@@ -202,8 +191,8 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="group p-8 rounded-2xl bg-linear-to-br from-blue-50 to-blue-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+              transition={{ duration: 0.3 }}
+              className="group p-8 rounded-2xl bg-white hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 border-gray-200"
             >
               <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-200">🤖</div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">AI Inspection</h3>
@@ -217,8 +206,8 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="group p-8 rounded-2xl bg-linear-to-brrom-purple-50 to-purple-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+              transition={{ duration: 0.3 }}
+              className="group p-8 rounded-2xl bg-white hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 border-gray-200"
             >
               <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-200">💬</div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">Real-time Chat</h3>
@@ -232,8 +221,8 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="group p-8 rounded-2xl bg-linear-to-br from-green-50 to-green-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+              transition={{ duration: 0.3 }}
+              className="group p-8 rounded-2xl bg-white hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 border-gray-200"
             >
               <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-200">🔒</div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">100% Secure</h3>
@@ -247,8 +236,8 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-              className="group p-8 rounded-2xl bg-linear-to-br from-yellow-50 to-yellow-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+              transition={{ duration: 0.3 }}
+              className="group p-8 rounded-2xl bg-white hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 border-gray-200"
             >
               <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-200">💰</div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">Best Prices</h3>
@@ -262,8 +251,8 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.5 }}
-              className="group p-8 rounded-2xl bg-linear-to-br from-pink-50 to-pink-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+              transition={{ duration: 0.3 }}
+              className="group p-8 rounded-2xl bg-white hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 border-gray-200"
             >
               <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-200">⚡</div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">Lightning Fast</h3>
@@ -277,8 +266,8 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.6 }}
-              className="group p-8 rounded-2xl bg-linear-to-br from-orange-50 to-orange-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+              transition={{ duration: 0.3 }}
+              className="group p-8 rounded-2xl bg-white hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 border-gray-200"
             >
               <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-200">🇵🇰</div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">Local & Trusted</h3>
@@ -290,14 +279,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="py-20 bg-white">
+      {/* How It Works Section - Gradient (Section 4) */}
+      <section className="py-20 bg-linear-to-r from-primary-600 via-purple-700 to-pink-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
-              How It <span className="text-primary-600">Works</span> 🎯
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+              How It <span className="text-yellow-300">Works</span> 🎯
             </h2>
-            <p className="text-xl text-gray-600">Super simple, even your grandma can do it!</p>
+            <p className="text-xl text-gray-100">Super simple, even your grandma can do it!</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -306,14 +295,14 @@ export default function HomePage() {
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
+              transition={{ duration: 0.3 }}
               className="relative text-center"
             >
               <div className="w-20 h-20 mx-auto bg-linear-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center text-white text-3xl font-black mb-4 shadow-lg">
                 1
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">📸 Upload Photos</h3>
-              <p className="text-gray-600">Take clear photos of your phone from all angles. Our AI will analyze them!</p>
+              <h3 className="text-xl font-bold text-white mb-2">📸 Upload Photos</h3>
+              <p className="text-gray-100">Take clear photos of your phone from all angles. Our AI will analyze them!</p>
               {/* Arrow */}
               <div className="hidden md:block absolute top-10 -right-4 text-4xl text-primary-300">→</div>
             </motion.div>
@@ -323,14 +312,14 @@ export default function HomePage() {
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
+              transition={{ duration: 0.3 }}
               className="relative text-center"
             >
               <div className="w-20 h-20 mx-auto bg-linear-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center text-white text-3xl font-black mb-4 shadow-lg">
                 2
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">🤖 AI Inspection</h3>
-              <p className="text-gray-600">Get instant authenticity check, condition score, and fair price estimate!</p>
+              <h3 className="text-xl font-bold text-white mb-2">🤖 AI Inspection</h3>
+              <p className="text-gray-100">Get instant authenticity check, condition score, and fair price estimate!</p>
               {/* Arrow */}
               <div className="hidden md:block absolute top-10 -right-4 text-4xl text-purple-300">→</div>
             </motion.div>
@@ -340,14 +329,14 @@ export default function HomePage() {
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
+              transition={{ duration: 0.3 }}
               className="relative text-center"
             >
               <div className="w-20 h-20 mx-auto bg-linear-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center text-white text-3xl font-black mb-4 shadow-lg">
                 3
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">💬 Start Chatting</h3>
-              <p className="text-gray-600">Connect with buyers instantly. Negotiate, answer questions, close deals!</p>
+              <h3 className="text-xl font-bold text-white mb-2">💬 Start Chatting</h3>
+              <p className="text-gray-100">Connect with buyers instantly. Negotiate, answer questions, close deals!</p>
               {/* Arrow */}
               <div className="hidden md:block absolute top-10 -right-4 text-4xl text-green-300">→</div>
             </motion.div>
@@ -357,21 +346,21 @@ export default function HomePage() {
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
+              transition={{ duration: 0.3 }}
               className="text-center"
             >
               <div className="w-20 h-20 mx-auto bg-linear-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center text-white text-3xl font-black mb-4 shadow-lg">
                 4
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">💰 Get Paid</h3>
-              <p className="text-gray-600">Meet safely, verify the buyer, hand over phone, and get paid. Easy money!</p>
+              <h3 className="text-xl font-bold text-white mb-2">💰 Get Paid</h3>
+              <p className="text-gray-100">Meet safely, verify the buyer, hand over phone, and get paid. Easy money!</p>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-20 bg-linear-to-b from-gray-50 to-white">
+      {/* Testimonials Section - #F2F2F2 (Section 5) */}
+      <section className="py-20" style={{ backgroundColor: '#F2F2F2' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
@@ -386,8 +375,8 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300"
+              transition={{ duration: 0.3 }}
+              className="bg-white/95 backdrop-blur-md p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300"
             >
               <div className="flex items-center mb-4">
                 <div className="w-12 h-12 bg-linear-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-xl font-bold">
@@ -409,8 +398,8 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300"
+              transition={{ duration: 0.3 }}
+              className="bg-white/95 backdrop-blur-md p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300"
             >
               <div className="flex items-center mb-4">
                 <div className="w-12 h-12 bg-linear-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center text-white text-xl font-bold">
@@ -432,8 +421,8 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300"
+              transition={{ duration: 0.3 }}
+              className="bg-white/95 backdrop-blur-md p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300"
             >
               <div className="flex items-center mb-4">
                 <div className="w-12 h-12 bg-linear-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center text-white text-xl font-bold">

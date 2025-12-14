@@ -49,11 +49,10 @@ export default function MainLayout() {
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-gray-200/50 shadow-sm">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            {/* Logo & Nav */}
+            {/* Logo & Nav - Main logo without tagline (gradient version) */}
             <div className="flex items-center space-x-8">
-              <Link to="/" className="text-2xl font-black hover:scale-105 transition-transform duration-200 flex items-center gap-2">
-                <span>📱</span>
-                <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-600 to-primary-800">Phonely</span>
+              <Link to="/" className="hover:scale-105 transition-transform duration-200 flex items-center gap-2">
+                <img src="/phonely-logo-wo-tagline-no-bg.png" alt="Phonely" className="h-24" />
               </Link>
               <div className="hidden md:flex items-center space-x-6">
                 <Link to="/listings" className="text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 hover:scale-105 transform">
@@ -180,56 +179,56 @@ export default function MainLayout() {
         </AnimatePresence>
       </main>
 
-      {/* Footer - Gen Z Style */}
-      <footer className="bg-linear-to-r from-gray-900 via-gray-800 to-gray-900 text-white mt-auto border-t-4 border-primary-600">
+      {/* Footer - Clean Style */}
+      <footer className="bg-gray-50 text-gray-800 mt-auto border-t-2 border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Brand */}
+            {/* Brand - Main logo without tagline (gradient version) */}
             <div className="space-y-4">
-              <h3 className="text-2xl font-black">
-                <span>📱</span> <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-400 to-primary-600">Phonely</span>
-              </h3>
-              <p className="text-gray-400 text-sm">
+              <div className="flex items-center">
+                <img src="/phonely-logo-wo-tagline-no-bg.png" alt="Phonely" className="h-24" />
+              </div>
+              <p className="text-gray-600 text-sm">
                 Your trusted marketplace for buying and selling phones. AI-powered authenticity checks. 🔥
               </p>
               <div className="flex space-x-4">
-                <a href="#" className="text-gray-400 hover:text-primary-400 transition-colors duration-200 text-xl">📘</a>
-                <a href="#" className="text-gray-400 hover:text-primary-400 transition-colors duration-200 text-xl">📷</a>
-                <a href="#" className="text-gray-400 hover:text-primary-400 transition-colors duration-200 text-xl">🐦</a>
+                <a href="#" className="text-gray-600 hover:text-primary-600 transition-colors duration-200 text-xl">📘</a>
+                <a href="#" className="text-gray-600 hover:text-primary-600 transition-colors duration-200 text-xl">📷</a>
+                <a href="#" className="text-gray-600 hover:text-primary-600 transition-colors duration-200 text-xl">🐦</a>
               </div>
             </div>
 
             {/* Quick Links */}
             <div>
-              <h4 className="font-bold mb-4 text-white">Quick Links</h4>
+              <h4 className="font-bold mb-4 text-gray-900">Quick Links</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link to="/listings" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">Browse Phones</Link></li>
-                <li><Link to="/listings/create" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">Sell Your Phone</Link></li>
-                <li><Link to="/chat" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">Messages</Link></li>
-                <li><Link to="/profile" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">My Profile</Link></li>
+                <li><Link to="/listings" className="text-gray-600 hover:text-primary-600 transition-colors duration-200">Browse Phones</Link></li>
+                <li><Link to="/listings/create" className="text-gray-600 hover:text-primary-600 transition-colors duration-200">Sell Your Phone</Link></li>
+                <li><Link to="/chat" className="text-gray-600 hover:text-primary-600 transition-colors duration-200">Messages</Link></li>
+                <li><Link to="/profile" className="text-gray-600 hover:text-primary-600 transition-colors duration-200">My Profile</Link></li>
               </ul>
             </div>
 
             {/* Support */}
             <div>
-              <h4 className="font-bold mb-4 text-white">Support</h4>
+              <h4 className="font-bold mb-4 text-gray-900">Support</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link to="/faq" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">FAQs</Link></li>
-                <li><a href="mailto:support@phonely.com.pk" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">Contact Us</a></li>
+                <li><a href="/faq" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-primary-600 transition-colors duration-200">FAQs</a></li>
+                <li><a href="mailto:support@phonely.com.pk" className="text-gray-600 hover:text-primary-600 transition-colors duration-200">Contact Us</a></li>
               </ul>
             </div>
 
             {/* Newsletter */}
             <div>
-              <h4 className="font-bold mb-4 text-white">Stay Updated 📬</h4>
-              <p className="text-gray-400 text-sm mb-3">Get the latest deals and updates!</p>
+              <h4 className="font-bold mb-4 text-gray-900">Stay Updated 📬</h4>
+              <p className="text-gray-600 text-sm mb-3">Get the latest deals and updates!</p>
               <div className="flex">
                 <input 
                   type="email" 
                   placeholder="Your email" 
-                  className="flex-1 px-3 py-2 bg-gray-700 text-white rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="flex-1 px-3 py-2 bg-white border border-gray-300 text-gray-900 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
-                <button className="px-4 py-2 bg-primary-600 hover:bg-primary-700 rounded-r-lg transition-colors duration-200 font-semibold">
+                <button className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-r-lg transition-colors duration-200 font-semibold">
                   →
                 </button>
               </div>
@@ -237,11 +236,11 @@ export default function MainLayout() {
           </div>
 
           {/* Bottom Bar */}
-          <div className="mt-8 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-gray-400 text-sm">© 2025 Phonely. All rights reserved. Made with 💙 in Pakistan</p>
+          <div className="mt-8 pt-8 border-t border-gray-300 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <p className="text-gray-600 text-sm">© 2025 Phonely. All rights reserved. Made with 💙 in Pakistan</p>
             <div className="flex space-x-6 text-sm">
-              <Link to="/privacy" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">Privacy Policy</Link>
-              <Link to="/terms" className="text-gray-400 hover:text-primary-400 transition-colors duration-200">Terms of Service</Link>
+              <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-primary-600 transition-colors duration-200">Privacy Policy</a>
+              <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-primary-600 transition-colors duration-200">Terms of Service</a>
             </div>
           </div>
         </div>

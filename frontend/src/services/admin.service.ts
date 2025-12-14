@@ -58,8 +58,31 @@ export interface PlatformAnalytics {
 
 export const adminService = {
   getDashboard: async () => {
-    const response = await api.get<{ status: string; data: AdminStats }>('/admin/dashboard');
-    return response.data.data;
+    const response = await api.get<{ 
+      status: string; 
+      data: { 
+        stats: {
+          users: { total: number; active: number; verified: number };
+          listings: { total: number; active: number; sold: number };
+        };
+        recentActivity: {
+          users: User[];
+          listings: Listing[];
+        };
+      }
+    }>('/admin/dashboard');
+    
+    // Transform nested response to flat structure
+    const { stats, recentActivity } = response.data.data;
+    return {
+      totalUsers: stats.users.total,
+      totalListings: stats.listings.total,
+      activeListings: stats.listings.active,
+      soldListings: stats.listings.sold,
+      totalRevenue: 0, // Not provided by backend yet
+      recentUsers: recentActivity.users,
+      recentListings: recentActivity.listings,
+    };
   },
 
   getUsers: async (page = 1, limit = 10) => {
@@ -70,8 +93,14 @@ export const adminService = {
   },
 
   getListings: async (status = 'all', page = 1, limit = 10) => {
+    const params: Record<string, string | number> = { page, limit };
+    // Only add status param if it's not 'all'
+    if (status && status !== 'all') {
+      params.status = status;
+    }
+    
     const response = await api.get<PaginatedResponse<Listing>>('/admin/listings', {
-      params: { status, page, limit },
+      params,
     });
     return response.data;
   },
@@ -114,5 +143,19 @@ export const adminService = {
       status,
     });
     return response.data.data;
+  },
+
+  getReports: async (status?: string, reportType?: string) => {
+    const params: Record<string, string> = {};
+    if (status) params.status = status;
+    if (reportType) params.reportType = reportType;
+    
+    const response = await api.get('/reports', { params });
+    return response.data;
+  },
+
+  updateReportStatus: async (reportId: string, data: { status: string; adminNotes?: string }) => {
+    const response = await api.put(`/reports/${reportId}`, data);
+    return response.data;
   },
 };

@@ -12,16 +12,18 @@ export default function AuthLayout() {
       </div>
 
       <div className="w-full max-w-md relative z-10">
+        {/* Logo with tagline in white pill - CTA/Promo style */}
         <motion.div 
           className="text-center mb-8"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-5xl font-black mb-2">
-            <span>📱</span> <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-600 to-primary-800">Phonely</span>
-          </h1>
-          <p className="text-gray-600 mt-2">Your trusted phone marketplace ✨</p>
+          <a href="/" onClick={() => window.scrollTo(0, 0)} className="inline-block">
+            <div className="inline-block bg-white px-8 py-6 rounded-full shadow-2xl hover:scale-105 transition-transform duration-200">
+              <img src="/phonely-logo-with-tagline-no-bg.png" alt="Phonely - Your trusted phone marketplace" className="h-40 md:h-44" />
+            </div>
+          </a>
         </motion.div>
         <motion.div 
           className="card backdrop-blur-xl bg-white/95 shadow-2xl border border-primary-100"

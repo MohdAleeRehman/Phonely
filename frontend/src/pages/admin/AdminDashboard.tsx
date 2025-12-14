@@ -5,7 +5,7 @@ import type { User, Listing } from '../../types';
 import Loading from '../../components/common/Loading';
 import ErrorMessage from '../../components/common/ErrorMessage';
 
-type Tab = 'overview' | 'users' | 'listings';
+type Tab = 'overview' | 'users' | 'listings' | 'reports';
 
 export default function AdminDashboard() {
   const queryClient = useQueryClient();
@@ -13,6 +13,8 @@ export default function AdminDashboard() {
   const [usersPage, setUsersPage] = useState(1);
   const [listingsPage, setListingsPage] = useState(1);
   const [listingStatusFilter, setListingStatusFilter] = useState<string>('');
+  const [reportStatusFilter, setReportStatusFilter] = useState<string>('');
+  const [reportTypeFilter, setReportTypeFilter] = useState<string>('');
 
   // Fetch dashboard stats
   const { data: stats, isLoading: statsLoading } = useQuery({
@@ -35,6 +37,13 @@ export default function AdminDashboard() {
     enabled: activeTab === 'listings',
   });
 
+  // Fetch reports
+  const { data: reportsData, isLoading: reportsLoading } = useQuery({
+    queryKey: ['adminReports', reportStatusFilter, reportTypeFilter],
+    queryFn: () => adminService.getReports(reportStatusFilter, reportTypeFilter),
+    enabled: activeTab === 'reports',
+  });
+
   // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: adminService.deleteUser,
@@ -50,6 +59,15 @@ export default function AdminDashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminListings'] });
       queryClient.invalidateQueries({ queryKey: ['adminStats'] });
+    },
+  });
+
+  // Update report mutation
+  const updateReportMutation = useMutation({
+    mutationFn: ({ reportId, data }: { reportId: string; data: { status: string; adminNotes?: string } }) =>
+      adminService.updateReportStatus(reportId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminReports'] });
     },
   });
 
@@ -101,6 +119,16 @@ export default function AdminDashboard() {
             }`}
           >
             Listings
+          </button>
+          <button
+            onClick={() => setActiveTab('reports')}
+            className={`pb-4 px-2 font-medium border-b-2 transition-colors ${
+              activeTab === 'reports'
+                ? 'border-primary-600 text-primary-600'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Reports
           </button>
         </div>
       </div>
@@ -282,7 +310,7 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-4 py-3 text-sm">{user.email}</td>
                         <td className="px-4 py-3 text-sm">{user.phone}</td>
-                        <td className="px-4 py-3 text-sm">{user.city}</td>
+                        <td className="px-4 py-3 text-sm">{user.location?.city || 'N/A'}</td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                             user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
@@ -482,6 +510,163 @@ export default function AdminDashboard() {
             </>
           ) : (
             <ErrorMessage message="Failed to load listings" />
+          )}
+        </>
+      )}
+
+      {/* Reports Tab */}
+      {activeTab === 'reports' && (
+        <>
+          {/* Filters */}
+          <div className="mb-6 flex gap-4">
+            <select
+              value={reportStatusFilter}
+              onChange={(e) => setReportStatusFilter(e.target.value)}
+              className="input-field max-w-xs"
+            >
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="reviewed">Reviewed</option>
+              <option value="resolved">Resolved</option>
+              <option value="dismissed">Dismissed</option>
+            </select>
+
+            <select
+              value={reportTypeFilter}
+              onChange={(e) => setReportTypeFilter(e.target.value)}
+              className="input-field max-w-xs"
+            >
+              <option value="">All Types</option>
+              <option value="user">User Reports</option>
+              <option value="listing">Listing Reports</option>
+            </select>
+          </div>
+
+          {reportsLoading ? (
+            <Loading />
+          ) : reportsData && reportsData.length > 0 ? (
+            <div className="space-y-4">
+              {reportsData.map((report: any) => (
+                <div key={report._id} className="card border-l-4 border-l-red-500">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      {/* Report Header */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="text-2xl">
+                          {report.reportType === 'user' ? '👤' : '📱'}
+                        </span>
+                        <div>
+                          <h3 className="font-bold text-lg">
+                            {report.reportType === 'user' ? 'User Report' : 'Listing Report'}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            Reported {new Date(report.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <span className={`ml-auto px-3 py-1 rounded-full text-xs font-medium ${
+                          report.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                          report.status === 'reviewed' ? 'bg-blue-100 text-blue-800' :
+                          report.status === 'resolved' ? 'bg-green-100 text-green-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {report.status.toUpperCase()}
+                        </span>
+                      </div>
+
+                      {/* Report Details */}
+                      <div className="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <p className="text-sm text-gray-600 font-medium">Reporter:</p>
+                          <p className="text-sm">{report.reporter?.name} ({report.reporter?.email})</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600 font-medium">Reported:</p>
+                          <p className="text-sm">
+                            {report.reportType === 'user' 
+                              ? `${report.reportedUser?.name} (${report.reportedUser?.email})`
+                              : report.reportedListing?.title}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Reason & Description */}
+                      <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                        <p className="text-sm font-bold text-gray-700 mb-2">
+                          🚨 Reason: <span className="text-red-600">{report.reason.replace(/-/g, ' ').toUpperCase()}</span>
+                        </p>
+                        <p className="text-sm text-gray-700">{report.description}</p>
+                      </div>
+
+                      {/* Admin Notes */}
+                      {report.adminNotes && (
+                        <div className="bg-blue-50 rounded-lg p-4 mb-4">
+                          <p className="text-sm font-bold text-blue-700 mb-1">Admin Notes:</p>
+                          <p className="text-sm text-gray-700">{report.adminNotes}</p>
+                          {report.reviewedBy && (
+                            <p className="text-xs text-gray-500 mt-2">
+                              Reviewed by {report.reviewedBy.name} on {new Date(report.reviewedAt).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  {report.status === 'pending' && (
+                    <div className="flex gap-2 mt-4 pt-4 border-t">
+                      <button
+                        onClick={() => {
+                          const adminNotes = prompt('Add admin notes (optional):');
+                          updateReportMutation.mutate({
+                            reportId: report._id,
+                            data: { status: 'reviewed', adminNotes: adminNotes || undefined }
+                          });
+                        }}
+                        disabled={updateReportMutation.isPending}
+                        className="btn-secondary text-sm"
+                      >
+                        Mark as Reviewed
+                      </button>
+                      <button
+                        onClick={() => {
+                          const adminNotes = prompt('Add resolution notes:');
+                          if (adminNotes) {
+                            updateReportMutation.mutate({
+                              reportId: report._id,
+                              data: { status: 'resolved', adminNotes }
+                            });
+                          }
+                        }}
+                        disabled={updateReportMutation.isPending}
+                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                      >
+                        Resolve
+                      </button>
+                      <button
+                        onClick={() => {
+                          const adminNotes = prompt('Why is this report being dismissed?');
+                          if (adminNotes) {
+                            updateReportMutation.mutate({
+                              reportId: report._id,
+                              data: { status: 'dismissed', adminNotes }
+                            });
+                          }
+                        }}
+                        disabled={updateReportMutation.isPending}
+                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                      >
+                        Dismiss
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="card text-center py-12">
+              <p className="text-gray-500">No reports found</p>
+            </div>
           )}
         </>
       )}

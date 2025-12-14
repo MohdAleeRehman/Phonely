@@ -10,7 +10,7 @@ export default defineConfig({
     tailwindcss(),
     // Brotli and Gzip compression for all assets
     compression({
-      include: [/\.(js|css|html|svg|json)$/],
+      include: [/\.(js|css|html|svg|json|png|jpg|jpeg|gif|webp)$/],
       threshold: 1024, // Only compress files larger than 1KB
     }),
   ],

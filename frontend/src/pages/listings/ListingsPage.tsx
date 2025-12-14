@@ -183,12 +183,7 @@ export default function ListingsPage() {
       </div>
 
       {/* Search Bar with Filter Toggle and Sort */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="card mb-6 relative z-10 backdrop-blur-sm bg-white/90"
-      >
+      <div className="card mb-6 relative z-10 backdrop-blur-sm bg-white/90">
         <div className="flex flex-col sm:flex-row gap-3">
           {/* Search Input */}
           <div className="flex-1">
@@ -216,25 +211,23 @@ export default function ListingsPage() {
           </div>
 
           {/* Filter Toggle Button */}
-          <motion.button
+          <button
             onClick={() => setShowFilters(!showFilters)}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
             className={`btn-secondary sm:w-auto whitespace-nowrap ${showFilters ? 'bg-primary-100 border-primary-400' : ''}`}
           >
             {showFilters ? '✖️ Hide Filters' : '🎛️ Show Filters'}
-          </motion.button>
+          </button>
         </div>
-      </motion.div>
+      </div>
 
       {/* Filters Panel (Collapsible) */}
       <AnimatePresence>
         {showFilters && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, maxHeight: 0 }}
+            animate={{ opacity: 1, maxHeight: 1000 }}
+            exit={{ opacity: 0, maxHeight: 0 }}
+            transition={{ duration: 0.15 }}
             className="overflow-hidden mb-8 relative z-10"
           >
             <div className="card backdrop-blur-sm bg-white/90">
@@ -422,12 +415,12 @@ export default function ListingsPage() {
           </motion.div>
           
           <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8 relative z-10">
-            {sortedListings.map((listing, index) => (
+            {sortedListings.map((listing) => (
               <motion.div
                 key={listing._id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
+                transition={{ duration: 0.2 }}
               >
                 <PhoneCard listing={listing} />
               </motion.div>

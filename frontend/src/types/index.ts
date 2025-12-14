@@ -5,9 +5,15 @@ export interface User {
   email: string;
   phone: string;
   avatar?: string;
-  city: string;
+  location?: {
+    city?: string;
+    country?: string;
+  };
+  city?: string; // Kept for backwards compatibility
   role: 'user' | 'admin';
   isVerified: boolean;
+  verified?: boolean; // Backend sometimes uses this name
+  isActive?: boolean;
   createdAt: string;
 }
 
