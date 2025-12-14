@@ -1,7 +1,5 @@
 import Waitlist from '../models/waitlist.model.js';
-import { asyncHandler } from '../utils/asyncHandler.js';
-import { ApiError } from '../utils/ApiError.js';
-import { ApiResponse } from '../utils/ApiResponse.js';
+import { asyncHandler, AppError } from '../middleware/error.middleware.js';
 import { sendWaitlistConfirmation } from '../services/email.service.js';
 
 /**
@@ -14,13 +12,13 @@ export const addToWaitlist = asyncHandler(async (req, res) => {
 
   // Validate input
   if (!name || !email) {
-    throw new ApiError(400, 'Name and email are required');
+    throw new AppError('Name and email are required', 400);
   }
 
   // Check if email already exists
   const existingEntry = await Waitlist.findOne({ email });
   if (existingEntry) {
-    throw new ApiError(400, 'This email is already on the waitlist');
+    throw new AppError('This email is already on the waitlist', 400);
   }
 
   // Create waitlist entry
@@ -36,9 +34,11 @@ export const addToWaitlist = asyncHandler(async (req, res) => {
     // Don't fail the request if email fails
   });
 
-  res.status(201).json(
-    new ApiResponse(201, waitlistEntry, 'Successfully joined the waitlist')
-  );
+  res.status(201).json({
+    status: 'success',
+    data: waitlistEntry,
+    message: 'Successfully joined the waitlist',
+  });
 });
 
 /**
@@ -56,16 +56,17 @@ export const getWaitlist = asyncHandler(async (req, res) => {
 
   const count = await Waitlist.countDocuments();
 
-  res.json(
-    new ApiResponse(200, {
+  res.json({
+    status: 'success',
+    data: {
       waitlist: waitlistEntries,
       pagination: {
         currentPage: page,
         totalPages: Math.ceil(count / limit),
         totalItems: count,
       },
-    })
-  );
+    },
+  });
 });
 
 /**
@@ -77,8 +78,11 @@ export const removeFromWaitlist = asyncHandler(async (req, res) => {
   const waitlistEntry = await Waitlist.findByIdAndDelete(req.params.id);
 
   if (!waitlistEntry) {
-    throw new ApiError(404, 'Waitlist entry not found');
+    throw new AppError('Waitlist entry not found', 404);
   }
 
-  res.json(new ApiResponse(200, null, 'Successfully removed from waitlist'));
+  res.json({
+    status: 'success',
+    message: 'Successfully removed from waitlist',
+  });
 });
