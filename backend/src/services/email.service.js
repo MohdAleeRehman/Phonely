@@ -477,6 +477,117 @@ export const sendVerificationEmail = async (email, name, verificationToken) => {
   return sendEmail({ to: email, subject, html });
 };
 
+/**
+ * Send waitlist confirmation email
+ * @param {string} email - User email
+ * @param {string} name - User name
+ */
+export const sendWaitlistConfirmation = async (email, name) => {
+  const subject = 'Welcome to the Phonely Waitlist! 🚀';
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #2563eb 0%, #7c3aed 50%, #ec4899 100%); color: white; padding: 40px 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .logo { width: 100px; height: auto; margin: 0 auto 20px; display: block; }
+        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+        .cta-box { background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); padding: 25px; border-radius: 8px; text-align: center; margin: 25px 0; }
+        .cta-button { display: inline-block; background: white; color: #2563eb; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 10px; }
+        .features { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .feature-item { display: flex; align-items: start; margin: 15px 0; }
+        .feature-icon { font-size: 24px; margin-right: 12px; }
+        .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+        .social-links { margin: 20px 0; }
+        .social-links a { display: inline-block; margin: 0 10px; color: #2563eb; text-decoration: none; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <img src="https://beta.phonely.com.pk/phonely-logo-wo-tagline-no-bg.png" alt="Phonely" class="logo" />
+          <h1 style="margin: 0; font-size: 32px;">You're on the List! 🎉</h1>
+          <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Thank you for your interest in Phonely</p>
+        </div>
+        <div class="content">
+          <h2>Hi ${name}! 👋</h2>
+          <p>Great news! You've successfully joined the Phonely waitlist. You're one of the early supporters who will help revolutionize phone reselling in Pakistan.</p>
+          
+          <div class="cta-box">
+            <p style="color: white; margin: 0 0 5px 0; font-size: 18px;">🧪 Our Beta Platform is Live!</p>
+            <p style="color: white; margin: 0 0 15px 0; opacity: 0.9;">Try it out now while we perfect the experience</p>
+            <a href="https://beta.phonely.com.pk" class="cta-button">Visit Beta Platform →</a>
+          </div>
+
+          <div class="features">
+            <h3 style="margin-top: 0; color: #2563eb;">What Makes Phonely Different?</h3>
+            
+            <div class="feature-item">
+              <span class="feature-icon">🇵🇰</span>
+              <div>
+                <strong>Built for Pakistan</strong><br>
+                <span style="color: #666; font-size: 14px;">Understanding local market dynamics and pricing</span>
+              </div>
+            </div>
+            
+            <div class="feature-item">
+              <span class="feature-icon">🤖</span>
+              <div>
+                <strong>AI-Powered Evaluation</strong><br>
+                <span style="color: #666; font-size: 14px;">Instant, accurate pricing based on real market data</span>
+              </div>
+            </div>
+            
+            <div class="feature-item">
+              <span class="feature-icon">🎯</span>
+              <div>
+                <strong>No Middlemen</strong><br>
+                <span style="color: #666; font-size: 14px;">Connect directly with buyers, get better prices</span>
+              </div>
+            </div>
+            
+            <div class="feature-item">
+              <span class="feature-icon">🔒</span>
+              <div>
+                <strong>Secure & Transparent</strong><br>
+                <span style="color: #666; font-size: 14px;">Every transaction is protected and traceable</span>
+              </div>
+            </div>
+          </div>
+
+          <p><strong>What's Next?</strong></p>
+          <ul>
+            <li>📱 Mobile apps launching soon (iOS & Android)</li>
+            <li>✨ We'll notify you when we officially launch</li>
+            <li>🎁 Early supporters get exclusive benefits</li>
+            <li>💬 Your feedback shapes our platform</li>
+          </ul>
+
+          <div class="social-links">
+            <p><strong>Stay Connected:</strong></p>
+            <a href="https://www.instagram.com/phonelypk/" target="_blank">📸 Follow us on Instagram</a><br>
+            <a href="mailto:support@phonely.com.pk">📧 support@phonely.com.pk</a>
+          </div>
+          
+          <p>Thank you for believing in our vision. Together, we're making phone reselling smarter! 🚀</p>
+          
+          <p>Best regards,<br>The Phonely Team</p>
+        </div>
+        <div class="footer">
+          <p>© ${new Date().getFullYear()} Phonely. Built with ❤️ in Pakistan.</p>
+          <p>This is an automated email. Please don't reply to this address.</p>
+          <p style="font-size: 11px; margin-top: 15px;">You received this email because you joined our waitlist at phonely.com.pk</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({ to: email, subject, html });
+};
+
 export default {
   sendEmail,
   sendOTPEmail,
@@ -484,5 +595,6 @@ export default {
   sendListingNotification,
   sendVerificationEmail,
   sendAdminOTPEmail,
+  sendWaitlistConfirmation,
 };
 

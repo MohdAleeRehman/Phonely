@@ -5,7 +5,7 @@ import type { User, Listing } from '../../types';
 import Loading from '../../components/common/Loading';
 import ErrorMessage from '../../components/common/ErrorMessage';
 
-type Tab = 'overview' | 'users' | 'listings' | 'reports';
+type Tab = 'overview' | 'users' | 'listings' | 'reports' | 'waitlist';
 
 export default function AdminDashboard() {
   const queryClient = useQueryClient();
@@ -15,6 +15,7 @@ export default function AdminDashboard() {
   const [listingStatusFilter, setListingStatusFilter] = useState<string>('');
   const [reportStatusFilter, setReportStatusFilter] = useState<string>('');
   const [reportTypeFilter, setReportTypeFilter] = useState<string>('');
+  const [waitlistPage, setWaitlistPage] = useState(1);
 
   // Fetch dashboard stats
   const { data: stats, isLoading: statsLoading } = useQuery({
@@ -44,6 +45,13 @@ export default function AdminDashboard() {
     enabled: activeTab === 'reports',
   });
 
+  // Fetch waitlist
+  const { data: waitlistData, isLoading: waitlistLoading } = useQuery({
+    queryKey: ['adminWaitlist', waitlistPage],
+    queryFn: () => adminService.getWaitlist(waitlistPage, 50),
+    enabled: activeTab === 'waitlist',
+  });
+
   // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: adminService.deleteUser,
@@ -71,6 +79,14 @@ export default function AdminDashboard() {
     },
   });
 
+  // Delete waitlist entry mutation
+  const deleteWaitlistMutation = useMutation({
+    mutationFn: adminService.removeFromWaitlist,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminWaitlist'] });
+    },
+  });
+
   const handleDeleteUser = (userId: string, userName: string) => {
     if (window.confirm(`Are you sure you want to delete user "${userName}"? This action cannot be undone.`)) {
       deleteUserMutation.mutate(userId);
@@ -80,6 +96,12 @@ export default function AdminDashboard() {
   const handleDeleteListing = (listingId: string, listingTitle: string) => {
     if (window.confirm(`Are you sure you want to delete listing "${listingTitle}"?`)) {
       deleteListingMutation.mutate(listingId);
+    }
+  };
+
+  const handleDeleteWaitlistEntry = (entryId: string, email: string) => {
+    if (window.confirm(`Are you sure you want to remove "${email}" from the waitlist?`)) {
+      deleteWaitlistMutation.mutate(entryId);
     }
   };
 
@@ -129,6 +151,16 @@ export default function AdminDashboard() {
             }`}
           >
             Reports
+          </button>
+          <button
+            onClick={() => setActiveTab('waitlist')}
+            className={`pb-4 px-2 font-medium border-b-2 transition-colors ${
+              activeTab === 'waitlist'
+                ? 'border-primary-600 text-primary-600'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Waitlist
           </button>
         </div>
       </div>
@@ -666,6 +698,127 @@ export default function AdminDashboard() {
           ) : (
             <div className="card text-center py-12">
               <p className="text-gray-500">No reports found</p>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Waitlist Tab */}
+      {activeTab === 'waitlist' && (
+        <>
+          {waitlistLoading ? (
+            <Loading />
+          ) : waitlistData && waitlistData.waitlist.length > 0 ? (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-2xl font-bold">Waitlist Entries</h2>
+                  <p className="text-gray-600 mt-1">
+                    Total: {waitlistData.pagination.totalItems} {waitlistData.pagination.totalItems === 1 ? 'entry' : 'entries'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Waitlist Table */}
+              <div className="card overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Name
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Email
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Source
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Joined
+                        </th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {waitlistData.waitlist.map((entry) => (
+                        <tr key={entry._id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-900">{entry.name}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">{entry.email}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              {entry.source}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {entry.notified ? (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                ✓ Notified
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                ⏳ Pending
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {new Date(entry.createdAt).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button
+                              onClick={() => handleDeleteWaitlistEntry(entry._id, entry.email)}
+                              disabled={deleteWaitlistMutation.isPending}
+                              className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                            >
+                              Remove
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Pagination */}
+              {waitlistData.pagination.totalPages > 1 && (
+                <div className="flex justify-center gap-2">
+                  <button
+                    onClick={() => setWaitlistPage((p) => Math.max(1, p - 1))}
+                    disabled={waitlistPage === 1}
+                    className="btn-secondary disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <span className="py-2 px-4">
+                    Page {waitlistData.pagination.currentPage} of {waitlistData.pagination.totalPages}
+                  </span>
+                  <button
+                    onClick={() => setWaitlistPage((p) => Math.min(waitlistData.pagination.totalPages, p + 1))}
+                    disabled={waitlistPage === waitlistData.pagination.totalPages}
+                    className="btn-secondary disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="card text-center py-12">
+              <p className="text-gray-500">No waitlist entries yet</p>
             </div>
           )}
         </>

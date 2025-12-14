@@ -12,7 +12,10 @@ import type { AuthResponse } from '../../types';
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
-  phone: z.string().regex(/^\+\d{10,15}$/, 'Phone must be in format +923001234567'),
+  phone: z
+    .string()
+    .regex(/^\+92\d{10}$/, 'Phone must be in format +92XXXXXXXXXX (13 characters)')
+    .length(13, 'Phone must be exactly 13 characters (+92 followed by 10 digits)'),
   password: z
     .string()
     .min(8, 'Password must be at least 8 characters')
@@ -173,12 +176,14 @@ export default function RegisterPage() {
             {...register('phone')}
             className="input-field"
             placeholder="+923001234567"
+            maxLength={13}
           />
           {errors.phone && (
             <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
               <span className="grayscale opacity-70">⚠️</span> {errors.phone.message}
             </p>
           )}
+          <p className="text-xs text-gray-500 mt-1">Format: +92 followed by 10 digits</p>
         </div>
 
         {/* Password Field with Strength Indicator */}

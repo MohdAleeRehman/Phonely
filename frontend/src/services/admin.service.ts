@@ -43,6 +43,24 @@ export interface ListingDetails extends Listing {
   };
 }
 
+export interface WaitlistEntry {
+  _id: string;
+  name: string;
+  email: string;
+  source: string;
+  notified: boolean;
+  createdAt: string;
+}
+
+export interface WaitlistResponse {
+  waitlist: WaitlistEntry[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+  };
+}
+
 export interface PlatformAnalytics {
   userGrowth: Array<{ date: string; count: number }>;
   listingGrowth: Array<{ date: string; count: number }>;
@@ -156,6 +174,18 @@ export const adminService = {
 
   updateReportStatus: async (reportId: string, data: { status: string; adminNotes?: string }) => {
     const response = await api.put(`/reports/${reportId}`, data);
+    return response.data;
+  },
+
+  getWaitlist: async (page = 1, limit = 50) => {
+    const response = await api.get<{ status: string; data: WaitlistResponse }>('/waitlist', {
+      params: { page, limit },
+    });
+    return response.data.data;
+  },
+
+  removeFromWaitlist: async (entryId: string) => {
+    const response = await api.delete(`/waitlist/${entryId}`);
     return response.data;
   },
 };

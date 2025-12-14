@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phonely - Your Trusted Phone Marketplace</title>
+  <meta name="description" content="Sell your phone smarter with Phonely. AI-powered phone resale platform currently in beta testing.">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+              950: '#172554',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    .float-animation {
+      animation: float 6s ease-in-out infinite;
+    }
+    .gradient-text {
+      background: linear-gradient(to right, #2563eb, #7c3aed, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+  <!-- Hero Section -->
+  <section class="min-h-screen flex items-center justify-center px-4 py-16 relative overflow-hidden">
+    <!-- Background blobs -->
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute top-20 left-10 w-96 h-96 bg-primary-600 rounded-full mix-blend-multiply filter blur-3xl float-animation"></div>
+      <div class="absolute top-40 right-10 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl float-animation" style="animation-delay: 2s;"></div>
+      <div class="absolute bottom-20 left-1/2 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl float-animation" style="animation-delay: 4s;"></div>
+    </div>
+
+    <div class="max-w-4xl mx-auto text-center relative z-10">
+      <!-- Logo -->
+      <div class="mb-0">
+        <img src="./logo.png" alt="Phonely" class="h-64 md:h-72 mx-auto" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+        <h1 class="hidden text-5xl font-black gradient-text">Phonely</h1>
+      </div>
+
+      <!-- Beta Badge -->
+      <div class="-mt-8 inline-flex items-center gap-2 px-4 py-2 bg-blue-100 border-2 border-blue-300 rounded-full mb-6">
+        <span class="text-2xl">🧪</span>
+        <span class="text-blue-900 font-semibold">Currently in Beta</span>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight">
+        Sell your phone.<br />
+        <span class="gradient-text">Smarter.</span>
+      </h1>
+
+      <!-- Subtext -->
+      <p class="text-xl md:text-2xl text-gray-600 mb-12 max-w-2xl mx-auto">
+        AI-powered phone resale platform for Pakistan.
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <a 
+          href="#notify" 
+          class="px-8 py-4 bg-gradient-to-r from-primary-600 via-purple-700 to-pink-600 text-white rounded-full font-bold text-lg hover:scale-105 transition-transform duration-200 shadow-xl hover:shadow-2xl inline-flex items-center gap-2"
+        >
+          <span>🔔</span>
+          <span>Get Notified</span>
+        </a>
+        <a 
+          href="https://beta.phonely.com.pk" 
+          target="_blank"
+          rel="noopener noreferrer"
+          class="px-8 py-4 bg-white border-2 border-gray-300 text-gray-900 rounded-full font-bold text-lg hover:scale-105 transition-transform duration-200 shadow-lg hover:shadow-xl inline-flex items-center gap-2"
+        >
+          <span>🚀</span>
+          <span>Visit Beta Platform</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-4xl md:text-5xl font-black text-center mb-16">
+        How It <span class="gradient-text">Works</span>
+      </h2>
+
+      <div class="grid md:grid-cols-3 gap-12">
+        <!-- Step 1 -->
+        <div class="text-center">
+          <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-primary-500 to-purple-700 rounded-3xl flex items-center justify-center text-5xl shadow-xl">
+            📸
+          </div>
+          <h3 class="text-2xl font-bold mb-3">Snap</h3>
+          <p class="text-gray-600">Upload your phone photos</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="text-center">
+          <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl flex items-center justify-center text-5xl shadow-xl">
+            🤖
+          </div>
+          <h3 class="text-2xl font-bold mb-3">Scan</h3>
+          <p class="text-gray-600">AI analyzes condition & market</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="text-center">
+          <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-pink-500 to-orange-500 rounded-3xl flex items-center justify-center text-5xl shadow-xl">
+            💰
+          </div>
+          <h3 class="text-2xl font-bold mb-3">Sell</h3>
+          <p class="text-gray-600">Get fair price offers</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Apps Coming Soon Section -->
+  <section class="py-20 bg-gradient-to-r from-primary-600 via-purple-700 to-pink-600 text-white">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <h2 class="text-4xl md:text-5xl font-black mb-8">
+        Apps Coming <span class="text-yellow-300">Soon</span>
+      </h2>
+      
+      <div class="flex justify-center gap-8 mb-8">
+        <!-- iOS Icon -->
+        <div class="opacity-50 grayscale">
+          <svg class="w-20 h-20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+          </svg>
+        </div>
+        
+        <!-- Android Icon -->
+        <div class="opacity-50 grayscale">
+          <svg class="w-20 h-20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.6,9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88,3.24c-2.86-1.21-6.08-1.21-8.94,0L5.65,5.67c-.19-.28-.55-.37-.83-.22-.3.16-.42.54-.26.85L6.4,9.48C3.3,11.25,1.28,14.44,1,18h22C22.72,14.44,20.7,11.25,17.6,9.48ZM7,15.25c-.69,0-1.25-.56-1.25-1.25s.56-1.25,1.25-1.25,1.25.56,1.25,1.25-.56,1.25-1.25,1.25Zm10,0c-.69,0-1.25-.56-1.25-1.25s.56-1.25,1.25-1.25,1.25.56,1.25,1.25-.56,1.25-1.25,1.25Z"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="space-y-2 text-lg">
+        <p class="font-bold">Mobile apps launching soon</p>
+        <p class="text-purple-100">Website currently in beta testing</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Signals Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+        <!-- Signal 1 -->
+        <div class="p-6">
+          <div class="text-5xl mb-4">🇵🇰</div>
+          <h3 class="text-xl font-bold mb-2">Built for Pakistan</h3>
+          <p class="text-gray-600">Designed for the Pakistani market</p>
+        </div>
+
+        <!-- Signal 2 -->
+        <div class="p-6">
+          <div class="text-5xl mb-4">🎯</div>
+          <h3 class="text-xl font-bold mb-2">No Middlemen</h3>
+          <p class="text-gray-600">Direct buyer-seller connection</p>
+        </div>
+
+        <!-- Signal 3 -->
+        <div class="p-6">
+          <div class="text-5xl mb-4">📊</div>
+          <h3 class="text-xl font-bold mb-2">Fair Pricing</h3>
+          <p class="text-gray-600">AI-powered market analysis</p>
+        </div>
+
+        <!-- Signal 4 -->
+        <div class="p-6">
+          <div class="text-5xl mb-4">🔒</div>
+          <h3 class="text-xl font-bold mb-2">Secure & Transparent</h3>
+          <p class="text-gray-600">Every transaction verified</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Notification Form Section -->
+  <section id="notify" class="py-20 bg-gradient-to-br from-primary-50 to-purple-50">
+    <div class="max-w-2xl mx-auto px-4">
+      <div class="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+        <h2 class="text-3xl md:text-4xl font-black text-center mb-4">
+          Join the <span class="gradient-text">Waitlist</span>
+        </h2>
+        <p class="text-gray-600 text-center mb-8">
+          Be the first to know when we launch officially
+        </p>
+
+        <form class="space-y-4" onsubmit="handleSubmit(event)">
+          <div>
+            <input 
+              type="text" 
+              name="name"
+              placeholder="Your Name"
+              required
+              class="w-full px-6 py-4 border-2 border-gray-300 rounded-full focus:border-primary-600 focus:outline-none text-lg"
+            >
+          </div>
+          <div>
+            <input 
+              type="email" 
+              name="email"
+              placeholder="Your Email"
+              required
+              class="w-full px-6 py-4 border-2 border-gray-300 rounded-full focus:border-primary-600 focus:outline-none text-lg"
+            >
+          </div>
+          <button 
+            type="submit"
+            class="w-full px-8 py-4 bg-gradient-to-r from-primary-600 via-purple-700 to-pink-600 text-white rounded-full font-bold text-lg hover:scale-105 transition-transform duration-200 shadow-xl hover:shadow-2xl"
+          >
+            🚀 Notify Me
+          </button>
+        </form>
+
+        <p class="text-sm text-gray-500 text-center mt-6">
+          We respect your privacy. Unsubscribe at any time.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white py-12">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="text-center md:text-left">
+          <p class="text-gray-400">© 2025 Phonely. All rights reserved.</p>
+          <p class="text-sm text-gray-500 mt-1">Currently in Beta Testing</p>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center gap-6">
+          <a 
+            href="https://instagram.com/phonelypk" 
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-gray-400 hover:text-white transition-colors duration-200 flex items-center gap-2"
+          >
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+            <span>@phonelypk</span>
+          </a>
+
+          <a 
+            href="mailto:support@phonely.com.pk"
+            class="text-gray-400 hover:text-white transition-colors duration-200 flex items-center gap-2"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            <span>support@phonely.com.pk</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    async function handleSubmit(event) {
+      event.preventDefault();
+      const form = event.target;
+      const submitButton = form.querySelector('button[type="submit"]');
+      const formData = new FormData(form);
+      const data = {
+        name: formData.get('name'),
+        email: formData.get('email')
+      };
+
+      // Disable button during submission
+      submitButton.disabled = true;
+      submitButton.textContent = '⏳ Submitting...';
+
+      try {
+        const response = await fetch('https://beta.phonely.com.pk/api/v1/waitlist', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          alert('🎉 Thank you for joining the waitlist! We\'ll notify you when we launch.');
+          form.reset();
+        } else {
+          // Handle specific error cases
+          if (result.message && result.message.includes('already on the waitlist')) {
+            alert('✅ You\'re already on our waitlist! We\'ll notify you when we launch.');
+          } else {
+            alert('❌ ' + (result.message || 'Something went wrong. Please try again.'));
+          }
+        }
+      } catch (error) {
+        console.error('Waitlist submission error:', error);
+        alert('❌ Network error. Please check your connection and try again.');
+      } finally {
+        // Re-enable button
+        submitButton.disabled = false;
+        submitButton.innerHTML = '🚀 Notify Me';
+      }
+    }
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
