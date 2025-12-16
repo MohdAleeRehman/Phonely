@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
+import { Shield, CheckCircle2, X, Smartphone, Package } from 'lucide-react';
 import api from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import PhoneCard from '../components/listings/PhoneCard';

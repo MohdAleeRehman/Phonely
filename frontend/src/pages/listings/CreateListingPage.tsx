@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Edit, Sparkles, AlertTriangle, Rocket, CheckCircle2, Upload, Clock, Bot, Search, Users, Phone, RotateCcw, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Camera, Monitor, User } from 'lucide-react';
+import { Edit, Sparkles, AlertTriangle, Rocket, CheckCircle2, Upload, Clock, Bot, Search, Users, RotateCcw, Camera, Monitor, User } from 'lucide-react';
 import PKRIcon from '../../components/icons/PKRIcon';
 import PhoneIcon from '../../components/icons/PhoneIcon';
 import ArrowLeftIcon from '../../components/icons/ArrowLeftIcon';

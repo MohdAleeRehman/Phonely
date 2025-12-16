@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HelpCircle, Search, ChevronUp, ChevronDown, MessageSquare, Mail, Package } from 'lucide-react';
+import { HelpCircle, ChevronUp, ChevronDown, MessageSquare, Mail } from 'lucide-react';
 
 interface FAQItem {
   question: string;

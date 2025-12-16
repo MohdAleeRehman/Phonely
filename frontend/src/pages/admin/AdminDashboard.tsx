@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { User as UserIcon, Smartphone, Shield, CheckCircle2 } from 'lucide-react';
+import { User as UserIcon, Smartphone, Shield } from 'lucide-react';
 import { adminService } from '../../services/admin.service';
 import type { User, Listing } from '../../types';
 import Loading from '../../components/common/Loading';

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState, useMemo } from 'react';
-import { Package, Link2, Smartphone, MapPin, Search, Lightbulb, Sparkles, Rocket, Lock } from 'lucide-react';
+import { Package, Link2, Smartphone, MapPin, Lightbulb, Sparkles, Rocket, Lock } from 'lucide-react';
 import PKRIcon from '../../icons/PKRIcon';
 import type { UseFormRegister, FieldErrors, UseFormWatch, UseFormSetValue } from 'react-hook-form';
 import { ButtonCard } from '../../common/ButtonCard';

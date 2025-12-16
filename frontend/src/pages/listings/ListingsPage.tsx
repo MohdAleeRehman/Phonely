@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, X, Sparkles, CheckCircle2, AlertTriangle, RotateCcw, Package, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, X, Sparkles, RotateCcw, Package, ChevronLeft, ChevronRight } from 'lucide-react';
 import { listingService } from '../../services/listing.service';
 import type { ListingFilters } from '../../services/listing.service';
 import PhoneCard from '../../components/listings/PhoneCard';
