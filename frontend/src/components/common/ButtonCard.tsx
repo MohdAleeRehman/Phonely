@@ -26,8 +26,8 @@ export const ButtonCard = ({
       className={`
         flex items-center gap-3 p-4 rounded-lg border-2 transition-all
         ${selected 
-          ? 'border-primary-600 bg-primary-50 shadow-md' 
-          : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+          ? 'border-cyan-400 bg-cyan-500/20 shadow-md shadow-cyan-500/20' 
+          : 'border-white/10 bg-white/5 hover:border-cyan-400/50 hover:bg-white/10 hover:shadow-sm'
         }
         ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
       `}
@@ -35,7 +35,7 @@ export const ButtonCard = ({
       <div className={`text-2xl ${selected ? 'scale-110' : ''} transition-transform`}>
         {icon}
       </div>
-      <span className={`text-sm font-medium ${selected ? 'text-primary-700' : 'text-gray-700'}`}>
+      <span className={`text-sm font-medium ${selected ? 'text-cyan-300' : 'text-gray-200'}`}>
         {label}
       </span>
     </motion.button>

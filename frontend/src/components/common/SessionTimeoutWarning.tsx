@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Lightbulb } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
 export default function SessionTimeoutWarning() {
@@ -70,10 +71,10 @@ export default function SessionTimeoutWarning() {
             </div>
 
             {/* Content */}
-            <h3 className="text-2xl font-black text-gray-900 text-center mb-2">
+            <h3 className="text-2xl font-black text-white text-center mb-2">
               Session Expiring Soon
             </h3>
-            <p className="text-gray-600 text-center mb-6">
+            <p className="text-gray-300 text-center mb-6">
               Your session will expire in <span className="font-bold text-orange-600 text-xl">{formatTime(timeLeft)}</span>
             </p>
             <p className="text-sm text-gray-500 text-center mb-6">
@@ -84,13 +85,13 @@ export default function SessionTimeoutWarning() {
             <div className="flex gap-3">
               <button
                 onClick={logout}
-                className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-3 border-2 border-white/20 text-gray-200 rounded-xl font-bold hover:bg-white/5 transition-colors"
               >
                 Logout Now
               </button>
               <button
                 onClick={handleStayLoggedIn}
-                className="flex-1 px-4 py-3 bg-linear-to-r from-primary-600 to-primary-700 text-white rounded-xl font-bold hover:shadow-lg transition-all"
+                className="flex-1 px-4 py-3 bg-linear-to-r from-cyan-500 to-blue-600 text-white rounded-xl font-bold hover:shadow-lg hover:shadow-cyan-500/50 transition-all"
               >
                 Stay Logged In
               </button>
@@ -98,7 +99,10 @@ export default function SessionTimeoutWarning() {
 
             {/* Tip */}
             <p className="text-xs text-gray-400 text-center mt-4">
-              💡 Tip: Enable "Keep me logged in" on the login page to stay logged in for 7 days
+              <span className="flex items-center gap-1">
+                <Lightbulb className="w-3 h-3 text-yellow-400" />
+                Tip: Enable "Keep me logged in" on the login page to stay logged in for 7 days
+              </span>
             </p>
           </motion.div>
         </div>

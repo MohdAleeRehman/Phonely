@@ -32,8 +32,8 @@ export default function VerifyEmailSentPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="text-center mb-8">
+    <div className="max-w-md mx-auto relative">
+      <div className="text-center mb-8 relative z-10">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
           <svg
             className="w-8 h-8 text-primary-600"
@@ -49,8 +49,8 @@ export default function VerifyEmailSentPage() {
             />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Check Your Email</h2>
-        <p className="text-gray-600">
+        <h2 className="text-2xl font-bold text-white mb-2">Check Your Email</h2>
+        <p className="text-gray-300">
           We've sent a verification link to
         </p>
         <p className="text-primary-600 font-semibold mt-1">{email}</p>
@@ -117,7 +117,7 @@ export default function VerifyEmailSentPage() {
 
       <div className="space-y-4">
         <div className="text-center">
-          <p className="text-gray-600 text-sm mb-2">Didn't receive the email?</p>
+          <p className="text-gray-300 text-sm mb-2">Didn't receive the email?</p>
           <button
             onClick={handleResend}
             disabled={isResending}
@@ -134,7 +134,7 @@ export default function VerifyEmailSentPage() {
           <div className="text-center">
             <Link
               to="/"
-              className="text-sm text-gray-600 hover:text-gray-900 underline"
+              className="text-sm text-gray-300 hover:text-white underline"
             >
               Continue to Home
             </Link>

@@ -82,9 +82,9 @@ export function MarkAsSoldModal({
               className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-hidden"
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between p-6 border-b border-white/10 dark:border-gray-700">
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  <h2 className="text-xl font-semibold text-white dark:text-white">
                     Mark as Sold
                   </h2>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -116,7 +116,7 @@ export function MarkAsSoldModal({
                       className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                         soldOutside
                           ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
-                          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                          : 'border-white/10 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                       }`}
                     >
                       <div className="mt-0.5">
@@ -133,7 +133,7 @@ export function MarkAsSoldModal({
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <span className="text-xl">🌐</span>
-                          <span className="font-medium text-gray-900 dark:text-white">
+                          <span className="font-medium text-white dark:text-white">
                             Sold Outside Phonely
                           </span>
                         </div>
@@ -147,7 +147,7 @@ export function MarkAsSoldModal({
                     {participantsData && participantsData.length > 0 && (
                       <div className="relative">
                         <div className="absolute inset-0 flex items-center">
-                          <div className="w-full border-t border-gray-200 dark:border-gray-700" />
+                          <div className="w-full border-t border-white/10 dark:border-gray-700" />
                         </div>
                         <div className="relative flex justify-center text-sm">
                           <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
@@ -160,7 +160,7 @@ export function MarkAsSoldModal({
                     {/* Chat Participants */}
                     {participantsData && participantsData.length > 0 ? (
                       <div className="space-y-2">
-                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <p className="text-sm font-medium text-gray-200 dark:text-gray-300">
                           Select from chat participants:
                         </p>
                         {participantsData.map((participant: { _id: string; name: string; avatar?: string }) => (
@@ -173,7 +173,7 @@ export function MarkAsSoldModal({
                             className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                               selectedBuyer === participant._id
                                 ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
-                                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                                : 'border-white/10 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                             }`}
                           >
                             <div className="mt-0.5">
@@ -202,7 +202,7 @@ export function MarkAsSoldModal({
                                 </span>
                               </div>
                             )}
-                            <span className="font-medium text-gray-900 dark:text-white">
+                            <span className="font-medium text-white dark:text-white">
                               {participant.name}
                             </span>
                           </div>
@@ -221,10 +221,10 @@ export function MarkAsSoldModal({
               </div>
 
               {/* Footer */}
-              <div className="flex items-center gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-3 p-6 border-t border-white/10 dark:border-gray-700">
                 <button
                   onClick={onClose}
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-200 dark:text-gray-300 rounded-lg hover:bg-white/5 dark:hover:bg-gray-700 transition-colors"
                   disabled={markAsSoldMutation.isPending}
                 >
                   Cancel

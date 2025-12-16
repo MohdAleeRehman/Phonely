@@ -1,11 +1,19 @@
 import { motion } from 'framer-motion';
+import { Camera, FileText, Smartphone, MapPin, Check } from 'lucide-react';
 
 interface Step {
   id: number;
   title: string;
-  emoji: string;
+  icon: string;
   description: string;
 }
+
+const iconMap: Record<string, React.ComponentType<{className?: string}>> = {
+  Camera,
+  FileText,
+  Smartphone,
+  MapPin,
+};
 
 interface StepIndicatorProps {
   steps: Step[];
@@ -13,6 +21,11 @@ interface StepIndicatorProps {
 }
 
 export default function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
+  // Don't render if currentStep is beyond steps array (e.g., step 5 for success screen)
+  if (currentStep > steps.length) {
+    return null;
+  }
+
   return (
     <div className="mb-8">
       {/* Desktop: Horizontal Progress Bar */}
@@ -44,10 +57,10 @@ export default function StepIndicator({ steps, currentStep }: StepIndicatorProps
                       : 'bg-gray-200 text-gray-400'
                   }`}
                 >
-                  {currentStep > step.id ? '✓' : step.emoji}
+                  {currentStep > step.id ? <Check className="w-5 h-5" /> : (() => { const Icon = iconMap[step.icon]; return Icon ? <Icon className="w-5 h-5" /> : null; })()}
                 </motion.div>
                 <div className={`text-xs font-semibold text-center ${
-                  currentStep >= step.id ? 'text-gray-900' : 'text-gray-400'
+                  currentStep >= step.id ? 'text-white' : 'text-gray-400'
                 }`}>
                   {step.title}
                 </div>
@@ -68,11 +81,16 @@ export default function StepIndicator({ steps, currentStep }: StepIndicatorProps
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-linear-to-br from-primary-500 to-primary-600 text-white flex items-center justify-center text-xl font-bold shadow-lg">
-                {steps[currentStep - 1].emoji}
+                {(() => { 
+                  const currentStepData = steps[currentStep - 1];
+                  if (!currentStepData) return null;
+                  const Icon = iconMap[currentStepData.icon];
+                  return Icon ? <Icon className="w-6 h-6" /> : null;
+                })()}
               </div>
               <div>
                 <div className="text-sm text-primary-600 font-medium">Step {currentStep} of {steps.length}</div>
-                <div className="text-lg font-black text-gray-900">{steps[currentStep - 1].title}</div>
+                <div className="text-lg font-black text-white">{steps[currentStep - 1]?.title || 'Complete'}</div>
               </div>
             </div>
           </div>

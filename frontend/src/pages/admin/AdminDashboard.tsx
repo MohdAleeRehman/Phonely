@@ -1,11 +1,26 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { User as UserIcon, Smartphone, Shield, CheckCircle2 } from 'lucide-react';
 import { adminService } from '../../services/admin.service';
 import type { User, Listing } from '../../types';
 import Loading from '../../components/common/Loading';
 import ErrorMessage from '../../components/common/ErrorMessage';
 
 type Tab = 'overview' | 'users' | 'listings' | 'reports' | 'waitlist';
+
+// Type for users response (backend returns 'users' instead of 'listings')
+type UsersResponse = {
+  status: string;
+  results: number;
+  data: {
+    users: User[];
+    pagination?: {
+      currentPage: number;
+      totalPages: number;
+      totalItems: number;
+    };
+  };
+};
 
 export default function AdminDashboard() {
   const queryClient = useQueryClient();
@@ -106,8 +121,28 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
+      {/* Circuit Pattern Background */}
+      <svg className="absolute inset-0 w-full h-full opacity-5 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="adminCircuit" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style={{stopColor:'#06b6d4',stopOpacity:1}} />
+            <stop offset="50%" style={{stopColor:'#2563eb',stopOpacity:1}} />
+            <stop offset="100%" style={{stopColor:'#7c3aed',stopOpacity:1}} />
+          </linearGradient>
+          <pattern id="adminPattern" x="0" y="0" width="400" height="300" patternUnits="userSpaceOnUse">
+            <path d="M50 0 L50 90 L70 110 L70 200" stroke="url(#adminCircuit)" strokeWidth="2" fill="none"/>
+            <path d="M100 0 L100 70 L120 90 L120 180" stroke="url(#adminCircuit)" strokeWidth="2" fill="none"/>
+            <path d="M150 0 L150 100 L170 120 L170 220" stroke="url(#adminCircuit)" strokeWidth="2" fill="none"/>
+            <circle cx="50" cy="90" r="4" fill="#06b6d4"/>
+            <circle cx="100" cy="70" r="4" fill="#7c3aed"/>
+            <rect x="116" y="86" width="8" height="8" fill="none" stroke="#7c3aed" strokeWidth="1.5"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#adminPattern)"/>
+      </svg>
+
+      <h1 className="text-3xl font-bold text-white mb-8 relative z-10">Admin Dashboard</h1>
 
       {/* Tabs */}
       <div className="border-b mb-8">
@@ -117,7 +152,7 @@ export default function AdminDashboard() {
             className={`pb-4 px-2 font-medium border-b-2 transition-colors ${
               activeTab === 'overview'
                 ? 'border-primary-600 text-primary-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
+                : 'border-transparent text-gray-300 hover:text-white'
             }`}
           >
             Overview
@@ -127,7 +162,7 @@ export default function AdminDashboard() {
             className={`pb-4 px-2 font-medium border-b-2 transition-colors ${
               activeTab === 'users'
                 ? 'border-primary-600 text-primary-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
+                : 'border-transparent text-gray-300 hover:text-white'
             }`}
           >
             Users
@@ -137,7 +172,7 @@ export default function AdminDashboard() {
             className={`pb-4 px-2 font-medium border-b-2 transition-colors ${
               activeTab === 'listings'
                 ? 'border-primary-600 text-primary-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
+                : 'border-transparent text-gray-300 hover:text-white'
             }`}
           >
             Listings
@@ -147,7 +182,7 @@ export default function AdminDashboard() {
             className={`pb-4 px-2 font-medium border-b-2 transition-colors ${
               activeTab === 'reports'
                 ? 'border-primary-600 text-primary-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
+                : 'border-transparent text-gray-300 hover:text-white'
             }`}
           >
             Reports
@@ -157,7 +192,7 @@ export default function AdminDashboard() {
             className={`pb-4 px-2 font-medium border-b-2 transition-colors ${
               activeTab === 'waitlist'
                 ? 'border-primary-600 text-primary-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
+                : 'border-transparent text-gray-300 hover:text-white'
             }`}
           >
             Waitlist
@@ -174,58 +209,58 @@ export default function AdminDashboard() {
             <>
               {/* Stats Cards */}
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div className="card">
+                <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-6 hover:bg-white/10 transition-all">
                   <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                    <div className="h-12 w-12 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center">
                       <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                       </svg>
                     </div>
                     <div>
-                      <p className="text-2xl font-bold">{stats.totalUsers}</p>
-                      <p className="text-sm text-gray-600">Total Users</p>
+                      <p className="text-2xl font-bold text-white">{stats.totalUsers}</p>
+                      <p className="text-sm text-gray-300">Total Users</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="card">
+                <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-6 hover:bg-white/10 transition-all">
                   <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-lg bg-green-100 text-green-600 flex items-center justify-center">
+                    <div className="h-12 w-12 rounded-lg bg-green-500/20 text-green-400 flex items-center justify-center">
                       <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                       </svg>
                     </div>
                     <div>
-                      <p className="text-2xl font-bold">{stats.totalListings}</p>
-                      <p className="text-sm text-gray-600">Total Listings</p>
+                      <p className="text-2xl font-bold text-white">{stats.totalListings}</p>
+                      <p className="text-sm text-gray-300">Total Listings</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="card">
+                <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-6 hover:bg-white/10 transition-all">
                   <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
+                    <div className="h-12 w-12 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center">
                       <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
                     <div>
-                      <p className="text-2xl font-bold">{stats.activeListings}</p>
-                      <p className="text-sm text-gray-600">Active Listings</p>
+                      <p className="text-2xl font-bold text-white">{stats.activeListings}</p>
+                      <p className="text-sm text-gray-300">Active Listings</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="card">
+                <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-6 hover:bg-white/10 transition-all">
                   <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">
+                    <div className="h-12 w-12 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center">
                       <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                       </svg>
                     </div>
                     <div>
-                      <p className="text-2xl font-bold">{stats.soldListings}</p>
-                      <p className="text-sm text-gray-600">Sold Listings</p>
+                      <p className="text-2xl font-bold text-white">{stats.soldListings}</p>
+                      <p className="text-sm text-gray-300">Sold Listings</p>
                     </div>
                   </div>
                 </div>
@@ -234,38 +269,38 @@ export default function AdminDashboard() {
               {/* Recent Activity */}
               <div className="grid lg:grid-cols-2 gap-6">
                 {/* Recent Users */}
-                <div className="card">
-                  <h3 className="text-lg font-semibold mb-4">Recent Users</h3>
+                <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">Recent Users</h3>
                   <div className="space-y-3">
                     {stats?.recentUsers && stats.recentUsers.length > 0 ? (
                       stats.recentUsers.map((user: User) => (
-                        <div key={user._id} className="flex items-center gap-3 pb-3 border-b last:border-0">
-                          <div className="h-10 w-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-semibold">
+                        <div key={user._id} className="flex items-center gap-3 pb-3 border-b border-white/10 last:border-0">
+                          <div className="h-10 w-10 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-semibold">
                             {user.name.charAt(0).toUpperCase()}
                           </div>
                           <div className="flex-1">
-                            <p className="font-medium">{user.name}</p>
-                            <p className="text-sm text-gray-600">{user.email}</p>
+                            <p className="font-medium text-white">{user.name}</p>
+                            <p className="text-sm text-gray-300">{user.email}</p>
                           </div>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-gray-400">
                             {new Date(user.createdAt).toLocaleDateString()}
                           </span>
                         </div>
                       ))
                     ) : (
-                      <p className="text-gray-500 text-center py-4">No recent users</p>
+                      <p className="text-gray-400 text-center py-4">No recent users</p>
                     )}
                   </div>
                 </div>
 
                 {/* Recent Listings */}
-                <div className="card">
-                  <h3 className="text-lg font-semibold mb-4">Recent Listings</h3>
+                <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">Recent Listings</h3>
                   <div className="space-y-3">
                     {stats?.recentListings && stats.recentListings.length > 0 ? (
                       stats.recentListings.map((listing: Listing) => (
-                      <div key={listing._id} className="flex items-center gap-3 pb-3 border-b last:border-0">
-                        <div className="h-10 w-10 rounded-lg bg-gray-200 overflow-hidden shrink-0">
+                      <div key={listing._id} className="flex items-center gap-3 pb-3 border-b border-white/10 last:border-0">
+                        <div className="h-10 w-10 rounded-lg bg-gray-700 overflow-hidden shrink-0">
                           {listing.images?.[0] ? (
                             (() => {
                               const first = listing.images[0];
@@ -287,16 +322,16 @@ export default function AdminDashboard() {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{listing.title}</p>
-                          <p className="text-sm text-primary-600">PKR {listing.price.toLocaleString()}</p>
+                          <p className="font-medium text-white truncate">{listing.title}</p>
+                          <p className="text-sm text-cyan-400">PKR {listing.price.toLocaleString()}</p>
                         </div>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-400">
                           {new Date(listing.createdAt).toLocaleDateString()}
                         </span>
                       </div>
                     ))
                     ) : (
-                      <p className="text-gray-500 text-center py-4">No recent listings</p>
+                      <p className="text-gray-400 text-center py-4">No recent listings</p>
                     )}
                   </div>
                 </div>
@@ -315,42 +350,42 @@ export default function AdminDashboard() {
             <Loading />
           ) : usersResponse ? (
             <>
-              <div className="card overflow-x-auto">
+              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b">
+                  <thead className="bg-white/5 border-b border-white/10">
                     <tr>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">User</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Email</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Phone</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">City</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Role</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Joined</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">User</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Email</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Phone</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">City</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Role</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Joined</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y">
-                    {usersResponse.data.listings && usersResponse.data.listings.length > 0 ? (
-                      usersResponse.data.listings.map((user: User) => (
-                      <tr key={user._id} className="hover:bg-gray-50">
+                  <tbody className="divide-y divide-white/10">
+                    {(usersResponse as unknown as UsersResponse).data.users && (usersResponse as unknown as UsersResponse).data.users.length > 0 ? (
+                      (usersResponse as unknown as UsersResponse).data.users.map((user: User) => (
+                      <tr key={user._id} className="hover:bg-white/5 transition-colors">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-semibold text-sm">
+                            <div className="h-8 w-8 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-semibold text-sm">
                               {user.name.charAt(0).toUpperCase()}
                             </div>
-                            <span className="font-medium">{user.name}</span>
+                            <span className="font-medium text-white">{user.name}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-sm">{user.email}</td>
-                        <td className="px-4 py-3 text-sm">{user.phone}</td>
-                        <td className="px-4 py-3 text-sm">{user.location?.city || 'N/A'}</td>
+                        <td className="px-4 py-3 text-sm text-gray-300">{user.email}</td>
+                        <td className="px-4 py-3 text-sm text-gray-300">{user.phone}</td>
+                        <td className="px-4 py-3 text-sm text-gray-300">{user.location?.city || 'N/A'}</td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+                            user.role === 'admin' ? 'bg-purple-500/20 text-purple-300' : 'bg-gray-500/20 text-gray-300'
                           }`}>
                             {user.role}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">
+                        <td className="px-4 py-3 text-sm text-gray-300">
                           {new Date(user.createdAt).toLocaleDateString()}
                         </td>
                         <td className="px-4 py-3">
@@ -366,7 +401,7 @@ export default function AdminDashboard() {
                     ))
                     ) : (
                       <tr>
-                        <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                        <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
                           No users found
                         </td>
                       </tr>
@@ -378,7 +413,7 @@ export default function AdminDashboard() {
               {/* Pagination */}
               {usersResponse.data.pagination && usersResponse.data.pagination.totalPages > 1 && (
                 <div className="flex items-center justify-between mt-6">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-300">
                     Page {usersResponse.data.pagination.currentPage} of {usersResponse.data.pagination.totalPages}
                   </p>
                   <div className="flex gap-2">
@@ -431,26 +466,26 @@ export default function AdminDashboard() {
             <Loading />
           ) : listingsResponse ? (
             <>
-              <div className="card overflow-x-auto">
+              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b">
+                  <thead className="bg-white/5 border-b border-white/10">
                     <tr>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Listing</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Seller</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Price</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Views</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Created</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Listing</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Seller</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Price</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Status</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Views</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Created</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y">
+                  <tbody className="divide-y divide-white/10">
                     {listingsResponse.data.listings && listingsResponse.data.listings.length > 0 ? (
                       listingsResponse.data.listings.map((listing: Listing) => (
-                      <tr key={listing._id} className="hover:bg-gray-50">
+                      <tr key={listing._id} className="hover:bg-white/5 transition-colors">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
-                            <div className="h-12 w-12 rounded-lg bg-gray-200 overflow-hidden shrink-0">
+                            <div className="h-12 w-12 rounded-lg bg-gray-700 overflow-hidden shrink-0">
                               {listing.images?.[0] ? (
                                 (() => {
                                   const first = listing.images[0];
@@ -472,25 +507,25 @@ export default function AdminDashboard() {
                               )}
                             </div>
                             <div className="max-w-xs">
-                              <p className="font-medium truncate">{listing.title}</p>
-                              <p className="text-sm text-gray-600">{listing.phone.brand} {listing.phone.model}</p>
+                              <p className="font-medium text-white truncate">{listing.title}</p>
+                              <p className="text-sm text-gray-300">{listing.phone.brand} {listing.phone.model}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-sm">{listing.seller.name}</td>
-                        <td className="px-4 py-3 text-sm font-medium">PKR {listing.price.toLocaleString()}</td>
+                        <td className="px-4 py-3 text-sm text-gray-300">{listing.seller.name}</td>
+                        <td className="px-4 py-3 text-sm font-medium text-cyan-400">PKR {listing.price.toLocaleString()}</td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            listing.status === 'active' ? 'bg-green-100 text-green-800' :
-                            listing.status === 'sold' ? 'bg-blue-100 text-blue-800' :
-                            listing.status === 'draft' ? 'bg-gray-100 text-gray-800' :
-                            'bg-red-100 text-red-800'
+                            listing.status === 'active' ? 'bg-green-500/20 text-green-300' :
+                            listing.status === 'sold' ? 'bg-blue-500/20 text-blue-300' :
+                            listing.status === 'draft' ? 'bg-gray-500/20 text-gray-300' :
+                            'bg-red-500/20 text-red-300'
                           }`}>
                             {listing.status}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-sm">{listing.views}</td>
-                        <td className="px-4 py-3 text-sm text-gray-600">
+                        <td className="px-4 py-3 text-sm text-gray-300">{listing.views}</td>
+                        <td className="px-4 py-3 text-sm text-gray-300">
                           {new Date(listing.createdAt).toLocaleDateString()}
                         </td>
                         <td className="px-4 py-3">
@@ -506,7 +541,7 @@ export default function AdminDashboard() {
                     ))
                     ) : (
                       <tr>
-                        <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                        <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
                           No listings found
                         </td>
                       </tr>
@@ -518,7 +553,7 @@ export default function AdminDashboard() {
               {/* Pagination */}
               {listingsResponse.data.pagination && listingsResponse.data.pagination.totalPages > 1 && (
                 <div className="flex items-center justify-between mt-6">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-300">
                     Page {listingsResponse.data.pagination.currentPage} of {listingsResponse.data.pagination.totalPages}
                   </p>
                   <div className="flex gap-2">
@@ -578,28 +613,30 @@ export default function AdminDashboard() {
             <Loading />
           ) : reportsData && reportsData.length > 0 ? (
             <div className="space-y-4">
-              {reportsData.map((report: any) => (
-                <div key={report._id} className="card border-l-4 border-l-red-500">
+              {reportsData.map((report: { _id: string; reportType: string; status: string; createdAt: string; reporter: { name: string; email: string }; reportedUser?: { name: string; email: string }; reportedListing?: { title: string }; reason: string; description: string; adminNotes?: string; reviewedBy?: { name: string }; reviewedAt?: string }) => (
+                <div key={report._id} className="bg-white/5 backdrop-blur-md border border-white/10 border-l-4 border-l-red-500 rounded-lg p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       {/* Report Header */}
                       <div className="flex items-center gap-3 mb-3">
-                        <span className="text-2xl">
-                          {report.reportType === 'user' ? '👤' : '📱'}
-                        </span>
+                        {report.reportType === 'user' ? (
+                          <UserIcon className="w-6 h-6 text-cyan-400" />
+                        ) : (
+                          <Smartphone className="w-6 h-6 text-cyan-400" />
+                        )}
                         <div>
-                          <h3 className="font-bold text-lg">
+                          <h3 className="font-bold text-lg text-white">
                             {report.reportType === 'user' ? 'User Report' : 'Listing Report'}
                           </h3>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-gray-300">
                             Reported {new Date(report.createdAt).toLocaleDateString()}
                           </p>
                         </div>
                         <span className={`ml-auto px-3 py-1 rounded-full text-xs font-medium ${
-                          report.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                          report.status === 'reviewed' ? 'bg-blue-100 text-blue-800' :
-                          report.status === 'resolved' ? 'bg-green-100 text-green-800' :
-                          'bg-gray-100 text-gray-800'
+                          report.status === 'pending' ? 'bg-yellow-500/20 text-yellow-300' :
+                          report.status === 'reviewed' ? 'bg-blue-500/20 text-blue-300' :
+                          report.status === 'resolved' ? 'bg-green-500/20 text-green-300' :
+                          'bg-gray-500/20 text-gray-300'
                         }`}>
                           {report.status.toUpperCase()}
                         </span>
@@ -608,12 +645,12 @@ export default function AdminDashboard() {
                       {/* Report Details */}
                       <div className="grid md:grid-cols-2 gap-4 mb-4">
                         <div>
-                          <p className="text-sm text-gray-600 font-medium">Reporter:</p>
-                          <p className="text-sm">{report.reporter?.name} ({report.reporter?.email})</p>
+                          <p className="text-sm text-gray-300 font-medium">Reporter:</p>
+                          <p className="text-sm text-white">{report.reporter?.name} ({report.reporter?.email})</p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600 font-medium">Reported:</p>
-                          <p className="text-sm">
+                          <p className="text-sm text-gray-300 font-medium">Reported:</p>
+                          <p className="text-sm text-white">
                             {report.reportType === 'user' 
                               ? `${report.reportedUser?.name} (${report.reportedUser?.email})`
                               : report.reportedListing?.title}
@@ -622,20 +659,21 @@ export default function AdminDashboard() {
                       </div>
 
                       {/* Reason & Description */}
-                      <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                        <p className="text-sm font-bold text-gray-700 mb-2">
-                          🚨 Reason: <span className="text-red-600">{report.reason.replace(/-/g, ' ').toUpperCase()}</span>
+                      <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 mb-4 border border-white/10">
+                        <p className="text-sm font-bold text-gray-200 mb-2">
+                          <Shield className="w-4 h-4 inline mr-1" />
+                          Reason: <span className="text-red-400">{report.reason.replace(/-/g, ' ').toUpperCase()}</span>
                         </p>
-                        <p className="text-sm text-gray-700">{report.description}</p>
+                        <p className="text-sm text-gray-300">{report.description}</p>
                       </div>
 
                       {/* Admin Notes */}
                       {report.adminNotes && (
-                        <div className="bg-blue-50 rounded-lg p-4 mb-4">
-                          <p className="text-sm font-bold text-blue-700 mb-1">Admin Notes:</p>
-                          <p className="text-sm text-gray-700">{report.adminNotes}</p>
-                          {report.reviewedBy && (
-                            <p className="text-xs text-gray-500 mt-2">
+                        <div className="bg-blue-500/20 backdrop-blur-md rounded-lg p-4 mb-4 border border-blue-400/30">
+                          <p className="text-sm font-bold text-blue-300 mb-1">Admin Notes:</p>
+                          <p className="text-sm text-gray-300">{report.adminNotes}</p>
+                          {report.reviewedBy && report.reviewedAt && (
+                            <p className="text-xs text-gray-400 mt-2">
                               Reviewed by {report.reviewedBy.name} on {new Date(report.reviewedAt).toLocaleDateString()}
                             </p>
                           )}
@@ -696,8 +734,8 @@ export default function AdminDashboard() {
               ))}
             </div>
           ) : (
-            <div className="card text-center py-12">
-              <p className="text-gray-500">No reports found</p>
+            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-6 text-center py-12">
+              <p className="text-gray-400">No reports found</p>
             </div>
           )}
         </>
@@ -712,65 +750,65 @@ export default function AdminDashboard() {
             <div className="space-y-6">
               <div className="flex justify-between items-center">
                 <div>
-                  <h2 className="text-2xl font-bold">Waitlist Entries</h2>
-                  <p className="text-gray-600 mt-1">
+                  <h2 className="text-2xl font-bold text-white">Waitlist Entries</h2>
+                  <p className="text-gray-300 mt-1">
                     Total: {waitlistData.pagination.totalItems} {waitlistData.pagination.totalItems === 1 ? 'entry' : 'entries'}
                   </p>
                 </div>
               </div>
 
               {/* Waitlist Table */}
-              <div className="card overflow-hidden">
+              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg overflow-hidden">
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-white/10">
+                    <thead className="bg-white/5">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">
                           Name
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">
                           Email
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">
                           Source
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">
                           Status
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">
                           Joined
                         </th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-200 uppercase tracking-wider">
                           Actions
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="divide-y divide-white/10">
                       {waitlistData.waitlist.map((entry) => (
-                        <tr key={entry._id} className="hover:bg-gray-50">
+                        <tr key={entry._id} className="hover:bg-white/5 transition-colors">
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">{entry.name}</div>
+                            <div className="text-sm font-medium text-white">{entry.name}</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">{entry.email}</div>
+                            <div className="text-sm text-gray-300">{entry.email}</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300">
                               {entry.source}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             {entry.notified ? (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-300">
                                 ✓ Notified
                               </span>
                             ) : (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-300">
                                 ⏳ Pending
                               </span>
                             )}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                             {new Date(entry.createdAt).toLocaleDateString('en-US', {
                               year: 'numeric',
                               month: 'short',
@@ -781,7 +819,7 @@ export default function AdminDashboard() {
                             <button
                               onClick={() => handleDeleteWaitlistEntry(entry._id, entry.email)}
                               disabled={deleteWaitlistMutation.isPending}
-                              className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                              className="text-red-400 hover:text-red-300 disabled:opacity-50"
                             >
                               Remove
                             </button>
@@ -803,7 +841,7 @@ export default function AdminDashboard() {
                   >
                     Previous
                   </button>
-                  <span className="py-2 px-4">
+                  <span className="py-2 px-4 text-gray-300">
                     Page {waitlistData.pagination.currentPage} of {waitlistData.pagination.totalPages}
                   </span>
                   <button
@@ -817,8 +855,8 @@ export default function AdminDashboard() {
               )}
             </div>
           ) : (
-            <div className="card text-center py-12">
-              <p className="text-gray-500">No waitlist entries yet</p>
+            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-6 text-center py-12">
+              <p className="text-gray-400">No waitlist entries yet</p>
             </div>
           )}
         </>

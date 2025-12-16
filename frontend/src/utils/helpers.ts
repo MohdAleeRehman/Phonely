@@ -131,15 +131,15 @@ export const validateImageFile = (file: File): { valid: boolean; error?: string 
 export const getConditionColor = (condition: string): string => {
   switch (condition.toLowerCase()) {
     case 'excellent':
-      return 'bg-green-100 text-green-800';
+      return 'bg-green-500/20 text-green-300 border border-green-500/50';
     case 'good':
-      return 'bg-blue-100 text-blue-800';
+      return 'bg-blue-500/20 text-blue-300 border border-blue-500/50';
     case 'fair':
-      return 'bg-yellow-100 text-yellow-800';
+      return 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/50';
     case 'poor':
-      return 'bg-red-100 text-red-800';
+      return 'bg-red-500/20 text-red-300 border border-red-500/50';
     default:
-      return 'bg-gray-100 text-gray-800';
+      return 'bg-gray-500/20 text-gray-300 border border-gray-500/50';
   }
 };
 
@@ -149,14 +149,14 @@ export const getConditionColor = (condition: string): string => {
 export const getStatusColor = (status: string): string => {
   switch (status.toLowerCase()) {
     case 'active':
-      return 'bg-green-100 text-green-800';
+      return 'bg-green-500/20 text-green-300 border border-green-500/50';
     case 'sold':
-      return 'bg-blue-100 text-blue-800';
+      return 'bg-blue-500/20 text-blue-300 border border-blue-500/50';
     case 'draft':
-      return 'bg-gray-100 text-gray-800';
+      return 'bg-gray-500/20 text-gray-300 border border-gray-500/50';
     case 'removed':
-      return 'bg-red-100 text-red-800';
+      return 'bg-red-500/20 text-red-300 border border-red-500/50';
     default:
-      return 'bg-gray-100 text-gray-800';
+      return 'bg-gray-500/20 text-gray-300 border border-gray-500/50';
   }
 };

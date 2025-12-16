@@ -129,7 +129,7 @@ export default function ImageUpload({
                 strokeLinejoin="round"
               />
             </svg>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-gray-300">
               Click to upload or drag and drop
             </p>
             <p className="text-xs text-gray-500">PNG, JPG up to 10MB</p>

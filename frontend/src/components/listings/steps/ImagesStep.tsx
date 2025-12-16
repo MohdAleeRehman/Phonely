@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Camera, CheckCircle2, Circle, Sparkles, ArrowRight, FileText } from 'lucide-react';
 import ImageUpload from '../../common/ImageUpload';
 import Loading from '../../common/Loading';
 
@@ -44,17 +45,18 @@ export default function ImagesStep({
       className="space-y-6"
     >
       <div>
-        <h2 className="text-3xl font-black text-gray-900 mb-2">
-          <span className="mr-3">📸</span>
+        <h2 className="text-3xl font-black text-white mb-2 flex items-center gap-3">
+          <Camera className="w-8 h-8 text-cyan-400" />
           Photo Time!
         </h2>
-        <p className="text-gray-600">Upload clear photos of your phone from different angles</p>
+        <p className="text-gray-300">Upload clear photos of your phone from different angles</p>
       </div>
 
       {/* Image Types Guide */}
-      <div className="p-5 bg-linear-to-r from-blue-50 to-purple-50 rounded-xl border-2 border-blue-200">
-        <p className="text-sm text-blue-900 font-bold mb-3 flex items-center gap-2">
-          <span className="text-lg">📋</span> Required Photos:
+      <div className="p-5 bg-blue-500/20 backdrop-blur-md rounded-xl border border-blue-400/30">
+        <p className="text-sm text-blue-300 font-bold mb-3 flex items-center gap-2">
+          <FileText className="w-5 h-5" />
+          Required Photos:
         </p>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
           {imageTypes.map((imgType) => {
@@ -65,13 +67,17 @@ export default function ImagesStep({
                 initial={{ scale: 0.9 }}
                 animate={{ scale: uploaded ? 1.05 : 1 }}
                 className={`flex items-start gap-2 p-3 rounded-lg transition-all ${
-                  uploaded ? 'bg-green-100 text-green-700 font-semibold shadow-sm' : 'bg-white text-gray-600'
+                  uploaded ? 'bg-green-500/20 text-green-300 font-semibold shadow-sm border border-green-400/30' : 'bg-white/5 text-gray-300 border border-white/10'
                 }`}
               >
-                <span className="text-base">{uploaded ? '✅' : '⭕'}</span>
+                {uploaded ? (
+                  <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0" />
+                ) : (
+                  <Circle className="w-5 h-5 text-gray-400 shrink-0" />
+                )}
                 <div>
                   <div className="font-medium">{imgType.label}</div>
-                  <div className={`text-xs ${uploaded ? 'text-green-600' : 'text-gray-500'}`}>
+                  <div className={`text-xs ${uploaded ? 'text-green-400' : 'text-gray-400'}`}>
                     {imgType.description}
                   </div>
                 </div>
@@ -87,10 +93,10 @@ export default function ImagesStep({
           initial={{ scale: 0.95 }}
           animate={{ scale: 1 }}
           transition={{ repeat: Infinity, duration: 2, repeatType: "reverse" }}
-          className="p-4 bg-linear-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-xl shadow-sm"
+          className="p-4 bg-yellow-500/20 backdrop-blur-md border border-yellow-400/30 rounded-xl shadow-sm"
         >
-          <p className="text-sm text-yellow-900 font-semibold flex items-center gap-2">
-            <span className="text-xl">👉</span>
+          <p className="text-sm text-yellow-300 font-semibold flex items-center gap-2">
+            <ArrowRight className="w-5 h-5" />
             <strong>Next Up: </strong>
             {getNextRequiredImageType()?.label} - {getNextRequiredImageType()?.description}
           </p>
@@ -135,16 +141,19 @@ export default function ImagesStep({
       </div>
 
       {isUploadingImage && (
-        <div className="flex items-center gap-2 text-sm text-purple-600 bg-purple-50 p-4 rounded-lg">
+        <div className="flex items-center gap-2 text-sm text-purple-300 bg-purple-500/20 border border-purple-500/50 p-4 rounded-lg backdrop-blur-sm">
           <Loading size="sm" />
-          <span className="font-semibold">Uploading image... ✨</span>
+          <span className="font-semibold flex items-center gap-2">
+            Uploading image...
+            <Sparkles className="w-4 h-4" />
+          </span>
         </div>
       )}
 
       {images.length === 0 && (
-        <div className="text-center p-8 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
-          <span className="text-4xl mb-2 block">📷</span>
-          <p className="text-gray-600">Upload at least one photo to continue</p>
+        <div className="text-center p-8 bg-white/5 rounded-xl border-2 border-dashed border-gray-500">
+          <Camera className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+          <p className="text-gray-300">Upload at least one photo to continue</p>
         </div>
       )}
     </motion.div>

@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Lightbulb } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../services/api';
+import PKRIcon from '../icons/PKRIcon';
 
 interface Listing {
   _id: string;
@@ -95,15 +97,15 @@ export default function PriceOfferModal({
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="card w-full max-w-md relative"
+              className="bg-gray-900/95 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl w-full max-w-md relative"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Make an Offer</h2>
+                <h2 className="text-2xl font-bold text-white">Make an Offer</h2>
                 <button
                   onClick={handleClose}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white"
                   disabled={isPending}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,28 +117,30 @@ export default function PriceOfferModal({
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Listing Info */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">Item</p>
-                  <p className="font-semibold">{listingTitle}</p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Listed Price: <span className="font-bold text-primary-600">PKR {listingPrice.toLocaleString()}</span>
+                <div className="bg-white/5 backdrop-blur-md border border-white/10 p-4 rounded-lg">
+                  <p className="text-sm text-gray-400 mb-1">Item</p>
+                  <p className="font-semibold text-white">{listingTitle}</p>
+                  <p className="text-sm text-gray-400 mt-2">
+                    Listed Price: <span className="font-bold text-cyan-400">PKR {listingPrice.toLocaleString()}</span>
                   </p>
                 </div>
 
                 {/* Offer Price Input */}
                 <div>
-                  <label htmlFor="offerPrice" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="offerPrice" className="block text-sm font-medium text-gray-300 mb-2">
                     Your Offer *
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">PKR</span>
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                      <PKRIcon className="w-6 h-6" />
+                    </div>
                     <input
                       id="offerPrice"
                       type="number"
                       value={offerPrice}
                       onChange={(e) => setOfferPrice(e.target.value)}
                       placeholder="0"
-                      className="input-field pl-14 w-full"
+                      className="input-field pl-12 w-full"
                       min="1"
                       max={listingPrice - 1}
                       required
@@ -147,16 +151,16 @@ export default function PriceOfferModal({
                     <motion.p
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="text-sm mt-2"
+                      className="text-sm mt-2 text-gray-300"
                     >
-                      <span className="text-green-600 font-medium">{percentageOff}% off</span> the listing price
+                      <span className="text-green-400 font-medium">{percentageOff}% off</span> the listing price
                     </motion.p>
                   )}
                 </div>
 
                 {/* Message Input */}
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-200 mb-2">
                     Message (Optional)
                   </label>
                   <textarea
@@ -172,9 +176,12 @@ export default function PriceOfferModal({
                 </div>
 
                 {/* Info */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <p className="text-sm text-blue-800">
-                    💡 The seller will be notified of your offer and can accept, reject, or send a counter offer.
+                <div className="bg-blue-500/20 border border-blue-400/30 rounded-lg p-3">
+                  <p className="text-sm text-blue-300">
+                    <span className="flex items-start gap-2">
+                      <Lightbulb className="w-4 h-4 text-yellow-400 shrink-0 mt-0.5" />
+                      <span>The seller will be notified of your offer and can accept, reject, or send a counter offer.</span>
+                    </span>
                   </p>
                 </div>
 

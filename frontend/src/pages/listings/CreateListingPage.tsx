@@ -5,6 +5,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Edit, Sparkles, AlertTriangle, Rocket, CheckCircle2, Upload, Clock, Bot, Search, Users, Phone, RotateCcw, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Camera, Monitor, User } from 'lucide-react';
+import PKRIcon from '../../components/icons/PKRIcon';
+import PhoneIcon from '../../components/icons/PhoneIcon';
+import ArrowLeftIcon from '../../components/icons/ArrowLeftIcon';
+import ArrowRightIcon from '../../components/icons/ArrowRightIcon';
+import ArrowUpIcon from '../../components/icons/ArrowUpIcon';
+import ArrowDownIcon from '../../components/icons/ArrowDownIcon';
 import { listingService } from '../../services/listing.service';
 import { inspectionService } from '../../services/inspection.service';
 
@@ -49,10 +56,10 @@ type ListingFormData = z.infer<typeof listingSchema>;
 
 // Multi-step form steps
 const STEPS = [
-  { id: 1, title: 'Photos', emoji: '📸', description: 'Upload images' },
-  { id: 2, title: 'Basic Info', emoji: '📝', description: 'Title & price' },
-  { id: 3, title: 'Details', emoji: '📱', description: 'Phone & condition' },
-  { id: 4, title: 'Finish', emoji: '📍', description: 'Accessories & location' },
+  { id: 1, title: 'Photos', icon: 'Camera', description: 'Upload images' },
+  { id: 2, title: 'Basic Info', icon: 'FileText', description: 'Title & price' },
+  { id: 3, title: 'Details', icon: 'Smartphone', description: 'Phone & condition' },
+  { id: 4, title: 'Finish', icon: 'MapPin', description: 'Accessories & location' },
 ];
 
 export default function CreateListingPage() {
@@ -74,15 +81,15 @@ export default function CreateListingPage() {
   });
 
   const imageTypes = [
-    { type: 'front', label: '📱 Front View', description: 'Full front view with screen off' },
-    { type: 'back', label: '🔄 Back View', description: 'Full back view showing camera & logo' },
-    { type: 'left-side', label: '◀️ Left Side', description: 'Left side showing buttons & ports' },
-    { type: 'right-side', label: '▶️ Right Side', description: 'Right side showing buttons & ports' },
-    { type: 'top', label: '⬆️ Top View', description: 'Top edge of the phone' },
-    { type: 'bottom', label: '⬇️ Bottom View', description: 'Bottom edge showing charging port' },
-    { type: 'front-camera-on', label: '🤳 Selfie Camera', description: 'Open camera app (selfie mode)' },
-    { type: 'back-camera-on', label: '📷 Back Camera', description: 'Open camera app (rear camera)' },
-    { type: 'display-test', label: '🖥️ Display Test', description: 'White screen at full brightness' },
+    { type: 'front', label: 'Front View', description: 'Full front view with screen off', icon: <PhoneIcon className="w-5 h-5" /> },
+    { type: 'back', label: 'Back View', description: 'Full back view showing camera & logo', icon: <RotateCcw className="w-5 h-5" /> },
+    { type: 'left-side', label: 'Left Side', description: 'Left side showing buttons & ports', icon: <ArrowLeftIcon className="w-5 h-5" /> },
+    { type: 'right-side', label: 'Right Side', description: 'Right side showing buttons & ports', icon: <ArrowRightIcon className="w-5 h-5" /> },
+    { type: 'top', label: 'Top View', description: 'Top edge of the phone', icon: <ArrowUpIcon className="w-5 h-5" /> },
+    { type: 'bottom', label: 'Bottom View', description: 'Bottom edge showing charging port', icon: <ArrowDownIcon className="w-5 h-5" /> },
+    { type: 'front-camera-on', label: 'Selfie Camera', description: 'Open camera app (selfie mode)', icon: <User className="w-5 h-5" /> },
+    { type: 'back-camera-on', label: 'Back Camera', description: 'Open camera app (rear camera)', icon: <Camera className="w-5 h-5" /> },
+    { type: 'display-test', label: 'Display Test', description: 'White screen at full brightness', icon: <Monitor className="w-5 h-5" /> },
   ];
 
   const getNextRequiredImageType = () => {
@@ -104,6 +111,7 @@ export default function CreateListingPage() {
     reset,
   } = useForm<ListingFormData>({
     resolver: zodResolver(listingSchema),
+    mode: 'onBlur', // Only validate on blur, not on change
     defaultValues: {
       priceNegotiable: false,
       warranty: false,
@@ -212,7 +220,7 @@ export default function CreateListingPage() {
           listing.description
         );
         
-        console.log('✅ AI inspection started in background');
+        console.log('AI inspection started in background');
       } catch (err) {
         console.error('Failed to start inspection:', err);
         // Continue anyway - inspection can fail but listing is created
@@ -365,6 +373,26 @@ export default function CreateListingPage() {
       exit={{ opacity: 0 }}
       className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative"
     >
+      {/* Circuit Pattern Background */}
+      <svg className="absolute inset-0 w-full h-full opacity-5 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="createCircuit" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style={{stopColor:'#06b6d4',stopOpacity:1}} />
+            <stop offset="50%" style={{stopColor:'#2563eb',stopOpacity:1}} />
+            <stop offset="100%" style={{stopColor:'#7c3aed',stopOpacity:1}} />
+          </linearGradient>
+          <pattern id="createPattern" x="0" y="0" width="400" height="300" patternUnits="userSpaceOnUse">
+            <path d="M50 0 L50 90 L70 110 L70 200" stroke="url(#createCircuit)" strokeWidth="2" fill="none"/>
+            <path d="M100 0 L100 70 L120 90 L120 180" stroke="url(#createCircuit)" strokeWidth="2" fill="none"/>
+            <path d="M150 0 L150 100 L170 120 L170 220" stroke="url(#createCircuit)" strokeWidth="2" fill="none"/>
+            <circle cx="50" cy="90" r="4" fill="#06b6d4"/>
+            <circle cx="100" cy="70" r="4" fill="#7c3aed"/>
+            <rect x="116" y="86" width="8" height="8" fill="none" stroke="#7c3aed" strokeWidth="1.5"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#createPattern)"/>
+      </svg>
+
       {/* Animated Background Blobs - Optimized with CSS */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
         <div 
@@ -385,18 +413,24 @@ export default function CreateListingPage() {
         transition={{ delay: 0.1 }}
         className="text-center mb-8"
       >
-        <h1 className="text-4xl md:text-5xl font-bold mb-3">
-          <span className="mr-2">{isEditMode ? '✏️' : '💰'}</span>
-          <span className="bg-linear-to-r from-primary-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl font-bold mb-3 flex items-center justify-center gap-3">
+          {isEditMode ? <Edit className="w-10 h-10 text-cyan-400" /> : <PKRIcon className="w-10 h-10 text-cyan-400" />}
+          <span className="bg-linear-to-r from-cyan-400 via-purple-600 to-pink-600 bg-clip-text text-transparent">
             {isEditMode ? 'Edit Your Listing' : 'Sell Your Phone'}
           </span>
         </h1>
-        <p className="text-gray-600 text-lg">
-          {isEditMode ? 'Update your listing details' : 'Fill in the deets and our AI will verify your phone\'s condition ✨'}
+        <p className="text-gray-300 text-lg flex items-center justify-center gap-2">
+          {isEditMode ? 'Update your listing details' : (
+            <>
+              Fill in the deets and our AI will verify your phone's condition
+              <Sparkles className="w-5 h-5 text-cyan-400" />
+            </>
+          )}
         </p>
         {!isEditMode && (
-          <p className="text-sm text-gray-500 mt-2">
-            Get the best price, no cap! 🔥
+          <p className="text-sm text-gray-500 mt-2 flex items-center justify-center gap-1">
+            Get the best price, no cap!
+            <Sparkles className="w-4 h-4 text-yellow-400" />
           </p>
         )}
       </motion.div>
@@ -405,9 +439,9 @@ export default function CreateListingPage() {
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="bg-linear-to-r from-red-50 to-pink-50 border border-red-200 text-red-600 p-4 rounded-xl mb-6 shadow-sm"
+          className="bg-red-500/20 border border-red-500/50 text-red-300 p-4 rounded-xl mb-6 shadow-sm backdrop-blur-sm"
         >
-          <span className="font-semibold">⚠️ Oops!</span> {error}
+          <span className="font-semibold flex items-center gap-2"><AlertTriangle className="w-5 h-5" /> Oops!</span> {error}
         </motion.div>
       )}
 
@@ -478,7 +512,7 @@ export default function CreateListingPage() {
                   transition={{ type: "spring", stiffness: 200, damping: 15 }}
                   className="w-32 h-32 mx-auto mb-6 bg-linear-to-br from-green-400 via-emerald-500 to-teal-600 rounded-full flex items-center justify-center shadow-2xl"
                 >
-                  <span className="text-6xl">✅</span>
+                  <CheckCircle2 className="w-16 h-16 text-white" />
                 </motion.div>
 
                 {/* Success Message */}
@@ -488,42 +522,43 @@ export default function CreateListingPage() {
                       Listing Submitted Successfully!
                     </span>
                   </h2>
-                  <p className="text-xl text-gray-600 mb-2">
-                    Your phone is now live on Phonely 🎉
+                  <p className="text-xl text-gray-300 mb-2 flex items-center justify-center gap-2">
+                    Your phone is now live on Phonely
+                    <Sparkles className="w-6 h-6 text-yellow-400" />
                   </p>
                   <p className="text-sm text-gray-500">
-                    Listing ID: <span className="font-mono bg-gray-100 px-2 py-1 rounded">{createMutation.data?._id || 'Processing...'}</span>
+                    Listing ID: <span className="font-mono bg-gray-700/50 px-2 py-1 rounded text-gray-300">{createMutation.data?._id || 'Processing...'}</span>
                   </p>
                 </div>
 
                 {/* What's Next Section */}
-                <div className="card bg-linear-to-br from-primary-50 via-purple-50 to-pink-50 border-2 border-primary-200 max-w-2xl mx-auto">
-                  <h3 className="text-2xl font-bold mb-6 flex items-center justify-center gap-2">
-                    <span>🤖</span>
+                <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-6 max-w-2xl mx-auto">
+                  <h3 className="text-2xl font-bold mb-6 flex items-center justify-center gap-2 text-white">
+                    <Bot className="w-6 h-6 text-cyan-400" />
                     <span>What Happens Next?</span>
                   </h3>
                   
                   <div className="grid md:grid-cols-3 gap-6 text-left">
                     <div className="space-y-2">
-                      <div className="text-4xl mb-2">🔍</div>
-                      <h4 className="font-bold text-lg">AI Inspection</h4>
-                      <p className="text-sm text-gray-600">
+                      <Search className="w-10 h-10 mb-2 text-cyan-400" />
+                      <h4 className="font-bold text-lg text-white">AI Inspection</h4>
+                      <p className="text-sm text-gray-300">
                         Our AI is analyzing your photos and verifying the condition (takes 30-60 seconds)
                       </p>
                     </div>
                     
                     <div className="space-y-2">
-                      <div className="text-4xl mb-2">💰</div>
-                      <h4 className="font-bold text-lg">Price Verification</h4>
-                      <p className="text-sm text-gray-600">
+                      <PKRIcon className="w-10 h-10 mb-2 text-green-400" />
+                      <h4 className="font-bold text-lg text-white">Price Verification</h4>
+                      <p className="text-sm text-gray-300">
                         AI checks current market prices and suggests optimal pricing
                       </p>
                     </div>
                     
                     <div className="space-y-2">
-                      <div className="text-4xl mb-2">👥</div>
-                      <h4 className="font-bold text-lg">Go Live</h4>
-                      <p className="text-sm text-gray-600">
+                      <Users className="w-10 h-10 mb-2 text-purple-400" />
+                      <h4 className="font-bold text-lg text-white">Go Live</h4>
+                      <p className="text-sm text-gray-300">
                         Your listing appears to buyers immediately with AI trust score
                       </p>
                     </div>
@@ -531,26 +566,26 @@ export default function CreateListingPage() {
                 </div>
 
                 {/* Tips Section */}
-                <div className="card bg-blue-50 border-2 border-blue-200 max-w-xl mx-auto">
-                  <h3 className="text-xl font-bold mb-4 flex items-center justify-center gap-2">
-                    <span>💡</span>
+                <div className="bg-blue-500/20 backdrop-blur-md border border-blue-400/30 rounded-lg p-6 max-w-xl mx-auto">
+                  <h3 className="text-xl font-bold mb-4 flex items-center justify-center gap-2 text-white">
+                    <Sparkles className="w-4 h-4 text-yellow-400" />
                     <span>Pro Tips</span>
                   </h3>
-                  <ul className="text-left space-y-2 text-sm text-gray-700">
+                  <ul className="text-left space-y-2 text-sm text-gray-300">
                     <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-1">✓</span>
+                      <CheckCircle2 className="w-4 h-4 text-green-400 mt-1 shrink-0" />
                       <span>Check your email - buyers may contact you directly</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-1">✓</span>
+                      <CheckCircle2 className="w-4 h-4 text-green-400 mt-1 shrink-0" />
                       <span>Respond quickly to inquiries for better visibility</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-1">✓</span>
+                      <CheckCircle2 className="w-4 h-4 text-green-400 mt-1 shrink-0" />
                       <span>AI trust score updates within 1 minute - refresh your listing page</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-green-500 mt-1">✓</span>
+                      <CheckCircle2 className="w-4 h-4 text-green-400 mt-1 shrink-0" />
                       <span>You can edit your listing anytime from "My Listings"</span>
                     </li>
                   </ul>
@@ -564,7 +599,8 @@ export default function CreateListingPage() {
                     whileTap={{ scale: 0.95 }}
                     className="btn-secondary px-8 py-4 text-lg"
                   >
-                    🔍 Browse All Listings
+                    <Search className="w-5 h-5 inline mr-2" />
+                    Browse All Listings
                   </motion.button>
                   
                   <motion.button
@@ -595,8 +631,8 @@ export default function CreateListingPage() {
               disabled={currentStep === 1}
               className={`px-6 py-3 rounded-xl font-semibold transition-all ${
                 currentStep === 1
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200 shadow-md hover:shadow-lg'
+                  ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed'
+                  : 'bg-white/5 backdrop-blur-md text-gray-200 hover:bg-white/10 border-2 border-white/10 shadow-md hover:shadow-lg'
               }`}
             >
               ← Back
@@ -625,7 +661,17 @@ export default function CreateListingPage() {
                     {isEditMode ? 'Updating...' : 'Creating...'}
                   </span>
                 ) : (
-                  isEditMode ? '✅ Update Listing' : '🚀 Create Listing'
+                  isEditMode ? (
+                    <>
+                      <CheckCircle2 className="w-5 h-5" />
+                      Update Listing
+                    </>
+                  ) : (
+                    <>
+                      <Rocket className="w-5 h-5" />
+                      Create Listing
+                    </>
+                  )
                 )}
               </button>
             )}
@@ -639,7 +685,7 @@ export default function CreateListingPage() {
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl"
+            className="bg-white/5 backdrop-blur-md rounded-2xl p-8 max-w-md w-full shadow-2xl"
           >
             <div className="text-center">
               <motion.div
@@ -647,23 +693,23 @@ export default function CreateListingPage() {
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                 className="w-20 h-20 mx-auto mb-6"
               >
-                <div className="w-full h-full rounded-full bg-linear-to-r from-primary-500 via-purple-500 to-pink-500 flex items-center justify-center text-4xl">
-                  📤
+                <div className="w-full h-full rounded-full bg-linear-to-r from-cyan-500 via-purple-500 to-pink-500 flex items-center justify-center">
+                  <Upload className="w-10 h-10 text-white" />
                 </div>
               </motion.div>
               
               <h3 className="text-2xl font-bold mb-2">
-                <span className="bg-linear-to-r from-primary-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <span className="bg-linear-to-r from-cyan-400 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                   Submitting Your Listing
                 </span>
               </h3>
               
-              <p className="text-gray-600">
+              <p className="text-gray-300">
                 Preparing your ad for AI inspection...
               </p>
               
               <p className="text-xs text-gray-500 mt-4">
-                Almost there! ⏱️
+                Almost there! <Clock className="w-4 h-4 inline ml-1" />
               </p>
             </div>
           </motion.div>

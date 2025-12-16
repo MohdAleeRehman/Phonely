@@ -43,15 +43,15 @@ export default function VerifyEmailPage() {
   }, [searchParams, navigate]);
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="text-center">
+    <div className="max-w-md mx-auto relative">
+      <div className="text-center relative z-10">
         {status === 'verifying' && (
           <>
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Verifying Your Email</h2>
-            <p className="text-gray-600">Please wait while we verify your email address...</p>
+            <h2 className="text-2xl font-bold text-white mb-2">Verifying Your Email</h2>
+            <p className="text-gray-300">Please wait while we verify your email address...</p>
           </>
         )}
 
@@ -72,8 +72,8 @@ export default function VerifyEmailPage() {
                 />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Email Verified!</h2>
-            <p className="text-gray-600 mb-4">{message}</p>
+            <h2 className="text-2xl font-bold text-white mb-2">Email Verified!</h2>
+            <p className="text-gray-300 mb-4">{message}</p>
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
               <p className="text-green-800 text-sm">
                 ✨ Your account is now fully activated. You can now access all features!
@@ -102,8 +102,8 @@ export default function VerifyEmailPage() {
                 />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Verification Failed</h2>
-            <p className="text-gray-600 mb-6">{message}</p>
+            <h2 className="text-2xl font-bold text-white mb-2">Verification Failed</h2>
+            <p className="text-gray-300 mb-6">{message}</p>
             
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
               <p className="text-yellow-800 text-sm font-medium mb-2">

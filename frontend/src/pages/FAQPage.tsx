@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { HelpCircle, Search, ChevronUp, ChevronDown, MessageSquare, Mail, Package } from 'lucide-react';
 
 interface FAQItem {
   question: string;
@@ -156,22 +157,25 @@ export default function FAQPage() {
   });
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-gray-50 to-white py-12">
+    <div className="min-h-screen bg-linear-to-b from-gray-900 via-blue-950 to-gray-900 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
           <motion.h1 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-6xl font-black text-gray-900 mb-4"
+            className="text-5xl md:text-6xl font-black text-white mb-4"
           >
-            Got Questions? 🤔
+            <span className="flex items-center justify-center gap-3">
+              Got Questions?
+              <HelpCircle className="w-12 h-12 text-cyan-400" />
+            </span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-xl text-gray-600"
+            className="text-xl text-gray-300"
           >
             We've got answers! Everything you need to know about buying & selling on Phonely.
           </motion.p>
@@ -187,10 +191,10 @@ export default function FAQPage() {
           <div className="relative">
             <input
               type="text"
-              placeholder="🔍 Search for answers..."
+              placeholder="Search for answers..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-6 py-4 rounded-full border-2 border-gray-300 focus:border-primary-500 focus:outline-none text-lg shadow-sm"
+              className="w-full px-6 py-4 rounded-full border-2 border-white/20 bg-white/5 backdrop-blur-md text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none text-lg shadow-sm"
             />
           </div>
         </motion.div>
@@ -208,8 +212,8 @@ export default function FAQPage() {
               onClick={() => setActiveCategory(category)}
               className={`px-6 py-2 rounded-full font-semibold transition-all duration-200 ${
                 activeCategory === category
-                  ? 'bg-linear-to-r from-primary-600 to-primary-700 text-white shadow-lg scale-105'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 border-2 border-gray-300'
+                  ? 'bg-linear-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/50 scale-105'
+                  : 'bg-white/5 backdrop-blur-md text-gray-200 hover:bg-white/10 border-2 border-white/20'
               }`}
             >
               {category}
@@ -225,22 +229,26 @@ export default function FAQPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden"
+              className="bg-white/5 backdrop-blur-md rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden"
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full px-6 py-5 text-left flex justify-between items-center hover:bg-gray-50 transition-colors duration-200"
+                className="w-full px-6 py-5 text-left flex justify-between items-center hover:bg-linear-to-br from-gray-900 via-blue-950 to-gray-900 transition-colors duration-200"
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-1">
-                    <span className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-xs font-bold">
+                    <span className="px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-xs font-bold border border-cyan-500/50">
                       {faq.category}
                     </span>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900">{faq.question}</h3>
+                  <h3 className="text-lg font-bold text-white">{faq.question}</h3>
                 </div>
-                <div className={`text-3xl transition-transform duration-300 ${openIndex === index ? 'rotate-180' : ''}`}>
-                  {openIndex === index ? '⬆️' : '⬇️'}
+                <div className="transition-transform duration-300">
+                  {openIndex === index ? (
+                    <ChevronUp className="w-6 h-6 text-cyan-400" />
+                  ) : (
+                    <ChevronDown className="w-6 h-6 text-cyan-400" />
+                  )}
                 </div>
               </button>
               
@@ -252,7 +260,7 @@ export default function FAQPage() {
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="px-6 pb-5 text-gray-700 leading-relaxed">
+                    <div className="px-6 pb-5 text-gray-200 leading-relaxed">
                       {faq.answer}
                     </div>
                   </motion.div>
@@ -265,9 +273,9 @@ export default function FAQPage() {
         {/* No Results */}
         {filteredFaqs.length === 0 && (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">🤷‍♂️</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">No answers found</h3>
-            <p className="text-gray-600 mb-6">Try a different search term or category!</p>
+            <HelpCircle className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+            <h3 className="text-2xl font-bold text-white mb-2">No answers found</h3>
+            <p className="text-gray-300 mb-6">Try a different search term or category!</p>
           </div>
         )}
 
@@ -276,18 +284,22 @@ export default function FAQPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="mt-16 text-center bg-linear-to-r from-primary-600 to-purple-700 rounded-2xl p-12 text-white"
+          className="mt-16 text-center bg-linear-to-r from-cyan-500 via-blue-600 to-purple-600 rounded-2xl p-12 text-white"
         >
-          <h2 className="text-3xl font-black mb-4">Still Have Questions? 💬</h2>
+          <h2 className="text-3xl font-black mb-4 flex items-center justify-center gap-2">
+            Still Have Questions?
+            <MessageSquare className="w-8 h-8" />
+          </h2>
           <p className="text-lg mb-6 text-gray-100">
             Can't find what you're looking for? Our support team is here to help!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="mailto:support@phonely.com.pk"
-              className="px-8 py-3 bg-transparent border-2 border-white text-white rounded-full font-bold hover:bg-white hover:text-primary-700 transition-all duration-200"
+              className="px-8 py-3 bg-transparent border-2 border-white text-white rounded-full font-bold hover:bg-white/5 backdrop-blur-md hover:text-cyan-300 transition-all duration-200"
             >
-              📧 Email Us
+              <Mail className="w-5 h-5 inline mr-2" />
+              Email Us
             </a>
           </div>
         </motion.div>

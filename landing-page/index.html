@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Phonely - Your Trusted Phone Marketplace</title>
-  <meta name="description" content="Sell your phone smarter with Phonely. AI-powered phone resale platform currently in beta testing.">
+  <title>Phonely - Sell Your Phone Smarter | AI-Powered Phone Marketplace Pakistan</title>
+  <meta name="description" content="Pakistan's first AI-powered phone resale platform. Get instant, accurate valuations and connect directly with buyers. No middlemen, fair pricing, 100% transparent.">
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="32x32" href="./favicon.png">
@@ -45,6 +45,16 @@
       0%, 100% { transform: translateY(0px); }
       50% { transform: translateY(-20px); }
     }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
     .float-animation {
       animation: float 6s ease-in-out infinite;
     }
@@ -54,20 +64,70 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+    .gradient-bg {
+      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 50%, #ec4899 100%);
+    }
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-900">
+<body class="bg-gray-900 text-white">
 
   <!-- Hero Section -->
-  <section class="min-h-screen flex items-center justify-center px-4 py-16 relative overflow-hidden">
-    <!-- Background blobs -->
-    <div class="absolute inset-0 opacity-10">
-      <div class="absolute top-20 left-10 w-96 h-96 bg-primary-600 rounded-full mix-blend-multiply filter blur-3xl float-animation"></div>
-      <div class="absolute top-40 right-10 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl float-animation" style="animation-delay: 2s;"></div>
-      <div class="absolute bottom-20 left-1/2 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl float-animation" style="animation-delay: 4s;"></div>
-    </div>
-
-    <div class="max-w-4xl mx-auto text-center relative z-10">
+  <section class="min-h-screen flex items-center justify-center px-4 py-20 relative overflow-hidden bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900">
+    <!-- Circuit pattern background -->
+    <svg class="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="circuitGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+          <stop offset="50%" style="stop-color:#2563eb;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+        </linearGradient>
+        <pattern id="circuit" x="0" y="0" width="300" height="200" patternUnits="userSpaceOnUse">
+          <!-- Horizontal traces -->
+          <path d="M0 30 L100 30 L120 50 L200 50" stroke="url(#circuitGrad)" stroke-width="2" fill="none"/>
+          <path d="M0 70 L80 70 L100 90 L250 90" stroke="url(#circuitGrad)" stroke-width="2" fill="none"/>
+          <path d="M0 110 L120 110 L140 130 L280 130" stroke="url(#circuitGrad)" stroke-width="2" fill="none"/>
+          <path d="M0 150 L60 150 L80 170 L200 170" stroke="url(#circuitGrad)" stroke-width="2" fill="none"/>
+          
+          <!-- Dotted connections -->
+          <line x1="100" y1="30" x2="140" y2="50" stroke="#2563eb" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+          <line x1="200" y1="50" x2="220" y2="90" stroke="#7c3aed" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+          
+          <!-- Nodes (circles) -->
+          <circle cx="100" cy="30" r="4" fill="none" stroke="#06b6d4" stroke-width="1.5"/>
+          <circle cx="200" cy="50" r="4" fill="#2563eb"/>
+          <circle cx="80" cy="70" r="4" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+          <circle cx="250" cy="90" r="4" fill="#7c3aed"/>
+          <circle cx="120" cy="110" r="4" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+          <circle cx="280" cy="130" r="4" fill="#ec4899"/>
+          <circle cx="60" cy="150" r="3" fill="#06b6d4"/>
+          
+          <!-- Square nodes -->
+          <rect x="116" y="46" width="8" height="8" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+          <rect x="136" y="126" width="8" height="8" fill="#7c3aed" opacity="0.7"/>
+          <rect x="76" y="166" width="8" height="8" fill="none" stroke="#ec4899" stroke-width="1.5"/>
+          
+          <!-- Plus symbols -->
+          <path d="M160 40 L170 40 M165 35 L165 45" stroke="#2563eb" stroke-width="1.5" opacity="0.4"/>
+          <path d="M220 110 L230 110 M225 105 L225 115" stroke="#7c3aed" stroke-width="1.5" opacity="0.4"/>
+          <path d="M30 180 L40 180 M35 175 L35 185" stroke="#ec4899" stroke-width="1.5" opacity="0.4"/>
+          
+          <!-- Small dots -->
+          <circle cx="180" cy="60" r="1.5" fill="#2563eb" opacity="0.6"/>
+          <circle cx="50" cy="100" r="1.5" fill="#7c3aed" opacity="0.6"/>
+          <circle cx="260" cy="140" r="1.5" fill="#ec4899" opacity="0.6"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#circuit)"/>
+    </svg>
+    
+    <div class="max-w-5xl mx-auto text-center relative z-10">
       <!-- Logo -->
       <div class="mb-0">
         <img src="./logo.png" alt="Phonely" class="h-64 md:h-72 mx-auto" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
@@ -75,158 +135,572 @@
       </div>
 
       <!-- Beta Badge -->
-      <div class="-mt-8 inline-flex items-center gap-2 px-4 py-2 bg-blue-100 border-2 border-blue-300 rounded-full mb-6">
-        <span class="text-2xl">🧪</span>
-        <span class="text-blue-900 font-semibold">Currently in Beta</span>
+      <div class="-mt-8 inline-flex items-center gap-2 px-5 py-2.5 bg-primary-500/20 border-2 border-primary-400/30 rounded-full mb-8 shadow-lg backdrop-blur-sm">
+        <span class="text-xl">🧪</span>
+        <span class="text-primary-200 font-semibold text-sm">Beta Testing Live Now</span>
       </div>
 
       <!-- Headline -->
-      <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight">
-        Sell your phone.<br />
-        <span class="gradient-text">Smarter.</span>
+      <h1 class="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight text-white">
+        Phone resale,<br />
+        <span class="gradient-text">reimagined.</span>
       </h1>
 
       <!-- Subtext -->
-      <p class="text-xl md:text-2xl text-gray-600 mb-12 max-w-2xl mx-auto">
-        AI-powered phone resale platform for Pakistan.
+      <p class="text-xl md:text-2xl text-gray-100 mb-4 max-w-3xl mx-auto font-medium">
+        Pakistan's first AI-powered phone marketplace.
+      </p>
+      <p class="text-lg md:text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
+        Get instant valuations, connect directly with buyers, and sell your phone for what it's actually worth—no middlemen, no guesswork.
       </p>
 
       <!-- CTA Buttons -->
-      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
         <a 
-          href="#notify" 
-          class="px-8 py-4 bg-gradient-to-r from-primary-600 via-purple-700 to-pink-600 text-white rounded-full font-bold text-lg hover:scale-105 transition-transform duration-200 shadow-xl hover:shadow-2xl inline-flex items-center gap-2"
+          href="#waitlist" 
+          class="px-10 py-5 gradient-bg text-white rounded-full font-bold text-lg hover:scale-105 hover:shadow-2xl transition-all duration-200 shadow-xl inline-flex items-center gap-3"
         >
-          <span>🔔</span>
-          <span>Get Notified</span>
+          <span>🚀</span>
+          <span>Join the Waitlist</span>
         </a>
         <a 
           href="https://beta.phonely.com.pk" 
           target="_blank"
           rel="noopener noreferrer"
-          class="px-8 py-4 bg-white border-2 border-gray-300 text-gray-900 rounded-full font-bold text-lg hover:scale-105 transition-transform duration-200 shadow-lg hover:shadow-xl inline-flex items-center gap-2"
+          class="px-10 py-5 bg-white/10 border-2 border-white/20 text-white rounded-full font-bold text-lg hover:scale-105 hover:bg-white/20 hover:shadow-xl transition-all duration-200 shadow-lg inline-flex items-center gap-3 backdrop-blur-sm"
         >
-          <span>🚀</span>
-          <span>Visit Beta Platform</span>
+          <span>🎯</span>
+          <span>Try Beta Platform</span>
         </a>
+      </div>
+
+      <!-- Social Proof Hint -->
+      <p class="text-sm text-gray-400">
+        <span class="font-semibold text-primary-400">Join 500+</span> early adopters already on the waitlist
+      </p>
+    </div>
+  </section>
+
+  <!-- Problem Statement Section -->
+  <section class="py-24 bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 relative overflow-hidden">
+    <!-- Vertical circuit lines -->
+    <svg class="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="vertGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+          <stop offset="50%" style="stop-color:#2563eb;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+        </linearGradient>
+        <pattern id="verticalLines1" x="0" y="0" width="200" height="300" patternUnits="userSpaceOnUse">
+          <path d="M40 0 L40 100 L60 120 L60 250" stroke="url(#vertGrad1)" stroke-width="2" fill="none"/>
+          <path d="M100 0 L100 80 L120 100 L120 220" stroke="url(#vertGrad1)" stroke-width="2" fill="none"/>
+          <path d="M160 0 L160 120 L140 140 L140 280" stroke="url(#vertGrad1)" stroke-width="2" fill="none"/>
+          <circle cx="40" cy="100" r="4" fill="#06b6d4"/>
+          <circle cx="60" cy="120" r="4" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+          <circle cx="100" cy="80" r="4" fill="#7c3aed"/>
+          <circle cx="160" cy="120" r="4" fill="#ec4899"/>
+          <rect x="56" y="116" width="8" height="8" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+          <rect x="136" y="96" width="8" height="8" fill="#ec4899" opacity="0.7"/>
+          <path d="M80 200 L90 200 M85 195 L85 205" stroke="#2563eb" stroke-width="1.5" opacity="0.4"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#verticalLines1)"/>
+    </svg>
+    
+    <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+      <h2 class="text-4xl md:text-5xl font-black mb-8">
+        Stop losing money on <span class="gradient-text">outdated phone resale</span>
+      </h2>
+      <p class="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+        Traditional phone resale in Pakistan means dealing with lowball offers from shops, sketchy buyers, and zero transparency. You deserve better.
+      </p>
+      
+      <div class="grid md:grid-cols-3 gap-8 text-left">
+        <div class="p-6 bg-red-500/10 border-2 border-red-400/20 rounded-2xl backdrop-blur-sm">
+          <div class="text-3xl mb-3">😤</div>
+          <h3 class="font-bold text-lg mb-2 text-red-300">Lowball Offers</h3>
+          <p class="text-gray-300 text-sm">Shops offer 30-40% below market value</p>
+        </div>
+        <div class="p-6 bg-orange-500/10 border-2 border-orange-400/20 rounded-2xl backdrop-blur-sm">
+          <div class="text-3xl mb-3">❓</div>
+          <h3 class="font-bold text-lg mb-2 text-orange-300">No Transparency</h3>
+          <p class="text-gray-300 text-sm">Can't verify if the price is fair</p>
+        </div>
+        <div class="p-6 bg-yellow-500/10 border-2 border-yellow-400/20 rounded-2xl backdrop-blur-sm">
+          <div class="text-3xl mb-3">⏳</div>
+          <h3 class="font-bold text-lg mb-2 text-yellow-300">Weeks to Sell</h3>
+          <p class="text-gray-300 text-sm">Finding buyers takes forever</p>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- How It Works Section -->
-  <section class="py-20 bg-white">
-    <div class="max-w-6xl mx-auto px-4">
-      <h2 class="text-4xl md:text-5xl font-black text-center mb-16">
-        How It <span class="gradient-text">Works</span>
-      </h2>
+  <section class="py-24 bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 relative overflow-hidden">
+    <!-- Horizontal circuit lines -->
+    <svg class="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="horizGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+          <stop offset="50%" style="stop-color:#7c3aed;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+        </linearGradient>
+        <pattern id="horizontalLines2" x="0" y="0" width="300" height="200" patternUnits="userSpaceOnUse">
+          <path d="M0 40 L80 40 L100 60 L220 60" stroke="url(#horizGrad2)" stroke-width="2" fill="none"/>
+          <path d="M0 80 L60 80 L80 100 L200 100" stroke="url(#horizGrad2)" stroke-width="2" fill="none"/>
+          <path d="M0 120 L100 120 L120 140 L260 140" stroke="url(#horizGrad2)" stroke-width="2" fill="none"/>
+          <path d="M0 160 L70 160 L90 180 L230 180" stroke="url(#horizGrad2)" stroke-width="2" fill="none"/>
+          <line x1="80" y1="40" x2="100" y2="60" stroke="#7c3aed" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+          <circle cx="80" cy="40" r="4" fill="#2563eb"/>
+          <circle cx="220" cy="60" r="4" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+          <circle cx="60" cy="80" r="4" fill="#ec4899"/>
+          <circle cx="100" cy="120" r="4" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+          <rect x="76" y="96" width="8" height="8" fill="#7c3aed" opacity="0.7"/>
+          <rect x="116" y="136" width="8" height="8" fill="none" stroke="#ec4899" stroke-width="1.5"/>
+          <path d="M180 80 L190 80 M185 75 L185 85" stroke="#2563eb" stroke-width="1.5" opacity="0.4"/>
+          <circle cx="150" cy="120" r="1.5" fill="#7c3aed" opacity="0.6"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#horizontalLines2)"/>
+    </svg>
+    
+    <div class="max-w-6xl mx-auto px-4 relative z-10">
+      <div class="text-center mb-20">
+        <h2 class="text-4xl md:text-6xl font-black mb-6 text-white">
+          How <span class="gradient-text">Phonely</span> Works
+        </h2>
+        <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+          Four simple steps to sell your phone at the right price, to the right buyer
+        </p>
+      </div>
 
-      <div class="grid md:grid-cols-3 gap-12">
+      <div class="space-y-12">
         <!-- Step 1 -->
-        <div class="text-center">
-          <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-primary-500 to-purple-700 rounded-3xl flex items-center justify-center text-5xl shadow-xl">
-            📸
+        <div class="flex flex-col md:flex-row items-center gap-8 bg-white/5 backdrop-blur-md border border-white/10 p-8 md:p-12 rounded-3xl shadow-xl card-hover">
+          <div class="flex-shrink-0">
+            <div class="w-20 h-20 bg-gradient-to-br from-primary-500 to-purple-600 rounded-2xl flex items-center justify-center text-4xl font-black text-white shadow-lg">
+              01
+            </div>
           </div>
-          <h3 class="text-2xl font-bold mb-3">Snap</h3>
-          <p class="text-gray-600">Upload your phone photos</p>
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="text-5xl">📸</span>
+              <h3 class="text-3xl font-black text-white">Upload Your Phone</h3>
+            </div>
+            <p class="text-lg text-gray-300 mb-4">
+              Take a few photos of your phone from different angles. Our AI analyzes the condition, detects any damage, and verifies authenticity.
+            </p>
+            <p class="text-sm text-gray-400">
+              <span class="font-semibold text-primary-400">Pro tip:</span> Good lighting = better AI accuracy = higher valuation
+            </p>
+          </div>
         </div>
 
         <!-- Step 2 -->
-        <div class="text-center">
-          <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl flex items-center justify-center text-5xl shadow-xl">
-            🤖
+        <div class="flex flex-col md:flex-row-reverse items-center gap-8 bg-white/5 backdrop-blur-md border border-white/10 p-8 md:p-12 rounded-3xl shadow-xl card-hover">
+          <div class="flex-shrink-0">
+            <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center text-4xl font-black text-white shadow-lg">
+              02
+            </div>
           </div>
-          <h3 class="text-2xl font-bold mb-3">Scan</h3>
-          <p class="text-gray-600">AI analyzes condition & market</p>
+          <div class="flex-1 md:text-right">
+            <div class="flex items-center gap-3 mb-4 md:flex-row-reverse">
+              <span class="text-5xl">🤖</span>
+              <h3 class="text-3xl font-black text-white">Get AI Valuation</h3>
+            </div>
+            <p class="text-lg text-gray-300 mb-4">
+              Our AI scans real-time market data across Pakistan, comparing your phone's condition, age, and specs to thousands of listings to give you an accurate price range.
+            </p>
+            <p class="text-sm text-gray-400">
+              <span class="font-semibold text-purple-400">Powered by:</span> Real-time market data + Computer vision AI
+            </p>
+          </div>
         </div>
 
         <!-- Step 3 -->
-        <div class="text-center">
-          <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-pink-500 to-orange-500 rounded-3xl flex items-center justify-center text-5xl shadow-xl">
-            💰
+        <div class="flex flex-col md:flex-row items-center gap-8 bg-white/5 backdrop-blur-md border border-white/10 p-8 md:p-12 rounded-3xl shadow-xl card-hover">
+          <div class="flex-shrink-0">
+            <div class="w-20 h-20 bg-gradient-to-br from-pink-500 to-orange-500 rounded-2xl flex items-center justify-center text-4xl font-black text-white shadow-lg">
+              03
+            </div>
           </div>
-          <h3 class="text-2xl font-bold mb-3">Sell</h3>
-          <p class="text-gray-600">Get fair price offers</p>
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="text-5xl">🔗</span>
+              <h3 class="text-3xl font-black text-white">Connect with Buyers</h3>
+            </div>
+            <p class="text-lg text-gray-300 mb-4">
+              Your listing goes live instantly. Verified buyers can see your phone's AI-verified condition report and reach out directly—no middlemen taking a cut.
+            </p>
+            <p class="text-sm text-gray-400">
+              <span class="font-semibold text-orange-400">You're in control:</span> Choose who to sell to, negotiate directly
+            </p>
+          </div>
         </div>
+
+        <!-- Step 4 -->
+        <div class="flex flex-col md:flex-row-reverse items-center gap-8 bg-white/5 backdrop-blur-md border border-white/10 p-8 md:p-12 rounded-3xl shadow-xl card-hover">
+          <div class="flex-shrink-0">
+            <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center text-4xl font-black text-white shadow-lg">
+              04
+            </div>
+          </div>
+          <div class="flex-1 md:text-right">
+            <div class="flex items-center gap-3 mb-4 md:flex-row-reverse">
+              <span class="text-5xl">💰</span>
+              <h3 class="text-3xl font-black text-white">Get Paid Fairly</h3>
+            </div>
+            <p class="text-lg text-gray-300 mb-4">
+              Finalize the deal at your price. Meet safely, complete the transaction, and walk away with cash—knowing you got the market-rate value for your device.
+            </p>
+            <p class="text-sm text-gray-400">
+              <span class="font-semibold text-green-400">Average savings:</span> 25-40% more than traditional shops
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-16">
+        <a 
+          href="#waitlist" 
+          class="inline-flex items-center gap-3 px-10 py-5 gradient-bg text-white rounded-full font-bold text-lg hover:scale-105 hover:shadow-2xl transition-all duration-200 shadow-xl"
+        >
+          <span>Start Selling Smarter</span>
+          <span>→</span>
+        </a>
       </div>
     </div>
   </section>
 
   <!-- Apps Coming Soon Section -->
-  <section class="py-20 bg-gradient-to-r from-primary-600 via-purple-700 to-pink-600 text-white">
-    <div class="max-w-4xl mx-auto px-4 text-center">
-      <h2 class="text-4xl md:text-5xl font-black mb-8">
-        Apps Coming <span class="text-yellow-300">Soon</span>
+  <section class="py-24 bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 relative overflow-hidden">
+    <!-- Vertical and angled circuit pattern -->
+    <svg class="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="verticalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+          <stop offset="50%" style="stop-color:#7c3aed;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+        </linearGradient>
+        <pattern id="verticalCircuit" x="0" y="0" width="200" height="300" patternUnits="userSpaceOnUse">
+          <!-- Vertical traces -->
+          <path d="M40 0 L40 100 L60 120 L60 250" stroke="url(#verticalGrad)" stroke-width="2" fill="none"/>
+          <path d="M100 0 L100 80 L120 100 L120 220" stroke="url(#verticalGrad)" stroke-width="2" fill="none"/>
+          <path d="M160 0 L160 120 L140 140 L140 280" stroke="url(#verticalGrad)" stroke-width="2" fill="none"/>
+          
+          <!-- Angled connections -->
+          <path d="M60 120 L100 140 L120 160" stroke="#7c3aed" stroke-width="2" fill="none" opacity="0.6"/>
+          <line x1="100" y1="80" x2="140" y2="100" stroke="#2563eb" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+          
+          <!-- Nodes -->
+          <circle cx="40" cy="100" r="4" fill="#06b6d4"/>
+          <circle cx="60" cy="120" r="4" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+          <circle cx="100" cy="80" r="4" fill="#7c3aed"/>
+          <circle cx="120" cy="160" r="4" fill="none" stroke="#ec4899" stroke-width="1.5"/>
+          <circle cx="160" cy="120" r="4" fill="#2563eb"/>
+          
+          <!-- Squares and symbols -->
+          <rect x="96" y="136" width="8" height="8" fill="#7c3aed" opacity="0.7"/>
+          <rect x="136" y="96" width="8" height="8" fill="none" stroke="#ec4899" stroke-width="1.5"/>
+          <path d="M80 200 L90 200 M85 195 L85 205" stroke="#2563eb" stroke-width="1.5" opacity="0.4"/>
+          <circle cx="180" cy="180" r="1.5" fill="#7c3aed" opacity="0.6"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#verticalCircuit)"/>
+    </svg>
+
+    <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+      <h2 class="text-4xl md:text-5xl font-black mb-4">
+        Mobile Apps <span class="gradient-text">Coming Soon</span>
       </h2>
+      <p class="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
+        Take Phonely with you wherever you go. iOS and Android apps launching soon.
+      </p>
       
-      <div class="flex justify-center gap-8 mb-8">
-        <!-- iOS Icon -->
-        <div class="opacity-50 grayscale">
-          <svg class="w-20 h-20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-          </svg>
+      <div class="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-8">
+        <!-- iOS Card -->
+        <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-8 hover:bg-white/10 transition-all duration-300 card-hover">
+          <div class="flex items-center justify-center mb-4">
+            <svg class="w-16 h-16 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-2 text-white">iOS App</h3>
+          <p class="text-gray-300 mb-4">Coming to the App Store</p>
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-sm text-gray-300">
+            <span>⏳</span>
+            <span>In Development</span>
+          </div>
         </div>
         
-        <!-- Android Icon -->
-        <div class="opacity-50 grayscale">
-          <svg class="w-20 h-20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17.6,9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88,3.24c-2.86-1.21-6.08-1.21-8.94,0L5.65,5.67c-.19-.28-.55-.37-.83-.22-.3.16-.42.54-.26.85L6.4,9.48C3.3,11.25,1.28,14.44,1,18h22C22.72,14.44,20.7,11.25,17.6,9.48ZM7,15.25c-.69,0-1.25-.56-1.25-1.25s.56-1.25,1.25-1.25,1.25.56,1.25,1.25-.56,1.25-1.25,1.25Zm10,0c-.69,0-1.25-.56-1.25-1.25s.56-1.25,1.25-1.25,1.25.56,1.25,1.25-.56,1.25-1.25,1.25Z"/>
-          </svg>
+        <!-- Android Card -->
+        <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-8 hover:bg-white/10 transition-all duration-300 card-hover">
+          <div class="flex items-center justify-center mb-4">
+            <svg class="w-16 h-16 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.6,9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88,3.24c-2.86-1.21-6.08-1.21-8.94,0L5.65,5.67c-.19-.28-.55-.37-.83-.22-.3.16-.42.54-.26.85L6.4,9.48C3.3,11.25,1.28,14.44,1,18h22C22.72,14.44,20.7,11.25,17.6,9.48ZM7,15.25c-.69,0-1.25-.56-1.25-1.25s.56-1.25,1.25-1.25,1.25.56,1.25,1.25-.56,1.25-1.25,1.25Zm10,0c-.69,0-1.25-.56-1.25-1.25s.56-1.25,1.25-1.25,1.25.56,1.25,1.25-.56,1.25-1.25,1.25Z"/>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-2 text-white">Android App</h3>
+          <p class="text-gray-300 mb-4">Coming to Google Play</p>
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-sm text-gray-300">
+            <span>⏳</span>
+            <span>In Development</span>
+          </div>
         </div>
       </div>
 
-      <div class="space-y-2 text-lg">
-        <p class="font-bold">Mobile apps launching soon</p>
-        <p class="text-purple-100">Website currently in beta testing</p>
-      </div>
+      <p class="text-gray-400 text-sm">
+        <a href="#waitlist" class="text-primary-400 hover:text-primary-300 font-semibold transition-colors">Join the waitlist</a> to be notified when apps launch
+      </p>
     </div>
   </section>
 
   <!-- Trust Signals Section -->
-  <section class="py-20 bg-white">
-    <div class="max-w-6xl mx-auto px-4">
-      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+  <section class="py-24 bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 relative overflow-hidden">
+    <!-- Horizontal circuit lines -->
+    <svg class="absolute inset-0 w-full h-full opacity-5" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="horizGrad4" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+          <stop offset="50%" style="stop-color:#7c3aed;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+        </linearGradient>
+        <pattern id="horizontalLines4" x="0" y="0" width="280" height="180" patternUnits="userSpaceOnUse">
+          <path d="M0 45 L90 45 L110 65 L240 65" stroke="url(#horizGrad4)" stroke-width="2" fill="none"/>
+          <path d="M0 90 L70 90 L90 110 L220 110" stroke="url(#horizGrad4)" stroke-width="2" fill="none"/>
+          <path d="M0 135 L110 135 L130 155 L250 155" stroke="url(#horizGrad4)" stroke-width="2" fill="none"/>
+          <circle cx="90" cy="45" r="4" fill="#06b6d4"/>
+          <circle cx="240" cy="65" r="4" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+          <circle cx="70" cy="90" r="4" fill="#7c3aed"/>
+          <circle cx="110" cy="135" r="4" fill="#ec4899"/>
+          <rect x="106" y="61" width="8" height="8" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+          <path d="M180 85 L190 85 M185 80 L185 90" stroke="#ec4899" stroke-width="1.5" opacity="0.4"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#horizontalLines4)"/>
+    </svg>
+
+    <div class="max-w-5xl mx-auto px-4 relative z-10">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-black mb-4">
+          Why <span class="gradient-text">Phonely</span> is Different
+        </h2>
+        <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+          Pakistan's first AI-powered phone marketplace built to give you fair value and complete control
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-px bg-white/10 rounded-3xl overflow-hidden">
         <!-- Signal 1 -->
-        <div class="p-6">
-          <div class="text-5xl mb-4">🇵🇰</div>
-          <h3 class="text-xl font-bold mb-2">Built for Pakistan</h3>
-          <p class="text-gray-600">Designed for the Pakistani market</p>
+        <div class="bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 p-8 md:p-12">
+          <div class="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-500 to-purple-600 rounded-2xl mb-6">
+            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-3 text-white">Built for Pakistan</h3>
+          <p class="text-gray-300 leading-relaxed">Designed specifically for the Pakistani market with local pricing data, Urdu support coming soon, and understanding of how phones are bought and sold here</p>
         </div>
 
         <!-- Signal 2 -->
-        <div class="p-6">
-          <div class="text-5xl mb-4">🎯</div>
-          <h3 class="text-xl font-bold mb-2">No Middlemen</h3>
-          <p class="text-gray-600">Direct buyer-seller connection</p>
+        <div class="bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 p-8 md:p-12">
+          <div class="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl mb-6">
+            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-3 text-white">No Middlemen</h3>
+          <p class="text-gray-300 leading-relaxed">Connect directly with verified buyers. No shops taking a cut, no dealers lowballing you. You set your price and keep 100% of what you earn</p>
         </div>
 
         <!-- Signal 3 -->
-        <div class="p-6">
-          <div class="text-5xl mb-4">📊</div>
-          <h3 class="text-xl font-bold mb-2">Fair Pricing</h3>
-          <p class="text-gray-600">AI-powered market analysis</p>
+        <div class="bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 p-8 md:p-12">
+          <div class="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-pink-500 to-orange-600 rounded-2xl mb-6">
+            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-3 text-white">Fair Pricing</h3>
+          <p class="text-gray-300 leading-relaxed">AI-powered valuations based on real market data from thousands of listings. Know exactly what your phone is worth before you list it</p>
         </div>
 
         <!-- Signal 4 -->
-        <div class="p-6">
-          <div class="text-5xl mb-4">🔒</div>
-          <h3 class="text-xl font-bold mb-2">Secure & Transparent</h3>
-          <p class="text-gray-600">Every transaction verified</p>
+        <div class="bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 p-8 md:p-12">
+          <div class="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl mb-6">
+            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-3 text-white">Secure & Transparent</h3>
+          <p class="text-gray-300 leading-relaxed">Every transaction comes with buyer verification, transaction guidelines, and safety tips. Complete transparency at every step</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Notification Form Section -->
-  <section id="notify" class="py-20 bg-gradient-to-br from-primary-50 to-purple-50">
-    <div class="max-w-2xl mx-auto px-4">
-      <div class="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
-        <h2 class="text-3xl md:text-4xl font-black text-center mb-4">
-          Join the <span class="gradient-text">Waitlist</span>
+  <!-- FAQ Section -->
+  <section class="py-24 bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 relative overflow-hidden">
+    <!-- Vertical circuit lines -->
+    <svg class="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="vertGrad5" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+          <stop offset="50%" style="stop-color:#7c3aed;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+        </linearGradient>
+        <pattern id="verticalLines5" x="0" y="0" width="220" height="300" patternUnits="userSpaceOnUse">
+          <path d="M50 0 L50 110 L70 130 L70 260" stroke="url(#vertGrad5)" stroke-width="2" fill="none"/>
+          <path d="M110 0 L110 90 L130 110 L130 240" stroke="url(#vertGrad5)" stroke-width="2" fill="none"/>
+          <path d="M170 0 L170 130 L150 150 L150 290" stroke="url(#vertGrad5)" stroke-width="2" fill="none"/>
+          <line x1="50" y1="110" x2="70" y2="130" stroke="#7c3aed" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+          <circle cx="50" cy="110" r="4" fill="#2563eb"/>
+          <circle cx="70" cy="130" r="4" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+          <circle cx="110" cy="90" r="4" fill="#ec4899"/>
+          <circle cx="170" cy="130" r="4" fill="#2563eb"/>
+          <rect x="126" y="106" width="8" height="8" fill="#7c3aed" opacity="0.7"/>
+          <rect x="146" y="146" width="8" height="8" fill="none" stroke="#ec4899" stroke-width="1.5"/>
+          <path d="M90 200 L100 200 M95 195 L95 205" stroke="#2563eb" stroke-width="1.5" opacity="0.4"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#verticalLines5)"/>
+    </svg>
+    
+    <div class="max-w-4xl mx-auto px-4 relative z-10">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-black mb-4">
+          Frequently Asked <span class="gradient-text">Questions</span>
         </h2>
-        <p class="text-gray-600 text-center mb-8">
-          Be the first to know when we launch officially
+        <p class="text-xl text-gray-300">
+          Everything you need to know about Phonely
         </p>
+      </div>
 
+      <div class="space-y-4">
+        <!-- FAQ 1 -->
+        <div class="bg-white/5 border-2 border-gray-700 rounded-2xl overflow-hidden backdrop-blur-sm">
+          <button onclick="toggleFaq(1)" class="w-full text-left px-6 py-5 flex justify-between items-center hover:bg-white/10 transition-colors">
+            <span class="font-bold text-lg pr-8 text-white">How does AI valuation work?</span>
+            <svg class="w-6 h-6 flex-shrink-0 transition-transform" id="icon-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div id="faq-1" class="hidden px-6 pb-5 text-gray-300">
+            <p>Our AI analyzes your phone photos using computer vision to detect condition, damage, and authenticity. It then compares this data with real-time market prices across Pakistan from thousands of listings to provide an accurate valuation range.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="bg-white/5 border-2 border-gray-700 rounded-2xl overflow-hidden backdrop-blur-sm">
+          <button onclick="toggleFaq(2)" class="w-full text-left px-6 py-5 flex justify-between items-center hover:bg-white/10 transition-colors">
+            <span class="font-bold text-lg pr-8 text-white">Is Phonely free to use?</span>
+            <svg class="w-6 h-6 flex-shrink-0 transition-transform" id="icon-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div id="faq-2" class="hidden px-6 pb-5 text-gray-300">
+            <p>Yes! Creating listings and connecting with buyers is completely free. We don't take any commission on your sales. You get to keep 100% of what you earn.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="bg-white/5 border-2 border-gray-700 rounded-2xl overflow-hidden backdrop-blur-sm">
+          <button onclick="toggleFaq(3)" class="w-full text-left px-6 py-5 flex justify-between items-center hover:bg-white/10 transition-colors">
+            <span class="font-bold text-lg pr-8 text-white">How long does it take to sell a phone?</span>
+            <svg class="w-6 h-6 flex-shrink-0 transition-transform" id="icon-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div id="faq-3" class="hidden px-6 pb-5 text-gray-300">
+            <p>Most phones sell within 3-7 days. Popular models in good condition often get offers within 24 hours. Your listing stays active until you mark it as sold.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="bg-white/5 border-2 border-gray-700 rounded-2xl overflow-hidden backdrop-blur-sm">
+          <button onclick="toggleFaq(4)" class="w-full text-left px-6 py-5 flex justify-between items-center hover:bg-white/10 transition-colors">
+            <span class="font-bold text-lg pr-8 text-white">Is it safe to meet buyers?</span>
+            <svg class="w-6 h-6 flex-shrink-0 transition-transform" id="icon-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div id="faq-4" class="hidden px-6 pb-5 text-gray-300">
+            <p>We recommend meeting in public places during daytime hours. Our platform shows verified buyer ratings and transaction history. Always trust your instincts and never share sensitive personal information until you're comfortable.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 5 -->
+        <div class="bg-white/5 border-2 border-gray-700 rounded-2xl overflow-hidden backdrop-blur-sm">
+          <button onclick="toggleFaq(5)" class="w-full text-left px-6 py-5 flex justify-between items-center hover:bg-white/10 transition-colors">
+            <span class="font-bold text-lg pr-8 text-white">What cities does Phonely operate in?</span>
+            <svg class="w-6 h-6 flex-shrink-0 transition-transform" id="icon-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div id="faq-5" class="hidden px-6 pb-5 text-gray-300">
+            <p>Phonely is available nationwide across Pakistan! We're currently most active in Karachi, Lahore, Islamabad, Rawalpindi, and Faisalabad, but you can list from and sell to any city in Pakistan.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 6 -->
+        <div class="bg-white/5 border-2 border-gray-700 rounded-2xl overflow-hidden backdrop-blur-sm">
+          <button onclick="toggleFaq(6)" class="w-full text-left px-6 py-5 flex justify-between items-center hover:bg-white/10 transition-colors">
+            <span class="font-bold text-lg pr-8 text-white">When will the mobile apps be available?</span>
+            <svg class="w-6 h-6 flex-shrink-0 transition-transform" id="icon-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div id="faq-6" class="hidden px-6 pb-5 text-gray-300">
+            <p>We're working hard on iOS and Android apps! Join the waitlist to be notified as soon as they launch. In the meantime, our website works perfectly on mobile browsers.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Waitlist Section -->
+  <section id="waitlist" class="py-24 bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 relative overflow-hidden">
+    <!-- Horizontal circuit lines -->
+    <svg class="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="horizGrad6" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+          <stop offset="50%" style="stop-color:#2563eb;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+        </linearGradient>
+        <pattern id="horizontalLines6" x="0" y="0" width="320" height="200" patternUnits="userSpaceOnUse">
+          <path d="M0 40 L100 40 L120 60 L260 60" stroke="url(#horizGrad6)" stroke-width="2" fill="none"/>
+          <path d="M0 80 L80 80 L100 100 L240 100" stroke="url(#horizGrad6)" stroke-width="2" fill="none"/>
+          <path d="M0 120 L120 120 L140 140 L280 140" stroke="url(#horizGrad6)" stroke-width="2" fill="none"/>
+          <path d="M0 160 L90 160 L110 180 L250 180" stroke="url(#horizGrad6)" stroke-width="2" fill="none"/>
+          <line x1="100" y1="40" x2="120" y2="60" stroke="#2563eb" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+          <circle cx="100" cy="40" r="4" fill="#06b6d4"/>
+          <circle cx="260" cy="60" r="4" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+          <circle cx="80" cy="80" r="4" fill="#7c3aed"/>
+          <circle cx="120" cy="120" r="4" fill="#ec4899"/>
+          <circle cx="90" cy="160" r="4" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+          <rect x="96" y="96" width="8" height="8" fill="#ec4899" opacity="0.7"/>
+          <rect x="136" y="136" width="8" height="8" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+          <path d="M200 70 L210 70 M205 65 L205 75" stroke="#2563eb" stroke-width="1.5" opacity="0.4"/>
+          <circle cx="180" cy="120" r="1.5" fill="#7c3aed" opacity="0.6"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#horizontalLines6)"/>
+    </svg>
+    
+    <div class="max-w-2xl mx-auto px-4 relative z-10">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl md:text-5xl font-black mb-6 text-white">
+          Ready to sell <span class="gradient-text">smarter?</span>
+        </h2>
+        <p class="text-xl text-white mb-4 font-semibold">
+          Join 500+ people on the waitlist for official launch
+        </p>
+        <p class="text-lg text-gray-300">
+          Get early access, exclusive updates, and launch day benefits
+        </p>
+      </div>
+
+      <div class="bg-white/5 rounded-3xl border-2 border-gray-700 p-8 md:p-12 shadow-xl backdrop-blur-sm">
         <form class="space-y-4" onsubmit="handleSubmit(event)">
           <div>
             <input 
@@ -234,7 +708,7 @@
               name="name"
               placeholder="Your Name"
               required
-              class="w-full px-6 py-4 border-2 border-gray-300 rounded-full focus:border-primary-600 focus:outline-none text-lg"
+              class="w-full px-6 py-4 bg-white/10 border-2 border-gray-600 rounded-2xl focus:border-primary-500 focus:outline-none text-lg text-white placeholder-gray-400"
             >
           </div>
           <div>
@@ -243,27 +717,50 @@
               name="email"
               placeholder="Your Email"
               required
-              class="w-full px-6 py-4 border-2 border-gray-300 rounded-full focus:border-primary-600 focus:outline-none text-lg"
+              class="w-full px-6 py-4 bg-white/10 border-2 border-gray-600 rounded-2xl focus:border-primary-500 focus:outline-none text-lg text-white placeholder-gray-400"
             >
           </div>
           <button 
             type="submit"
-            class="w-full px-8 py-4 bg-gradient-to-r from-primary-600 via-purple-700 to-pink-600 text-white rounded-full font-bold text-lg hover:scale-105 transition-transform duration-200 shadow-xl hover:shadow-2xl"
+            class="w-full px-8 py-5 gradient-bg text-white rounded-2xl font-bold text-lg hover:scale-105 transition-all duration-200 shadow-xl hover:shadow-2xl"
           >
-            🚀 Notify Me
+            🚀 Join the Waitlist
           </button>
         </form>
 
-        <p class="text-sm text-gray-500 text-center mt-6">
-          We respect your privacy. Unsubscribe at any time.
+        <p class="text-sm text-gray-400 text-center mt-6">
+          ✨ We respect your privacy • Unsubscribe anytime
         </p>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="bg-gray-900 text-white py-12">
-    <div class="max-w-6xl mx-auto px-4">
+  <footer class="bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 text-white py-12 relative overflow-hidden">
+    <!-- Vertical circuit lines -->
+    <svg class="absolute inset-0 w-full h-full opacity-5" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="vertGrad7" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+          <stop offset="50%" style="stop-color:#7c3aed;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+        </linearGradient>
+        <pattern id="verticalLines7" x="0" y="0" width="180" height="250" patternUnits="userSpaceOnUse">
+          <path d="M40 0 L40 80 L60 100 L60 200" stroke="url(#vertGrad7)" stroke-width="2" fill="none"/>
+          <path d="M90 0 L90 60 L110 80 L110 180" stroke="url(#vertGrad7)" stroke-width="2" fill="none"/>
+          <path d="M140 0 L140 100 L120 120 L120 220" stroke="url(#vertGrad7)" stroke-width="2" fill="none"/>
+          <circle cx="40" cy="80" r="4" fill="#2563eb"/>
+          <circle cx="60" cy="100" r="4" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+          <circle cx="90" cy="60" r="4" fill="#ec4899"/>
+          <circle cx="140" cy="100" r="4" fill="#2563eb"/>
+          <rect x="106" y="76" width="8" height="8" fill="#7c3aed" opacity="0.7"/>
+          <path d="M70 150 L80 150 M75 145 L75 155" stroke="#ec4899" stroke-width="1.5" opacity="0.4"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#verticalLines7)"/>
+    </svg>
+    
+    <div class="max-w-6xl mx-auto px-4 relative z-10">
       <div class="flex flex-col md:flex-row justify-between items-center gap-6">
         <div class="text-center md:text-left">
           <p class="text-gray-400">© 2025 Phonely. All rights reserved.</p>
@@ -298,6 +795,21 @@
   </footer>
 
   <script>
+    // FAQ Toggle
+    function toggleFaq(id) {
+      const content = document.getElementById(`faq-${id}`);
+      const icon = document.getElementById(`icon-${id}`);
+      
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        content.classList.add('hidden');
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Waitlist Form Submission
     async function handleSubmit(event) {
       event.preventDefault();
       const form = event.target;
@@ -324,7 +836,7 @@
         const result = await response.json();
 
         if (response.ok) {
-          alert('🎉 Thank you for joining the waitlist! We\'ll notify you when we launch.');
+          alert('🎉 Thank you for joining the waitlist! Check your email for confirmation.');
           form.reset();
         } else {
           // Handle specific error cases
@@ -340,7 +852,7 @@
       } finally {
         // Re-enable button
         submitButton.disabled = false;
-        submitButton.innerHTML = '🚀 Notify Me';
+        submitButton.innerHTML = '🚀 Join the Waitlist';
       }
     }
 

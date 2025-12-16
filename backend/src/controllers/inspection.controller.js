@@ -179,6 +179,7 @@ export const handleInspectionCallback = asyncHandler(async (req, res) => {
       vision_analysis: results.vision_analysis ? 'present' : 'missing',
       text_analysis: results.text_analysis ? 'present' : 'missing',
       pricing_analysis: results.pricing_analysis ? 'present' : 'missing',
+      authenticity_score: results.vision_analysis?.authenticity?.score || 'missing',
     }));
 
     // Validate required data

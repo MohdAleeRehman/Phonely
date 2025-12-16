@@ -114,8 +114,8 @@ export default function RatingModal({
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* User Info */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">
+                <div className="bg-white/5 p-4 rounded-lg">
+                  <p className="text-sm text-gray-300 mb-1">
                     {transactionType === 'buyer' ? 'You bought from' : 'You sold to'}
                   </p>
                   <p className="font-semibold text-lg">{ratedUserName}</p>
@@ -124,7 +124,7 @@ export default function RatingModal({
 
                 {/* Star Rating */}
                 <div className="text-center">
-                  <p className="text-sm font-medium text-gray-700 mb-3">How was your experience?</p>
+                  <p className="text-sm font-medium text-gray-200 mb-3">How was your experience?</p>
                   <div className="flex justify-center gap-2">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <motion.button
@@ -154,7 +154,7 @@ export default function RatingModal({
                     <motion.p
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="text-sm text-gray-600 mt-2"
+                      className="text-sm text-gray-300 mt-2"
                     >
                       {rating === 1 && 'Poor'}
                       {rating === 2 && 'Fair'}
@@ -167,7 +167,7 @@ export default function RatingModal({
 
                 {/* Review Text */}
                 <div>
-                  <label htmlFor="review" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="review" className="block text-sm font-medium text-gray-200 mb-2">
                     Review (Optional)
                   </label>
                   <textarea

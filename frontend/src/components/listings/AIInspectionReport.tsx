@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
+import { CheckCircle2, ThumbsUp, AlertTriangle, X, Lock, Search, FileText, BarChart3, Sparkles, AlertCircle, CircleDot, Bot, ChevronUp, Eye } from 'lucide-react';
+import PKRIcon from '../icons/PKRIcon';
 import { inspectionService } from '../../services/inspection.service';
 import type { Inspection } from '../../types';
 import Loading from '../common/Loading';
@@ -11,7 +13,7 @@ interface AIInspectionReportProps {
 }
 
 export default function AIInspectionReport({ inspectionId, listingPrice }: AIInspectionReportProps) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   const { data: inspection, isLoading, error } = useQuery<Inspection>({
     queryKey: ['inspection', inspectionId],
@@ -21,10 +23,10 @@ export default function AIInspectionReport({ inspectionId, listingPrice }: AIIns
 
   if (isLoading) {
     return (
-      <div className="card bg-linear-to-br from-green-50 to-green-100 border-2 border-green-200">
+      <div className="card bg-linear-to-br from-green-500/20 to-emerald-500/20 border-2 border-green-500/50 backdrop-blur-sm">
         <div className="flex items-center justify-center py-8">
           <Loading size="md" />
-          <span className="ml-3 text-gray-600">Loading AI Inspection Report...</span>
+          <span className="ml-3 text-gray-300">Loading AI Inspection Report...</span>
         </div>
       </div>
     );
@@ -49,21 +51,21 @@ export default function AIInspectionReport({ inspectionId, listingPrice }: AIIns
   };
 
   const getAuthenticityColor = (score: number) => {
-    if (score >= 90) return 'text-green-600';
-    if (score >= 70) return 'text-yellow-600';
-    return 'text-red-600';
+    if (score >= 90) return 'text-green-400';
+    if (score >= 70) return 'text-yellow-400';
+    return 'text-red-400';
   };
 
   const getSeverityIcon = (severity: string) => {
     switch (severity.toLowerCase()) {
       case 'critical':
-        return '🔴';
+        return <CircleDot className="w-4 h-4 text-red-400" />;
       case 'moderate':
-        return '🟠';
+        return <CircleDot className="w-4 h-4 text-orange-400" />;
       case 'minor':
-        return '🟡';
+        return <CircleDot className="w-4 h-4 text-yellow-400" />;
       default:
-        return '⚪';
+        return <CircleDot className="w-4 h-4 text-gray-400" />;
     }
   };
 
@@ -81,53 +83,67 @@ export default function AIInspectionReport({ inspectionId, listingPrice }: AIIns
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
-      className="card bg-linear-to-br from-green-50 to-emerald-100 border-2 border-green-300 shadow-lg"
+      className="card bg-linear-to-br from-green-500/20 to-emerald-500/20 border-2 border-green-500/50 shadow-lg backdrop-blur-md"
     >
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-black flex items-center gap-3">
-          <span className="text-3xl">🤖</span>
-          <span className="bg-linear-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">
+          <Bot className="w-8 h-8 text-cyan-400" />
+          <span className="bg-linear-to-r from-green-400 to-teal-400 bg-clip-text text-transparent">
             AI Inspection Report
           </span>
         </h2>
         <button
           onClick={() => setExpanded(!expanded)}
-          className="text-green-600 hover:text-green-700 font-medium flex items-center gap-2"
+          className="px-6 py-3 bg-linear-to-r from-cyan-500 to-blue-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 flex items-center gap-2"
         >
-          {expanded ? '🔼 Collapse' : '🔽 Expand'}
+          {expanded ? (
+            <>
+              <ChevronUp className="w-5 h-5" />
+              Collapse Report
+            </>
+          ) : (
+            <>
+              <Eye className="w-5 h-5" />
+              View Full Report
+            </>
+          )}
         </button>
       </div>
 
       {expanded && (
         <div className="space-y-6">
           {/* Overall Condition Score */}
-          <div className="bg-white rounded-2xl p-6 border-2 border-green-200 shadow-md">
+          <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border-2 border-green-500/50 shadow-md">
             <div className="flex justify-between items-start mb-4">
               <div>
-                <p className="text-gray-600 text-sm font-medium mb-1">Overall Condition Score</p>
-                <p className="text-5xl font-black text-gray-900">{conditionScore}/10</p>
+                <p className="text-gray-300 text-sm font-medium mb-1">Overall Condition Score</p>
+                <p className="text-5xl font-black text-white">{conditionScore}/10</p>
                 <p className={`text-lg font-bold mt-2 ${
-                  conditionScore >= 8 ? 'text-green-600' :
-                  conditionScore >= 6 ? 'text-yellow-600' :
-                  conditionScore >= 4 ? 'text-orange-600' : 'text-red-600'
+                  conditionScore >= 8 ? 'text-green-400' :
+                  conditionScore >= 6 ? 'text-yellow-400' :
+                  conditionScore >= 4 ? 'text-orange-400' : 'text-red-400'
                 }`}>
                   {getConditionText(conditionScore)} Condition
                 </p>
               </div>
               <div className={`w-20 h-20 rounded-full flex items-center justify-center ${
-                conditionScore >= 8 ? 'bg-green-100' :
-                conditionScore >= 6 ? 'bg-yellow-100' :
-                conditionScore >= 4 ? 'bg-orange-100' : 'bg-red-100'
+                conditionScore >= 8 ? 'bg-green-500/20' :
+                conditionScore >= 6 ? 'bg-yellow-500/20' :
+                conditionScore >= 4 ? 'bg-orange-500/20' : 'bg-red-500/20'
               }`}>
-                <span className="text-3xl">
-                  {conditionScore >= 8 ? '✅' :
-                   conditionScore >= 6 ? '👍' :
-                   conditionScore >= 4 ? '⚠️' : '❌'}
-                </span>
+                {conditionScore >= 8 ? (
+                  <CheckCircle2 className="w-8 h-8 text-green-400" />
+                ) : conditionScore >= 6 ? (
+                  <ThumbsUp className="w-8 h-8 text-yellow-400" />
+                ) : conditionScore >= 4 ? (
+                  <AlertTriangle className="w-8 h-8 text-orange-400" />
+                ) : (
+                  <X className="w-8 h-8 text-red-400" />
+                )}
               </div>
             </div>
-            <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-4 bg-gray-700/50 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${(conditionScore / 10) * 100}%` }}
@@ -138,11 +154,12 @@ export default function AIInspectionReport({ inspectionId, listingPrice }: AIIns
           </div>
 
           {/* Authenticity Score */}
-          <div className="bg-white rounded-2xl p-6 border-2 border-green-200 shadow-md">
+          <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border-2 border-green-500/50 shadow-md">
             <div className="flex justify-between items-center mb-4">
               <div>
-                <p className="text-gray-600 text-sm font-medium mb-1 flex items-center gap-2">
-                  <span>🔒</span> Authenticity Score
+                <p className="text-gray-300 text-sm font-medium mb-1 flex items-center gap-2">
+                  <Lock className="w-5 h-5 text-cyan-400" />
+                  Authenticity Score
                 </p>
                 <p className={`text-4xl font-black ${getAuthenticityColor(authenticityScore)}`}>
                   {authenticityScore}%
@@ -150,23 +167,26 @@ export default function AIInspectionReport({ inspectionId, listingPrice }: AIIns
               </div>
               <div className="text-right">
                 {authenticityScore >= 90 && (
-                  <div className="bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-bold">
-                    ✅ Genuine
+                  <div className="bg-green-500/20 text-green-300 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-sm border border-green-500/50">
+                    <CheckCircle2 className="w-4 h-4 inline mr-1" />
+                    Genuine
                   </div>
                 )}
                 {authenticityScore >= 70 && authenticityScore < 90 && (
-                  <div className="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full text-sm font-bold">
-                    ⚠️ Likely Genuine
+                  <div className="bg-yellow-500/20 text-yellow-300 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-sm border border-yellow-500/50">
+                    <AlertTriangle className="w-4 h-4 inline mr-1" />
+                    Likely Genuine
                   </div>
                 )}
                 {authenticityScore < 70 && (
-                  <div className="bg-red-100 text-red-700 px-4 py-2 rounded-full text-sm font-bold">
-                    ❌ Verification Needed
+                  <div className="bg-red-500/20 text-red-300 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-sm border border-red-500/50">
+                    <X className="w-4 h-4 inline mr-1" />
+                    Verification Needed
                   </div>
                 )}
               </div>
             </div>
-            <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-4 bg-gray-700/50 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${authenticityScore}%` }}
@@ -177,7 +197,7 @@ export default function AIInspectionReport({ inspectionId, listingPrice }: AIIns
                 }`}
               />
             </div>
-            <p className="text-xs text-gray-500 mt-3">
+            <p className="text-xs text-gray-400 mt-3">
               Our AI analyzes device branding, packaging, and physical characteristics to verify authenticity.
             </p>
           </div>
@@ -185,23 +205,27 @@ export default function AIInspectionReport({ inspectionId, listingPrice }: AIIns
           {/* Detected Issues by Severity */}
           {detectedIssues.length > 0 && (
             <div className="space-y-4">
-              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <span>🔍</span> Detected Issues ({detectedIssues.length})
+              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <Search className="w-5 h-5 text-cyan-400" />
+                Detected Issues ({detectedIssues.length})
               </h3>
 
               {/* Critical Issues */}
               {criticalIssues.length > 0 && (
-                <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4">
-                  <p className="font-bold text-red-800 mb-3 flex items-center gap-2">
-                    <span className="text-xl">🔴</span> Critical Issues ({criticalIssues.length})
+                <div className="bg-red-500/20 border-2 border-red-500/50 rounded-xl p-4 backdrop-blur-sm">
+                  <p className="font-bold text-red-300 mb-3 flex items-center gap-2">
+                    <AlertCircle className="w-5 h-5 text-red-400" />
+                    Critical Issues ({criticalIssues.length})
                   </p>
                   <div className="space-y-2">
                     {criticalIssues.map((issue, index) => (
-                      <div key={index} className="bg-white rounded-lg p-3 border-2 border-red-200 flex items-start gap-3">
-                        <span className="text-red-600 text-lg mt-0.5">{getSeverityIcon(issue.severity)}</span>
-                        <div>
-                          <p className="font-bold text-red-800 capitalize">{issue.type.replace(/-/g, ' ')}</p>
-                          <p className="text-sm text-gray-600 mt-1">Requires immediate attention</p>
+                      <div key={index} className="bg-white/5 backdrop-blur-md rounded-lg p-3 border-2 border-red-500/50 flex items-start gap-3">
+                        <span className="text-red-400 text-lg mt-0.5 shrink-0">{getSeverityIcon(issue.severity)}</span>
+                        <div className="flex-1">
+                          <p className="font-bold text-red-300 capitalize mb-1">
+                            {('location' in issue ? (issue as { location?: string }).location : null) || issue.type.replace(/-/g, ' ')}
+                          </p>
+                          <p className="text-sm text-gray-300">Requires immediate attention</p>
                         </div>
                       </div>
                     ))}
@@ -211,17 +235,19 @@ export default function AIInspectionReport({ inspectionId, listingPrice }: AIIns
 
               {/* Moderate Issues */}
               {moderateIssues.length > 0 && (
-                <div className="bg-orange-50 border-2 border-orange-300 rounded-xl p-4">
-                  <p className="font-bold text-orange-800 mb-3 flex items-center gap-2">
-                    <span className="text-xl">🟠</span> Moderate Issues ({moderateIssues.length})
+                <div className="bg-orange-500/20 border-2 border-orange-500/50 rounded-xl p-4 backdrop-blur-sm">
+                  <p className="font-bold text-orange-300 mb-3 flex items-center gap-2">
+                    <CircleDot className="w-5 h-5 text-orange-400" /> Moderate Issues ({moderateIssues.length})
                   </p>
                   <div className="space-y-2">
                     {moderateIssues.map((issue, index) => (
-                      <div key={index} className="bg-white rounded-lg p-3 border-2 border-orange-200 flex items-start gap-3">
-                        <span className="text-orange-600 text-lg mt-0.5">{getSeverityIcon(issue.severity)}</span>
-                        <div>
-                          <p className="font-bold text-orange-800 capitalize">{issue.type.replace(/-/g, ' ')}</p>
-                          <p className="text-sm text-gray-600 mt-1">May affect functionality</p>
+                      <div key={index} className="bg-white/5 backdrop-blur-md rounded-lg p-3 border-2 border-orange-500/50 flex items-start gap-3">
+                        <span className="text-orange-400 text-lg mt-0.5 shrink-0">{getSeverityIcon(issue.severity)}</span>
+                        <div className="flex-1">
+                          <p className="font-bold text-orange-300 capitalize mb-1">
+                            {('location' in issue ? (issue as { location?: string }).location : null) || issue.type.replace(/-/g, ' ')}
+                          </p>
+                          <p className="text-sm text-gray-300">May affect functionality</p>
                         </div>
                       </div>
                     ))}
@@ -231,17 +257,19 @@ export default function AIInspectionReport({ inspectionId, listingPrice }: AIIns
 
               {/* Minor Issues */}
               {minorIssues.length > 0 && (
-                <div className="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-4">
-                  <p className="font-bold text-yellow-800 mb-3 flex items-center gap-2">
-                    <span className="text-xl">🟡</span> Minor Issues ({minorIssues.length})
+                <div className="bg-yellow-500/20 border-2 border-yellow-500/50 rounded-xl p-4 backdrop-blur-sm">
+                  <p className="font-bold text-yellow-300 mb-3 flex items-center gap-2">
+                    <CircleDot className="w-5 h-5 text-yellow-400" /> Minor Issues ({minorIssues.length})
                   </p>
                   <div className="space-y-2">
                     {minorIssues.map((issue, index) => (
-                      <div key={index} className="bg-white rounded-lg p-3 border-2 border-yellow-200 flex items-start gap-3">
-                        <span className="text-yellow-600 text-lg mt-0.5">{getSeverityIcon(issue.severity)}</span>
-                        <div>
-                          <p className="font-bold text-yellow-800 capitalize">{issue.type.replace(/-/g, ' ')}</p>
-                          <p className="text-sm text-gray-600 mt-1">Cosmetic or minor wear</p>
+                      <div key={index} className="bg-white/5 backdrop-blur-md rounded-lg p-3 border-2 border-yellow-500/50 flex items-start gap-3">
+                        <span className="text-yellow-400 text-lg mt-0.5 shrink-0">{getSeverityIcon(issue.severity)}</span>
+                        <div className="flex-1">
+                          <p className="font-bold text-yellow-300 capitalize mb-1">
+                            {('location' in issue ? (issue as { location?: string }).location : null) || issue.type.replace(/-/g, ' ')}
+                          </p>
+                          <p className="text-sm text-gray-300">Cosmetic or minor wear</p>
                         </div>
                       </div>
                     ))}
@@ -253,61 +281,65 @@ export default function AIInspectionReport({ inspectionId, listingPrice }: AIIns
 
           {/* Pricing Analysis */}
           {inspection.pricingAnalysis && (
-            <div className="bg-white rounded-2xl p-6 border-2 border-blue-200 shadow-md">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span>💰</span> Pricing Analysis
+            <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border-2 border-blue-500/50 shadow-md">
+              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <PKRIcon className="w-5 h-5 text-cyan-400" />
+                Pricing Analysis
               </h3>
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <p className="text-sm text-gray-600 mb-1">AI Min Price</p>
-                    <p className="text-xl font-bold text-blue-600">
+                  <div className="text-center p-4 bg-blue-500/20 rounded-lg border border-blue-500/50 backdrop-blur-sm">
+                    <p className="text-sm text-gray-300 mb-1">AI Min Price</p>
+                    <p className="text-xl font-bold text-blue-400">
                       PKR {inspection.pricingAnalysis.suggestedMinPrice.toLocaleString()}
                     </p>
                   </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
-                    <p className="text-sm text-gray-600 mb-1">Market Average</p>
-                    <p className="text-xl font-bold text-purple-600">
+                  <div className="text-center p-4 bg-purple-500/20 rounded-lg border border-purple-500/50 backdrop-blur-sm">
+                    <p className="text-sm text-gray-300 mb-1">Market Average</p>
+                    <p className="text-xl font-bold text-purple-400">
                       PKR {inspection.pricingAnalysis.marketAverage.toLocaleString()}
                     </p>
                   </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                    <p className="text-sm text-gray-600 mb-1">AI Max Price</p>
-                    <p className="text-xl font-bold text-green-600">
+                  <div className="text-center p-4 bg-green-500/20 rounded-lg border border-green-500/50 backdrop-blur-sm">
+                    <p className="text-sm text-gray-300 mb-1">AI Max Price</p>
+                    <p className="text-xl font-bold text-green-400">
                       PKR {inspection.pricingAnalysis.suggestedMaxPrice.toLocaleString()}
                     </p>
                   </div>
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
                   <div className="flex justify-between items-center">
                     <div>
-                      <p className="text-sm text-gray-600 mb-1">Current Listing Price</p>
-                      <p className="text-2xl font-bold text-gray-900">PKR {listingPrice.toLocaleString()}</p>
+                      <p className="text-sm text-gray-300 mb-1">Current Listing Price</p>
+                      <p className="text-2xl font-bold text-white">PKR {listingPrice.toLocaleString()}</p>
                     </div>
                     <div>
                       {listingPrice < inspection.pricingAnalysis.suggestedMinPrice && (
-                        <div className="bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-bold">
-                          🔥 Great Deal!
+                        <div className="bg-green-500/20 text-green-300 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-sm border border-green-500/50 flex items-center">
+                          <Sparkles className="w-4 h-4 mr-1" />
+                          Great Deal!
                         </div>
                       )}
                       {listingPrice >= inspection.pricingAnalysis.suggestedMinPrice && 
                        listingPrice <= inspection.pricingAnalysis.suggestedMaxPrice && (
-                        <div className="bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-bold">
-                          ✅ Fair Price
+                        <div className="bg-blue-500/20 text-blue-300 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-sm border border-blue-500/50 flex items-center">
+                          <CheckCircle2 className="w-4 h-4 mr-1" />
+                          Fair Price
                         </div>
                       )}
                       {listingPrice > inspection.pricingAnalysis.suggestedMaxPrice && (
-                        <div className="bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-sm font-bold">
-                          ⚠️ Above Market
+                        <div className="bg-orange-500/20 text-orange-300 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-sm border border-orange-500/50 flex items-center">
+                          <AlertTriangle className="w-4 h-4 mr-1" />
+                          Above Market
                         </div>
                       )}
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <span>📊</span>
+                <div className="flex items-center gap-2 text-sm text-gray-300">
+                  <BarChart3 className="w-4 h-4" />
                   <span>Confidence Level: <span className="font-bold capitalize">{inspection.pricingAnalysis.confidenceLevel}</span></span>
                 </div>
               </div>
@@ -316,27 +348,40 @@ export default function AIInspectionReport({ inspectionId, listingPrice }: AIIns
 
           {/* Text Analysis */}
           {inspection.textAnalysis && (
-            <div className="bg-white rounded-xl p-6 border-2 border-purple-200">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span>📝</span> Description Analysis
+            <div className="bg-white/5 backdrop-blur-md rounded-xl p-6 border-2 border-purple-500/50">
+              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-cyan-400" />
+                Description Analysis
               </h3>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                  <p className="text-sm text-gray-600 mb-1">Quality</p>
-                  <p className="text-lg font-bold text-purple-600 capitalize">
+                <div className="p-4 bg-purple-500/20 rounded-lg border border-purple-500/50 backdrop-blur-sm">
+                  <p className="text-sm text-gray-300 mb-1">Quality</p>
+                  <p className="text-lg font-bold text-purple-400 capitalize">
                     {inspection.textAnalysis.descriptionQuality}
                   </p>
                 </div>
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <p className="text-sm text-gray-600 mb-1">Completeness</p>
-                  <p className="text-lg font-bold text-blue-600">
+                <div className="p-4 bg-blue-500/20 rounded-lg border border-blue-500/50 backdrop-blur-sm">
+                  <p className="text-sm text-gray-300 mb-1">Completeness</p>
+                  <p className="text-lg font-bold text-blue-400">
                     {inspection.textAnalysis.completeness}%
                   </p>
                 </div>
-                <div className="p-4 bg-green-50 rounded-lg border border-green-200 col-span-2">
-                  <p className="text-sm text-gray-600 mb-1">Consistency Check</p>
-                  <p className={`text-lg font-bold ${inspection.textAnalysis.consistency ? 'text-green-600' : 'text-red-600'}`}>
-                    {inspection.textAnalysis.consistency ? '✅ Consistent' : '❌ Inconsistencies Found'}
+                <div className="p-4 bg-green-500/20 rounded-lg border border-green-500/50 col-span-2 backdrop-blur-sm">
+                  <p className="text-sm text-gray-300 mb-1">Consistency Check</p>
+                  <p className={`text-lg font-bold ${inspection.textAnalysis.consistency ? 'text-green-400' : 'text-red-400'}`}>
+                    <span className="flex items-center gap-2">
+                      {inspection.textAnalysis.consistency ? (
+                        <>
+                          <CheckCircle2 className="w-4 h-4 text-green-400" />
+                          Consistent
+                        </>
+                      ) : (
+                        <>
+                          <X className="w-4 h-4 text-red-400" />
+                          Inconsistencies Found
+                        </>
+                      )}
+                    </span>
                   </p>
                 </div>
               </div>
@@ -344,10 +389,10 @@ export default function AIInspectionReport({ inspectionId, listingPrice }: AIIns
           )}
 
           {/* Report Footer */}
-          <div className="bg-linear-to-r from-green-50 to-teal-50 rounded-xl p-4 border border-green-200">
-            <div className="flex items-center justify-between text-sm text-gray-600">
+          <div className="bg-linear-to-r from-green-500/20 to-teal-500/20 rounded-xl p-4 border border-green-500/50 backdrop-blur-sm">
+            <div className="flex items-center justify-between text-sm text-gray-300">
               <div className="flex items-center gap-2">
-                <span>🤖</span>
+                <Bot className="w-4 h-4 text-cyan-400" />
                 <span>Report generated by Phonely AI</span>
               </div>
               <div>

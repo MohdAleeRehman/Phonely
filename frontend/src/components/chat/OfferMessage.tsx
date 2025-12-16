@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Clock, CheckCircle2, X, RotateCcw } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import api from '../../services/api';
@@ -34,7 +35,7 @@ export default function OfferMessage({ message, chatId, isOwnMessage }: OfferMes
     toast((t) => (
       <div className="flex flex-col gap-2">
         <p className="font-medium">Accept this offer?</p>
-        <p className="text-sm text-gray-600">PKR {offerPrice.toLocaleString()}</p>
+        <p className="text-sm text-gray-300">PKR {offerPrice.toLocaleString()}</p>
         <div className="flex gap-2">
           <button
             onClick={() => {
@@ -63,17 +64,17 @@ export default function OfferMessage({ message, chatId, isOwnMessage }: OfferMes
   };
 
   const statusColors = {
-    pending: 'bg-yellow-100 border-yellow-300 text-yellow-800',
-    accepted: 'bg-green-100 border-green-300 text-green-800',
-    rejected: 'bg-red-100 border-red-300 text-red-800',
-    countered: 'bg-blue-100 border-blue-300 text-blue-800',
+    pending: 'bg-yellow-500/20 border-yellow-400/50 text-yellow-300',
+    accepted: 'bg-green-500/20 border-green-400/50 text-green-300',
+    rejected: 'bg-red-500/20 border-red-400/50 text-red-300',
+    countered: 'bg-blue-500/20 border-blue-400/50 text-blue-300',
   };
 
   const statusIcons = {
-    pending: '⏳',
-    accepted: '✅',
-    rejected: '❌',
-    countered: '🔄',
+    pending: <Clock className="w-5 h-5" />,
+    accepted: <CheckCircle2 className="w-5 h-5" />,
+    rejected: <X className="w-5 h-5" />,
+    countered: <RotateCcw className="w-5 h-5" />,
   };
 
   return (
@@ -85,28 +86,28 @@ export default function OfferMessage({ message, chatId, isOwnMessage }: OfferMes
       <div
         className={`max-w-sm border-2 rounded-lg p-4 ${
           isOwnMessage
-            ? 'bg-primary-50 border-primary-200'
-            : 'bg-white border-gray-200'
+            ? 'bg-cyan-500/20 border-cyan-400/50 backdrop-blur-md'
+            : 'bg-white/10 border-white/20 backdrop-blur-md'
         }`}
       >
         {/* Offer Header */}
         <div className="flex items-center gap-2 mb-3">
-          <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span className="font-semibold text-gray-900">Price Offer</span>
+          <span className="font-semibold text-white">Price Offer</span>
         </div>
 
         {/* Offer Price */}
         <div className="mb-3">
-          <p className="text-3xl font-bold text-primary-600">
+          <p className="text-3xl font-bold text-cyan-300">
             PKR {offerPrice.toLocaleString()}
           </p>
         </div>
 
         {/* Message Content */}
         {message.content && (
-          <p className="text-gray-700 text-sm mb-3">{message.content}</p>
+          <p className="text-gray-300 text-sm mb-3">{message.content}</p>
         )}
 
         {/* Status Badge */}
@@ -117,7 +118,7 @@ export default function OfferMessage({ message, chatId, isOwnMessage }: OfferMes
 
         {/* Action Buttons - Only show if it's not your offer and status is pending */}
         {!isOwnMessage && offerStatus === 'pending' && (
-          <div className="flex gap-2 mt-4 pt-4 border-t border-gray-200">
+          <div className="flex gap-2 mt-4 pt-4 border-t border-white/10">
             <button
               onClick={handleAccept}
               disabled={isPending}
@@ -136,7 +137,7 @@ export default function OfferMessage({ message, chatId, isOwnMessage }: OfferMes
         )}
 
         {/* Timestamp */}
-        <p className="text-xs text-gray-500 mt-2">
+        <p className="text-xs text-gray-400 mt-2">
           {new Date(message.createdAt).toLocaleTimeString('en-US', {
             hour: 'numeric',
             minute: '2-digit',

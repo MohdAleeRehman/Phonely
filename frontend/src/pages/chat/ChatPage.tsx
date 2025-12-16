@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
+import { MessageCircle, Smartphone, Phone, Rocket, Sparkles } from 'lucide-react';
+import PKRIcon from '../../components/icons/PKRIcon';
 import toast from 'react-hot-toast';
 import { chatService } from '../../services/chat.service';
 import { socketService } from '../../services/socket.service';
@@ -13,6 +15,7 @@ import ChatSkeleton from '../../components/chat/ChatSkeleton';
 import PriceOfferModal from '../../components/chat/PriceOfferModal';
 import SharePhoneModal from '../../components/chat/SharePhoneModal';
 import OfferMessage from '../../components/chat/OfferMessage';
+import CircuitPattern from '../../components/common/CircuitPattern';
 
 export default function ChatPage() {
   const { chatId } = useParams<{ chatId?: string }>();
@@ -151,7 +154,7 @@ export default function ChatPage() {
       toast.success(`New message from ${senderName}`, {
         duration: 4000,
         position: 'top-right',
-        icon: '💬',
+        icon: '💬', // Toast library handles this, keeping for now
       });
     }
   }, [user, selectedChat, markAsReadMutation, queryClient]);
@@ -294,8 +297,12 @@ export default function ChatPage() {
 
   return (
     <div className="h-[calc(100vh-4rem)] flex relative overflow-hidden">
+      {/* Circuit Pattern Background */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+      <CircuitPattern />
+      </div>
       {/* Animated Background Blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-1">
         <motion.div
           animate={{
             scale: [1, 1.3, 1],
@@ -326,10 +333,10 @@ export default function ChatPage() {
       </div>
 
       {/* Sidebar - Conversation List */}
-      <div className="w-80 border-r-2 border-gray-200 bg-white/90 backdrop-blur-sm overflow-y-auto relative z-10 shadow-lg">
-        <div className="p-4 border-b-2 border-gray-200 bg-white/80 backdrop-blur-sm">
-          <h2 className="text-2xl font-black flex items-center gap-2">
-            <span>💬</span> <span className="bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">Messages</span>
+      <div className="w-80 border-r-2 border-white/10 bg-white/5 backdrop-blur-md overflow-y-auto relative z-10 shadow-lg">
+        <div className="p-4 border-b-2 border-white/10 bg-white/5 backdrop-blur-sm">
+          <h2 className="text-2xl font-black flex items-center gap-2 text-white">
+            <MessageCircle className="w-6 h-6 text-cyan-400" /> <span className="bg-linear-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">Messages</span>
           </h2>
         </div>
 
@@ -347,15 +354,15 @@ export default function ChatPage() {
                   onClick={() => setSelectedChat(chat._id)}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  whileHover={{ scale: 1.02, backgroundColor: 'rgba(249, 250, 251, 1)' }}
+                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`w-full p-4 text-left transition-colors ${
-                    selectedChat === chat._id ? 'bg-primary-50 border-l-4 border-primary-600' : ''
+                  className={`w-full p-4 text-left transition-all ${
+                    selectedChat === chat._id ? 'bg-white/10 border-l-4 border-cyan-400' : 'hover:bg-white/5'
                   }`}
                 >
                   <div className="flex gap-3">
                     {/* Listing Image */}
-                    <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-gray-200">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-gray-700">
                       {listing.images[0] ? (
                         <img
                           src={typeof listing.images[0] === 'string' ? listing.images[0] : listing.images[0].url}
@@ -374,7 +381,7 @@ export default function ChatPage() {
                     {/* Chat Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
-                        <p className="font-semibold truncate">{otherUser.name}</p>
+                        <p className="font-semibold text-white truncate">{otherUser.name}</p>
                         {(() => {
                           const userId = user?._id || user?.id;
                           const unreadCount = userId && chat.unreadCount ? (chat.unreadCount[userId] || 0) : 0;
@@ -389,8 +396,8 @@ export default function ChatPage() {
                           ) : null;
                         })()}
                       </div>
-                      <p className="text-sm text-gray-600 truncate">{listing.title}</p>
-                      <p className="text-sm font-semibold text-primary-600">
+                      <p className="text-sm text-gray-300 truncate">{listing.title}</p>
+                      <p className="text-sm font-semibold bg-linear-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
                         PKR {listing.price.toLocaleString()}
                       </p>
                       {chat.lastMessage?.content && (
@@ -408,29 +415,29 @@ export default function ChatPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="p-8 text-center text-gray-500"
+            className="p-8 text-center text-gray-400"
           >
-            <div className="text-6xl mb-4">💬</div>
-            <p className="text-lg font-medium">No conversations yet</p>
-            <p className="text-sm mt-2">Start chatting with sellers 🚀</p>
+            <MessageCircle className="w-16 h-16 mx-auto mb-4 text-gray-500" />
+            <p className="text-lg font-medium text-gray-300">No conversations yet</p>
+            <p className="text-sm mt-2 text-gray-400">Start chatting with sellers</p>
           </motion.div>
         )}
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-gray-50/50 backdrop-blur-sm relative z-10">
+      <div className="flex-1 flex flex-col bg-linear-to-br from-gray-900/80 via-blue-950/80 to-gray-900/80 backdrop-blur-sm relative z-10">
         {selectedChat && chatData ? (
           <>
             {/* Chat Header */}
-            <div className="bg-white/90 backdrop-blur-sm border-b p-4">
+            <div className="bg-white/5 backdrop-blur-md border-b border-white/10 p-4">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-linear-to-br from-primary-500 to-primary-700 text-white flex items-center justify-center font-bold shadow-lg">
+                <div className="h-10 w-10 rounded-full bg-linear-to-br from-cyan-500 to-purple-700 text-white flex items-center justify-center font-bold shadow-lg">
                   {getOtherUser(chatData.chat)?.name.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <p className="font-bold">{getOtherUser(chatData.chat)?.name}</p>
-                  <p className="text-sm text-gray-600 flex items-center gap-1">
-                    📱 {getListing(chatData.chat)?.title}
+                  <p className="font-bold text-white">{getOtherUser(chatData.chat)?.name}</p>
+                  <p className="text-sm text-gray-300 flex items-center gap-1">
+                    <Smartphone className="w-4 h-4" /> {getListing(chatData.chat)?.title}
                   </p>
                 </div>
               </div>
@@ -475,16 +482,16 @@ export default function ChatPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="text-center text-gray-500 mt-8"
                 >
-                  <div className="text-6xl mb-4">💬</div>
+                  <MessageCircle className="w-16 h-16 mx-auto mb-4 text-gray-400" />
                   <p className="text-lg font-medium">No messages yet</p>
-                  <p className="text-sm mt-2">Send a message to start the conversation 🚀</p>
+                  <p className="text-sm mt-2 flex items-center justify-center gap-1">Send a message to start the conversation <Rocket className="w-4 h-4 text-cyan-400" /></p>
                 </motion.div>
               )}
 
               {/* Typing Indicator */}
               {isTyping && (
                 <div className="flex justify-start">
-                  <div className="bg-white px-4 py-2 rounded-lg">
+                  <div className="bg-white/5 backdrop-blur-md px-4 py-2 rounded-lg">
                     <div className="flex gap-1">
                       <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                       <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -496,27 +503,27 @@ export default function ChatPage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="bg-white/90 backdrop-blur-sm border-t border-gray-200 px-4 py-2">
+            <div className="bg-white/5 backdrop-blur-md border-t border-white/10 px-4 py-2">
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowPriceOffer(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors border border-blue-200 font-medium"
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-lg transition-colors border border-blue-400/30 font-medium"
                 >
-                  <span className="text-lg">💰</span>
+                  <PKRIcon className="w-5 h-5" />
                   <span>Make Offer</span>
                 </button>
                 <button
                   onClick={() => setShowSharePhone(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg transition-colors border border-green-200 font-medium"
+                  className="flex items-center gap-2 px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-lg transition-colors border border-green-400/30 font-medium"
                 >
-                  <span className="text-lg">📱</span>
+                  <Phone className="w-5 h-5" />
                   <span>Share Number</span>
                 </button>
               </div>
             </div>
 
             {/* Message Input */}
-            <div className="bg-white/90 backdrop-blur-sm border-t border-gray-200 p-4">
+            <div className="bg-white/5 backdrop-blur-md border-t border-white/10 p-4">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -526,7 +533,7 @@ export default function ChatPage() {
                     handleTyping();
                   }}
                   onKeyPress={handleKeyPress}
-                  placeholder="Type a message... ✨"
+                  placeholder="Type a message..."
                   className="input-field flex-1"
                   disabled={sendMessageMutation.isPending}
                 />
@@ -555,11 +562,13 @@ export default function ChatPage() {
             className="flex-1 flex items-center justify-center text-gray-500"
           >
             <div className="text-center">
-              <div className="text-8xl mb-4">💬</div>
-              <p className="text-2xl font-bold bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent mb-2">
+              <MessageCircle className="w-20 h-20 mx-auto mb-4 text-gray-400" />
+              <p className="text-2xl font-bold bg-linear-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent mb-2">
                 Select a conversation
               </p>
-              <p className="text-lg">Start chatting with buyers and sellers ✨</p>
+              <p className="text-lg flex items-center justify-center gap-2">
+                Start chatting with buyers and sellers <Sparkles className="w-5 h-5 text-cyan-400" />
+              </p>
             </div>
           </motion.div>
         )}

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Smartphone, Sparkles, Battery, Zap, Eye, FileText, MessageSquare, Shield, Star, Wrench, Camera, Volume2, Mic, Wifi, Plug, Hand, Thermometer, CheckCircle2, AlertTriangle, Lightbulb, Settings } from 'lucide-react';
 import type { UseFormRegister, FieldErrors, UseFormWatch, UseFormSetValue } from 'react-hook-form';
 import { ButtonCard } from '../../common/ButtonCard';
 
@@ -9,41 +10,41 @@ const CONDITION_INFO = {
   excellent: {
     label: 'Excellent',
     description: 'Like new, no visible scratches or dents. Screen is perfect. All functions work flawlessly. Battery health 90%+. Box and accessories included.',
-    icon: '⭐'
+    icon: <Star className="w-6 h-6" />
   },
   good: {
     label: 'Good', 
     description: 'Minor signs of use. Possible light scratches on body or screen. All functions work properly. Battery health 80-90%. May not include original box.',
-    icon: '✨'
+    icon: <Sparkles className="w-6 h-6" />
   },
   fair: {
     label: 'Fair',
     description: 'Visible wear and tear. Noticeable scratches or small dents. All essential functions work. Battery health 60-80%. No accessories included.',
-    icon: '📱'
+    icon: <Smartphone className="w-6 h-6" />
   },
   poor: {
     label: 'Poor',
     description: 'Heavy signs of use. Cracked screen or significant damage. May have functional issues. Battery health below 60%. Sold as-is for parts/repair.',
-    icon: '🔧'
+    icon: <Wrench className="w-6 h-6" />
   }
 };
 
 const DISPLAY_QUALITY = {
-  flawless: { label: 'Flawless', description: 'No scratches, perfect display', icon: '✨' },
-  'minor-scratches': { label: 'Minor Scratches', description: 'Light scratches, barely visible', icon: '👌' },
-  'noticeable-wear': { label: 'Noticeable Wear', description: 'Visible scratches but functional', icon: '📱' },
-  cracked: { label: 'Cracked', description: 'Cracked screen but usable', icon: '💔' },
+  flawless: { label: 'Flawless', description: 'No scratches, perfect display', icon: <Sparkles className="w-6 h-6" /> },
+  'minor-scratches': { label: 'Minor Scratches', description: 'Light scratches, barely visible', icon: <CheckCircle2 className="w-6 h-6" /> },
+  'noticeable-wear': { label: 'Noticeable Wear', description: 'Visible scratches but functional', icon: <Smartphone className="w-6 h-6" /> },
+  cracked: { label: 'Cracked', description: 'Cracked screen but usable', icon: <AlertTriangle className="w-6 h-6" /> },
 };
 
 const COMMON_ISSUES = [
-  { value: 'battery-drains-fast', label: 'Battery Drains Fast', icon: '🔋' },
-  { value: 'camera-issue', label: 'Camera Issue', icon: '📷' },
-  { value: 'speaker-low', label: 'Speaker Low/Muffled', icon: '🔊' },
-  { value: 'microphone-issue', label: 'Microphone Issue', icon: '🎤' },
-  { value: 'wifi-bluetooth', label: 'WiFi/Bluetooth Issues', icon: '📡' },
-  { value: 'charging-slow', label: 'Slow Charging', icon: '⚡' },
-  { value: 'touch-not-responsive', label: 'Touch Not Responsive', icon: '👆' },
-  { value: 'overheating', label: 'Overheating', icon: '🔥' },
+  { value: 'battery-drains-fast', label: 'Battery Drains Fast', icon: <Battery className="w-5 h-5" /> },
+  { value: 'camera-issue', label: 'Camera Issue', icon: <Camera className="w-5 h-5" /> },
+  { value: 'speaker-low', label: 'Speaker Low/Muffled', icon: <Volume2 className="w-5 h-5" /> },
+  { value: 'microphone-issue', label: 'Microphone Issue', icon: <Mic className="w-5 h-5" /> },
+  { value: 'wifi-bluetooth', label: 'WiFi/Bluetooth Issues', icon: <Wifi className="w-5 h-5" /> },
+  { value: 'charging-slow', label: 'Slow Charging', icon: <Plug className="w-5 h-5" /> },
+  { value: 'touch-not-responsive', label: 'Touch Not Responsive', icon: <Hand className="w-5 h-5" /> },
+  { value: 'overheating', label: 'Overheating', icon: <Thermometer className="w-5 h-5" /> },
 ];
 
 interface PhoneDetailsAndConditionStepProps {
@@ -75,16 +76,16 @@ export default function PhoneDetailsAndConditionStep({
     >
       {/* Phone Details Section */}
       <div>
-        <h2 className="text-3xl font-black text-gray-900 mb-2">
-          <span className="mr-3">📱</span>
+        <h2 className="text-3xl font-black text-white mb-2 flex items-center gap-3">
+          <Smartphone className="w-8 h-8 text-cyan-400" />
           Phone Details
         </h2>
-        <p className="text-gray-600 mb-6">Tell us about your device</p>
+        <p className="text-gray-300 mb-6">Tell us about your device</p>
 
         <div className="grid md:grid-cols-2 gap-4">
           {/* Brand */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-gray-300 mb-2">
               Brand *
             </label>
             <select {...register('brand')} className="input-field">
@@ -94,13 +95,13 @@ export default function PhoneDetailsAndConditionStep({
               ))}
             </select>
             {errors.brand && (
-              <p className="text-red-600 text-sm mt-1">{errors.brand.message as string}</p>
+              <p className="text-red-300 text-sm mt-1">{errors.brand.message as string}</p>
             )}
           </div>
 
           {/* Model */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-gray-300 mb-2">
               Model *
             </label>
             <input
@@ -109,13 +110,13 @@ export default function PhoneDetailsAndConditionStep({
               placeholder="iPhone 14 Pro Max"
             />
             {errors.model && (
-              <p className="text-red-600 text-sm mt-1">{errors.model.message as string}</p>
+              <p className="text-red-300 text-sm mt-1">{errors.model.message as string}</p>
             )}
           </div>
 
           {/* Storage */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-gray-300 mb-2">
               Storage *
             </label>
             <select {...register('storage')} className="input-field">
@@ -125,25 +126,31 @@ export default function PhoneDetailsAndConditionStep({
               ))}
             </select>
             {errors.storage && (
-              <p className="text-red-600 text-sm mt-1">{errors.storage.message as string}</p>
+              <p className="text-red-300 text-sm mt-1">{errors.storage.message as string}</p>
             )}
           </div>
 
           {/* RAM */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-gray-300 mb-2">
               RAM (Optional)
             </label>
-            <input
-              {...register('ram')}
-              className="input-field"
-              placeholder="8GB"
-            />
+            <select {...register('ram')} className="input-field">
+              <option value="">Select RAM (Optional)</option>
+              <option value="2GB">2GB</option>
+              <option value="3GB">3GB</option>
+              <option value="4GB">4GB</option>
+              <option value="6GB">6GB</option>
+              <option value="8GB">8GB</option>
+              <option value="12GB">12GB</option>
+              <option value="16GB">16GB</option>
+              <option value="18GB">18GB</option>
+            </select>
           </div>
 
           {/* Color */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-gray-300 mb-2">
               Color *
             </label>
             <input
@@ -152,13 +159,13 @@ export default function PhoneDetailsAndConditionStep({
               placeholder="Silver, Space Gray, Gold..."
             />
             {errors.color && (
-              <p className="text-red-600 text-sm mt-1">{errors.color.message as string}</p>
+              <p className="text-red-300 text-sm mt-1">{errors.color.message as string}</p>
             )}
           </div>
 
           {/* IMEI */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-gray-300 mb-2">
               IMEI (Optional, min 15 digits)
             </label>
             <input
@@ -175,10 +182,11 @@ export default function PhoneDetailsAndConditionStep({
               <input
                 type="checkbox"
                 {...register('warranty')}
-                className="h-5 w-5 text-primary-600 rounded focus:ring-primary-500"
+                className="h-5 w-5 text-cyan-400 rounded focus:ring-cyan-500"
               />
-              <span className="text-sm font-semibold text-gray-700">
-                🛡️ Under Official Warranty
+              <span className="text-sm font-semibold text-gray-300 flex items-center gap-2">
+                <Shield className="w-4 h-4 text-cyan-400" />
+                Under Official Warranty
               </span>
             </label>
           </div>
@@ -186,12 +194,12 @@ export default function PhoneDetailsAndConditionStep({
       </div>
 
       {/* Condition Section */}
-      <div className="border-t-2 border-gray-200 pt-8">
-        <h2 className="text-3xl font-black text-gray-900 mb-2">
-          <span className="mr-3">⭐</span>
+      <div className="border-t-2 border-white/10 pt-8">
+        <h2 className="text-3xl font-black text-white mb-2 flex items-center gap-3">
+          <Star className="w-8 h-8 text-cyan-400" />
           Condition Assessment
         </h2>
-        <p className="text-gray-600 mb-6">Rate your phone's overall condition</p>
+        <p className="text-gray-300 mb-6">Rate your phone's overall condition</p>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {Object.entries(CONDITION_INFO).map(([key, info]) => (
@@ -208,20 +216,20 @@ export default function PhoneDetailsAndConditionStep({
           ))}
         </div>
         {errors.condition && (
-          <p className="text-red-600 text-sm mt-2">{errors.condition.message as string}</p>
+          <p className="text-red-300 text-sm mt-2">{errors.condition.message as string}</p>
         )}
 
         {selectedCondition && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-4 p-4 bg-blue-50 border-2 border-blue-200 rounded-xl"
+            className="mt-4 p-4 bg-blue-500/20 border-2 border-blue-500/50 rounded-xl backdrop-blur-sm"
           >
-            <p className="text-sm font-semibold text-blue-900 mb-1">
-              {CONDITION_INFO[selectedCondition as keyof typeof CONDITION_INFO].icon}{' '}
+            <p className="text-sm font-semibold text-blue-300 mb-1 flex items-center gap-2">
+              {CONDITION_INFO[selectedCondition as keyof typeof CONDITION_INFO].icon}
               {CONDITION_INFO[selectedCondition as keyof typeof CONDITION_INFO].label}
             </p>
-            <p className="text-sm text-blue-800">
+            <p className="text-sm text-gray-300">
               {CONDITION_INFO[selectedCondition as keyof typeof CONDITION_INFO].description}
             </p>
           </motion.div>
@@ -233,16 +241,19 @@ export default function PhoneDetailsAndConditionStep({
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="border-t-2 border-gray-200 pt-8"
+          className="border-t-2 border-white/10 pt-8"
         >
-          <h3 className="text-2xl font-black text-gray-900 mb-2">
-            <span className="mr-3">🔋</span>
+          <h3 className="text-2xl font-black text-white mb-2 flex items-center gap-3">
+            <Battery className="w-6 h-6 text-cyan-400" />
             Battery Health
           </h3>
-          <p className="text-gray-600 mb-4">⚡ Check in Settings → Battery → Battery Health</p>
+          <p className="text-gray-300 mb-4 flex items-center gap-2">
+            <Zap className="w-4 h-4 text-yellow-400" />
+            Check in Settings → Battery → Battery Health
+          </p>
 
           <div className="max-w-md">
-            <label className="block text-sm font-bold text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-gray-300 mb-2">
               Battery Health % (0-100)
             </label>
             <input
@@ -253,20 +264,24 @@ export default function PhoneDetailsAndConditionStep({
               min="0"
               max="100"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              💡 Enter the percentage shown in your iPhone's Battery Health settings
+            <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+              <Lightbulb className="w-3 h-3 text-yellow-400" />
+              Enter the percentage shown in your iPhone's Battery Health settings
             </p>
           </div>
         </motion.div>
       )}
 
       {/* Display Quality */}
-      <div className="border-t-2 border-gray-200 pt-8">
-        <h3 className="text-2xl font-black text-gray-900 mb-2">
-          <span className="mr-3">📱</span>
+      <div className="border-t-2 border-white/10 pt-8">
+        <h3 className="text-2xl font-black text-white mb-2 flex items-center gap-3">
+          <Smartphone className="w-6 h-6 text-cyan-400" />
           Display Condition
         </h3>
-        <p className="text-gray-600 mb-4">👀 Rate your screen's physical condition</p>
+        <p className="text-gray-300 mb-4 flex items-center gap-2">
+          <Eye className="w-4 h-4 text-cyan-400" />
+          Rate your screen's physical condition
+        </p>
 
         <div className="grid md:grid-cols-4 gap-3">
           {Object.entries(DISPLAY_QUALITY).map(([key, info]) => (
@@ -284,9 +299,9 @@ export default function PhoneDetailsAndConditionStep({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg"
+            className="mt-3 p-3 bg-blue-500/20 border border-blue-500/50 rounded-lg backdrop-blur-sm"
           >
-            <p className="text-sm text-blue-800">
+            <p className="text-sm text-gray-300">
               {DISPLAY_QUALITY[watch('displayQuality') as keyof typeof DISPLAY_QUALITY]?.description}
             </p>
           </motion.div>
@@ -294,16 +309,19 @@ export default function PhoneDetailsAndConditionStep({
       </div>
 
       {/* Functionality */}
-      <div className="border-t-2 border-gray-200 pt-8">
-        <h3 className="text-2xl font-black text-gray-900 mb-2">
-          <span className="mr-3">⚙️</span>
+      <div className="border-t-2 border-white/10 pt-8">
+        <h3 className="text-2xl font-black text-white mb-2 flex items-center gap-3">
+          <Settings className="w-6 h-6 text-cyan-400" />
           Device Functionality
         </h3>
-        <p className="text-gray-600 mb-4">✨ Are all features working perfectly?</p>
+        <p className="text-gray-300 mb-4 flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-yellow-400" />
+          Are all features working perfectly?
+        </p>
 
         <div className="grid md:grid-cols-2 gap-3 mb-4">
           <ButtonCard
-            icon="✅"
+            icon={<CheckCircle2 className="w-6 h-6" />}
             label="Everything Works"
             selected={watch('allFeaturesWorking') === true}
             onClick={() => {
@@ -313,7 +331,7 @@ export default function PhoneDetailsAndConditionStep({
             }}
           />
           <ButtonCard
-            icon="⚠️"
+            icon={<AlertTriangle className="w-6 h-6" />}
             label="Has Some Issues"
             selected={watch('allFeaturesWorking') === false}
             onClick={() => setValue('allFeaturesWorking', false)}
@@ -326,7 +344,7 @@ export default function PhoneDetailsAndConditionStep({
             animate={{ opacity: 1, height: 'auto' }}
             className="space-y-3"
           >
-            <p className="text-sm text-gray-600 font-medium">Select all issues that apply:</p>
+            <p className="text-sm text-gray-300 font-medium">Select all issues that apply:</p>
             <div className="grid md:grid-cols-2 gap-2">
               {COMMON_ISSUES.map((issue) => {
                 const isSelected = selectedIssues.includes(issue.value);
@@ -346,13 +364,13 @@ export default function PhoneDetailsAndConditionStep({
                     className={`
                       flex items-center gap-2 p-3 rounded-lg border-2 transition-all text-left
                       ${isSelected 
-                        ? 'border-orange-500 bg-orange-50' 
-                        : 'border-gray-200 bg-white hover:border-gray-300'
+                        ? 'border-orange-500/50 bg-orange-500/20' 
+                        : 'border-white/10 bg-white/5 hover:border-white/20'
                       }
                     `}
                   >
-                    <span className="text-lg">{issue.icon}</span>
-                    <span className={`text-sm ${isSelected ? 'text-orange-700 font-medium' : 'text-gray-700'}`}>
+                    <span className="shrink-0">{issue.icon}</span>
+                    <span className={`text-sm ${isSelected ? 'text-orange-300 font-medium' : 'text-gray-300'}`}>
                       {issue.label}
                     </span>
                   </motion.button>
@@ -364,12 +382,15 @@ export default function PhoneDetailsAndConditionStep({
       </div>
 
       {/* Additional Notes */}
-      <div className="border-t-2 border-gray-200 pt-8">
-        <h3 className="text-2xl font-black text-gray-900 mb-2">
-          <span className="mr-3">📝</span>
+      <div className="border-t-2 border-white/10 pt-8">
+        <h3 className="text-2xl font-black text-white mb-2 flex items-center gap-3">
+          <FileText className="w-6 h-6 text-cyan-400" />
           Additional Details (Optional)
         </h3>
-        <p className="text-gray-600 mb-4">💬 Anything else buyers should know?</p>
+        <p className="text-gray-300 mb-4 flex items-center gap-2">
+          <MessageSquare className="w-4 h-4 text-cyan-400" />
+          Anything else buyers should know?
+        </p>
 
         <textarea
           {...register('additionalNotes')}

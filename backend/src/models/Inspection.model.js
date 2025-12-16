@@ -37,6 +37,11 @@ const inspectionSchema = new mongoose.Schema(
         min: 0,
         max: 10,
       },
+      authenticityScore: {
+        type: Number,
+        min: 0,
+        max: 100,
+      },
       detectedIssues: [
         {
           type: {

@@ -17,10 +17,10 @@ export default function PhoneCard({ listing }: PhoneCardProps) {
 
   const getConditionColor = (condition: string) => {
     const colors = {
-      excellent: 'bg-green-100 text-green-800',
-      good: 'bg-blue-100 text-blue-800',
-      fair: 'bg-yellow-100 text-yellow-800',
-      poor: 'bg-red-100 text-red-800',
+      excellent: 'bg-green-500/20 text-green-300 border border-green-500/50',
+      good: 'bg-blue-500/20 text-blue-300 border border-blue-500/50',
+      fair: 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/50',
+      poor: 'bg-red-500/20 text-red-300 border border-red-500/50',
     };
     return colors[condition as keyof typeof colors] || colors.good;
   };
@@ -34,10 +34,10 @@ export default function PhoneCard({ listing }: PhoneCardProps) {
     >
       <Link
         to={`/listings/${listing._id}`}
-        className="block bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow cursor-pointer"
+        className="block bg-white/5 backdrop-blur-md border border-white/10 rounded-lg shadow-md p-6 hover:shadow-xl hover:bg-white/10 transition-all cursor-pointer"
       >
       {/* Image */}
-      <div className="relative h-48 bg-gray-100 rounded-lg mb-4 overflow-hidden">
+      <div className="relative h-48 bg-gray-800 rounded-lg mb-4 overflow-hidden">
         {listing.images?.[0] ? (
           <img
             src={typeof listing.images[0] === 'string' ? listing.images[0] : listing.images[0].url}
@@ -59,7 +59,7 @@ export default function PhoneCard({ listing }: PhoneCardProps) {
 
         {/* AI Verified Badge */}
         {listing.inspectionReport && (
-          <div className="absolute top-2 right-2 bg-primary-600 text-white px-2 py-1 rounded text-xs font-semibold flex items-center gap-1">
+          <div className="absolute top-2 right-2 bg-linear-to-r from-cyan-500 to-blue-600 text-white px-2 py-1 rounded text-xs font-semibold flex items-center gap-1">
             <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
@@ -74,7 +74,7 @@ export default function PhoneCard({ listing }: PhoneCardProps) {
 
       {/* Content */}
       <div>
-        <h3 className="font-semibold text-lg text-gray-900 mb-1 truncate">
+        <h3 className="font-semibold text-lg text-white mb-1 truncate">
           {listing.title}
         </h3>
 
@@ -82,10 +82,10 @@ export default function PhoneCard({ listing }: PhoneCardProps) {
           <span className={`px-2 py-1 rounded text-xs font-medium ${getConditionColor(listing.condition)}`}>
             {listing.condition}
           </span>
-          <span className="text-sm text-gray-600">{listing.phone.storage}</span>
+          <span className="text-sm text-gray-300">{listing.phone.storage}</span>
         </div>
 
-        <p className="text-2xl font-bold text-primary-600 mb-2">
+        <p className="text-2xl font-bold bg-linear-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent mb-2">
           {formatPrice(listing.price)}
         </p>
 
@@ -95,7 +95,7 @@ export default function PhoneCard({ listing }: PhoneCardProps) {
           </p>
         )}
 
-        <div className="flex items-center justify-between text-sm text-gray-600">
+        <div className="flex items-center justify-between text-sm text-gray-300">
           <div className="flex items-center gap-1">
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path

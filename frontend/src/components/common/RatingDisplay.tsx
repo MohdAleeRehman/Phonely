@@ -64,7 +64,7 @@ export default function RatingDisplay({
 
       {/* Rating number and count */}
       {showCount && (
-        <span className={`${textSizes[size]} text-gray-600 ml-1`}>
+        <span className={`${textSizes[size]} text-gray-300 ml-1`}>
           {rating.toFixed(1)} {count > 0 && `(${count})`}
         </span>
       )}

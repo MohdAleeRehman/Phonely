@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Clock, AlertTriangle, Lock } from 'lucide-react';
 import { authService } from '../../services/auth.service';
 import { useAuthStore } from '../../store/authStore';
 
@@ -7,9 +8,9 @@ import { useAuthStore } from '../../store/authStore';
 const showToast = (message: string, type: 'success' | 'error' = 'error') => {
   // Simple alert for now - can be replaced with a proper toast library later
   if (type === 'error') {
-    alert(`❌ ${message}`);
+    alert(`Error: ${message}`);
   } else {
-    alert(`✅ ${message}`);
+    alert(`Success: ${message}`);
   }
 };
 
@@ -142,30 +143,30 @@ export default function AdminOTPVerification() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-red-50 via-white to-red-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-red-500 to-red-600 rounded-full mb-4">
-            <span className="text-3xl">🔒</span>
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-full mb-4">
+            <Lock className="w-8 h-8 text-red-400" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Verification</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold text-white mb-2">Admin Verification</h1>
+          <p className="text-gray-300">
             We've sent a 6-digit code to
             <br />
-            <span className="font-semibold text-gray-900">{email}</span>
+            <span className="font-semibold text-white">{email}</span>
           </p>
         </div>
 
         {/* OTP Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+        <div className="bg-white/5 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-white/10">
           {/* Timer */}
-          <div className="flex items-center justify-center gap-2 mb-6 p-3 bg-red-50 rounded-lg border border-red-100">
-            <span className="text-2xl">⏱️</span>
-            <span className="text-lg font-semibold text-red-600">
+          <div className="flex items-center justify-center gap-2 mb-6 p-3 bg-red-500/20 backdrop-blur-md rounded-lg border border-red-400/30">
+            <Clock className="w-6 h-6 text-red-400" />
+            <span className="text-lg font-semibold text-red-300">
               {formatTime(timeLeft)}
             </span>
-            <span className="text-sm text-red-600">remaining</span>
+            <span className="text-sm text-red-300">remaining</span>
           </div>
 
           {/* OTP Input */}
@@ -182,8 +183,8 @@ export default function AdminOTPVerification() {
                 onKeyDown={(e) => handleKeyDown(index, e)}
                 className={`w-12 h-14 text-center text-2xl font-bold border-2 rounded-lg focus:outline-none focus:ring-4 transition-all ${
                   digit
-                    ? 'border-red-500 bg-red-50 text-red-600 focus:ring-red-100'
-                    : 'border-gray-300 focus:border-red-500 focus:ring-red-100'
+                    ? 'border-red-400 bg-red-500/20 text-white focus:ring-red-500/30'
+                    : 'border-white/20 bg-white/5 text-white focus:border-red-400 focus:ring-red-500/30'
                 }`}
                 disabled={loading}
               />
@@ -222,14 +223,14 @@ export default function AdminOTPVerification() {
           </button>
 
           {/* Security Notice */}
-          <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+          <div className="mt-6 p-4 bg-amber-500/20 backdrop-blur-md border border-amber-400/30 rounded-lg">
             <div className="flex gap-3">
-              <span className="text-xl">⚠️</span>
+              <AlertTriangle className="w-5 h-5 text-amber-400" />
               <div className="flex-1">
-                <p className="text-sm font-semibold text-amber-800 mb-1">
+                <p className="text-sm font-semibold text-amber-300 mb-1">
                   Security Notice
                 </p>
-                <ul className="text-xs text-amber-700 space-y-1">
+                <ul className="text-xs text-amber-200 space-y-1">
                   <li>• Never share this code with anyone</li>
                   <li>• This is an admin-level access attempt</li>
                   <li>• Contact support if you didn't request this</li>
@@ -241,14 +242,14 @@ export default function AdminOTPVerification() {
           {/* Back to Login */}
           <button
             onClick={() => navigate('/login')}
-            className="w-full mt-4 text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
+            className="w-full mt-4 text-gray-300 hover:text-white text-sm font-medium transition-colors"
           >
             ← Back to Login
           </button>
         </div>
 
         {/* Help Text */}
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-gray-400 mt-6">
           Didn't receive the code? Check your spam folder or try logging in again.
         </p>
       </div>

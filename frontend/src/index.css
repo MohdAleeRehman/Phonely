@@ -13,6 +13,13 @@
   --color-primary-900: #1e3a8a;
   --color-primary-950: #172554;
   
+  --color-cyan-400: #22d3ee;
+  --color-cyan-500: #06b6d4;
+  --color-purple-600: #7c3aed;
+  --color-purple-700: #6d28d9;
+  --color-pink-500: #ec4899;
+  --color-pink-600: #db2777;
+  
   --animate-spin: spin 1s linear infinite;
   --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-bounce: bounce 1s infinite;
@@ -23,7 +30,7 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 font-sans;
+    @apply bg-linear-to-br from-gray-900 via-blue-950 to-gray-900 text-white font-sans;
   }
   
   @keyframes spin {
@@ -92,15 +99,28 @@
   }
   
   .btn-secondary {
-    @apply bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-all duration-200 font-medium hover:scale-105;
+    @apply bg-white/10 text-white px-4 py-2 rounded-lg hover:bg-white/20 border-2 border-white/20 hover:border-white/30 transition-all duration-200 font-medium hover:scale-105 backdrop-blur-md;
   }
   
   .input-field {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200;
+    @apply w-full px-4 py-3 bg-white/5 backdrop-blur-md border border-white/20 rounded-lg text-white placeholder:text-gray-400 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 outline-none transition-all duration-200 hover:border-white/30;
+  }
+
+  /* Select dropdown specific styling */
+  .input-field select,
+  .input-field option,
+  .input-field optgroup {
+    background-color: #1f2937;
+    color: white;
+  }
+
+  .input-field optgroup {
+    font-weight: bold;
+    color: #06b6d4;
   }
   
   .card {
-    @apply bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow duration-200;
+    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow duration-200 text-white;
   }
   
   .animate-fade-in {

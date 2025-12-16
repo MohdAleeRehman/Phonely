@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState, useMemo } from 'react';
+import { Package, Link2, Smartphone, MapPin, Search, Lightbulb, Sparkles, Rocket, Lock } from 'lucide-react';
+import PKRIcon from '../../icons/PKRIcon';
 import type { UseFormRegister, FieldErrors, UseFormWatch, UseFormSetValue } from 'react-hook-form';
 import { ButtonCard } from '../../common/ButtonCard';
 
@@ -74,49 +76,50 @@ export default function AccessoriesAndLocationStep({
     >
       {/* Accessories Section */}
       <div>
-        <h2 className="text-3xl font-black text-gray-900 mb-2">
-          <span className="mr-3">📦</span>
+        <h2 className="text-3xl font-black text-white mb-2 flex items-center gap-3">
+          <Package className="w-8 h-8 text-cyan-400" />
           What's Included?
         </h2>
-        <p className="text-gray-600 mb-6">Select what comes with your device</p>
+        <p className="text-gray-300 mb-6">Select what comes with your device</p>
 
         <div className="grid md:grid-cols-3 gap-4">
           <ButtonCard
-            icon="📦"
+            icon={<Package className="w-6 h-6" />}
             label="Complete Box"
             selected={watch('accessories') === 'complete-box'}
             onClick={() => setValue('accessories', 'complete-box')}
           />
           <ButtonCard
-            icon="🔗"
+            icon={<Link2 className="w-6 h-6" />}
             label="Cable Only"
             selected={watch('accessories') === 'cable-only'}
             onClick={() => setValue('accessories', 'cable-only')}
           />
           <ButtonCard
-            icon="📱"
+            icon={<Smartphone className="w-6 h-6" />}
             label="Device Only"
             selected={watch('accessories') === 'device-only'}
             onClick={() => setValue('accessories', 'device-only')}
           />
         </div>
-        <p className="text-xs text-gray-500 mt-3">
-          💡 Note: Most manufacturers no longer include charging adapters with new phones
+        <p className="text-xs text-gray-500 mt-3 flex items-center gap-1">
+          <Lightbulb className="w-3 h-3 text-yellow-400" />
+          Note: Most manufacturers no longer include charging adapters with new phones
         </p>
       </div>
 
       {/* Location Section */}
-      <div className="border-t-2 border-gray-200 pt-8">
-        <h2 className="text-3xl font-black text-gray-900 mb-2">
-          <span className="mr-3">📍</span>
+      <div className="border-t-2 border-white/10 pt-8">
+        <h2 className="text-3xl font-black text-white mb-2 flex items-center gap-3">
+          <MapPin className="w-8 h-8 text-cyan-400" />
           Location
         </h2>
-        <p className="text-gray-600 mb-6">Where are you located?</p>
+        <p className="text-gray-300 mb-6">Where are you located?</p>
 
         <div className="space-y-4">
           {/* City */}
           <div className="relative">
-            <label className="block text-sm font-bold text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-gray-300 mb-2">
               City *
             </label>
             
@@ -126,7 +129,7 @@ export default function AccessoriesAndLocationStep({
             {/* Search input (not part of form) */}
             <input
               type="text"
-              placeholder="🔍 Search or select city..."
+              placeholder="Search or select city..."
               value={(watch('city') as string) || citySearch}
               onChange={(e) => {
                 setCitySearch(e.target.value);
@@ -139,11 +142,11 @@ export default function AccessoriesAndLocationStep({
             
             {/* Dropdown */}
             {cityFocused && (
-              <div className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto border-2 border-gray-300 rounded-lg bg-white shadow-lg">
+              <div className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto border-2 border-white/20 rounded-lg bg-gray-800 shadow-lg">
                 {Object.keys(filteredCitiesByProvince).length > 0 ? (
                   Object.entries(filteredCitiesByProvince).map(([province, cities]) => (
                     <div key={province}>
-                      <div className="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-50 sticky top-0 border-b">
+                      <div className="px-4 py-2 text-xs font-bold text-gray-300 bg-white/5 sticky top-0 border-b">
                         {province}
                       </div>
                       {cities.map((city) => (
@@ -155,7 +158,7 @@ export default function AccessoriesAndLocationStep({
                             setCitySearch(''); 
                             setCityFocused(false);
                           }}
-                          className="w-full text-left px-4 py-2.5 hover:bg-primary-50 text-sm border-b border-gray-100 last:border-0 transition-colors"
+                          className="w-full text-left px-4 py-2.5 hover:bg-white/10 text-sm text-gray-200 border-b border-white/10 last:border-0 transition-colors"
                         >
                           {city}
                         </button>
@@ -168,14 +171,14 @@ export default function AccessoriesAndLocationStep({
               </div>
             )}
             
-            {errors.city && (
-              <p className="text-red-600 text-sm mt-1">{errors.city.message as string}</p>
+            {errors.city && errors.city.message && (
+              <p className="text-red-300 text-sm mt-1">{errors.city.message as string}</p>
             )}
           </div>
 
           {/* Address */}
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
+            <label className="block text-sm font-bold text-gray-300 mb-2">
               Address / Area *
             </label>
             <input
@@ -183,34 +186,35 @@ export default function AccessoriesAndLocationStep({
               className="input-field"
               placeholder="Street address or area (e.g., DHA Phase 5, Gulberg)"
             />
-            {errors.address && (
-              <p className="text-red-600 text-sm mt-1">{errors.address.message as string}</p>
+            {errors.address && errors.address.message && (
+              <p className="text-red-300 text-sm mt-1">{errors.address.message as string}</p>
             )}
-            <p className="text-xs text-gray-500 mt-1">
-              🔒 Your exact address will only be shared after you accept a buyer's request
+            <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+              <Lock className="w-3 h-3 text-cyan-400" />
+              Your exact address will only be shared after you accept a buyer's request
             </p>
           </div>
         </div>
       </div>
 
       {/* Summary Info Box */}
-      <div className="border-t-2 border-gray-200 pt-8">
-        <div className="p-6 bg-linear-to-br from-green-50 to-green-100 border-2 border-green-200 rounded-xl">
+      <div className="border-t-2 border-white/10 pt-8">
+        <div className="p-6 bg-linear-to-br from-green-500/20 to-emerald-500/20 border-2 border-green-500/50 rounded-xl backdrop-blur-sm">
           <div className="flex items-start gap-3">
-            <span className="text-3xl">🎉</span>
+            <Sparkles className="w-8 h-8 text-yellow-400 shrink-0" />
             <div>
-              <h3 className="font-bold text-green-900 text-lg mb-2">
+              <h3 className="font-bold text-green-300 text-lg mb-2">
                 Almost Ready to List!
               </h3>
-              <p className="text-sm text-green-800 mb-3">
+              <p className="text-sm text-gray-300 mb-3">
                 You're one step away from getting your phone listed. Our AI will verify your listing and suggest the best price!
               </p>
-              <div className="flex items-center gap-2 text-xs text-green-700">
-                <span>✨ AI Verification</span>
+              <div className="flex items-center gap-2 text-xs text-gray-300">
+                <span className="flex items-center gap-1"><Sparkles className="w-3 h-3" /> AI Verification</span>
                 <span>•</span>
-                <span>💰 Price Suggestion</span>
+                <span className="flex items-center gap-1"><PKRIcon className="w-3 h-3" /> Price Suggestion</span>
                 <span>•</span>
-                <span>🚀 Instant Listing</span>
+                <span className="flex items-center gap-1"><Rocket className="w-3 h-3" /> Instant Listing</span>
               </div>
             </div>
           </div>

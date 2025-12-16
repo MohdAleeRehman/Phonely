@@ -148,8 +148,7 @@ export const getAllListings = asyncHandler(async (req, res) => {
  */
 export const getListingById = asyncHandler(async (req, res) => {
   const listing = await Listing.findById(req.params.id)
-    .populate('seller', 'name avatar verified verificationBadge ratings location createdAt')
-    .populate('inspectionReport.reportId');
+    .populate('seller', 'name avatar verified verificationBadge ratings location createdAt');
 
   if (!listing) {
     throw new AppError('Listing not found', 404);
@@ -162,10 +161,21 @@ export const getListingById = asyncHandler(async (req, res) => {
     { new: false }
   ).catch((err) => console.error('Failed to increment view count:', err));
 
+  // Convert listing to object and ensure reportId is a string
+  const listingObj = listing.toObject();
+  if (listingObj.inspectionReport?.reportId) {
+    // If reportId is an object (populated or ObjectId), convert to string
+    if (typeof listingObj.inspectionReport.reportId === 'object') {
+      listingObj.inspectionReport.reportId = listingObj.inspectionReport.reportId._id 
+        ? String(listingObj.inspectionReport.reportId._id)
+        : String(listingObj.inspectionReport.reportId);
+    }
+  }
+
   res.status(200).json({
     status: 'success',
     data: {
-      listing,
+      listing: listingObj,
     },
   });
 });

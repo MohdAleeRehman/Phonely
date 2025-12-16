@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Filter, X, Sparkles, CheckCircle2, AlertTriangle, RotateCcw, Package, ChevronLeft, ChevronRight } from 'lucide-react';
 import { listingService } from '../../services/listing.service';
 import type { ListingFilters } from '../../services/listing.service';
 import PhoneCard from '../../components/listings/PhoneCard';
@@ -123,6 +124,26 @@ export default function ListingsPage() {
       exit={{ opacity: 0 }}
       className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative"
     >
+      {/* Circuit Pattern Background */}
+      <svg className="absolute inset-0 w-full h-full opacity-5 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="listingsCircuit" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style={{stopColor:'#06b6d4',stopOpacity:1}} />
+            <stop offset="50%" style={{stopColor:'#2563eb',stopOpacity:1}} />
+            <stop offset="100%" style={{stopColor:'#7c3aed',stopOpacity:1}} />
+          </linearGradient>
+          <pattern id="listingsPattern" x="0" y="0" width="400" height="300" patternUnits="userSpaceOnUse">
+            <path d="M50 0 L50 90 L70 110 L70 200" stroke="url(#listingsCircuit)" strokeWidth="2" fill="none"/>
+            <path d="M100 0 L100 70 L120 90 L120 180" stroke="url(#listingsCircuit)" strokeWidth="2" fill="none"/>
+            <path d="M150 0 L150 100 L170 120 L170 220" stroke="url(#listingsCircuit)" strokeWidth="2" fill="none"/>
+            <circle cx="50" cy="90" r="4" fill="#06b6d4"/>
+            <circle cx="100" cy="70" r="4" fill="#7c3aed"/>
+            <rect x="116" y="86" width="8" height="8" fill="none" stroke="#7c3aed" strokeWidth="1.5"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#listingsPattern)"/>
+      </svg>
+
       {/* Animated Background Blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
         <motion.div
@@ -171,25 +192,26 @@ export default function ListingsPage() {
       {/* Header */}
       <div className="mb-8 relative z-10">
         <h1 className="text-4xl font-black mb-2 flex items-center gap-2">
-  <span>🔍</span>
-  <span className="bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
+  <Search className="w-8 h-8 text-cyan-400" />
+  <span className="bg-linear-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
     Browse Phones
   </span>
 </h1>
 
-        <p className="text-gray-600 text-lg">
-          Find your perfect phone from our AI-verified listings ✨
+        <p className="text-gray-300 text-lg flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-cyan-400" />
+          Find your perfect phone from our AI-verified listings
         </p>
       </div>
 
       {/* Search Bar with Filter Toggle and Sort */}
-      <div className="card mb-6 relative z-10 backdrop-blur-sm bg-white/90">
+      <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-6 mb-6 relative z-10">
         <div className="flex flex-col sm:flex-row gap-3">
           {/* Search Input */}
           <div className="flex-1">
             <input
               type="text"
-              placeholder="🔍 Search by phone model..."
+              placeholder="Search by phone model..."
               value={filters.search || ''}
               onChange={(e) => updateFilter('search', e.target.value)}
               className="input-field w-full"
@@ -203,19 +225,23 @@ export default function ListingsPage() {
               onChange={(e) => setSortBy(e.target.value as SortOption)}
               className="input-field w-full"
             >
-              <option value="newest">📅 Newest First</option>
-              <option value="oldest">⏰ Oldest First</option>
-              <option value="price-low">💰 Price: Low to High</option>
-              <option value="price-high">💎 Price: High to Low</option>
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
             </select>
           </div>
 
           {/* Filter Toggle Button */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`btn-secondary sm:w-auto whitespace-nowrap ${showFilters ? 'bg-primary-100 border-primary-400' : ''}`}
+            className={`btn-secondary sm:w-auto whitespace-nowrap flex items-center gap-2 ${showFilters ? 'bg-primary-600/20 border-primary-400' : ''}`}
           >
-            {showFilters ? '✖️ Hide Filters' : '🎛️ Show Filters'}
+            {showFilters ? (
+              <><X className="w-4 h-4" /> Hide Filters</>
+            ) : (
+              <><Filter className="w-4 h-4" /> Show Filters</>
+            )}
           </button>
         </div>
       </div>
@@ -230,18 +256,18 @@ export default function ListingsPage() {
             transition={{ duration: 0.15 }}
             className="overflow-hidden mb-8 relative z-10"
           >
-            <div className="card backdrop-blur-sm bg-white/90">
+            <div className="card backdrop-blur-md bg-white/5 border border-white/10">
               <div className="grid md:grid-cols-4 gap-4">
 
           {/* City Filter */}
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-200 mb-1">
               City
             </label>
             <div className="relative">
               <input
                 type="text"
-                placeholder="🔍 Search or select..."
+                placeholder="Search or select..."
                 value={filters.city || citySearch}
                 onChange={(e) => {
                   setCitySearch(e.target.value);
@@ -249,21 +275,22 @@ export default function ListingsPage() {
                 }}
                 onFocus={() => setCityFocused(true)}
                 onBlur={() => setTimeout(() => setCityFocused(false), 200)}
-                className="input-field w-full"
+                className="input-field w-full pl-10"
               />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             </div>
             {cityFocused && (
-              <div className="absolute z-10 mt-1 w-full max-h-60 overflow-y-auto border border-gray-300 rounded-lg bg-white shadow-lg">
+              <div className="absolute z-10 mt-1 w-full max-h-60 overflow-y-auto border border-white/10 rounded-lg bg-gray-900/95 backdrop-blur-md shadow-xl">
                 {Object.keys(filteredCitiesByProvince).length > 0 ? (
                   Object.entries(filteredCitiesByProvince).map(([province, cities]) => (
                     <div key={province}>
-                      <div className="px-3 py-1 text-xs font-semibold text-gray-500 bg-gray-50 sticky top-0">{province}</div>
+                      <div className="px-3 py-1 text-xs font-semibold text-gray-300 bg-white/5 sticky top-0">{province}</div>
                       {cities.map((city) => (
                         <button
                           key={city}
                           type="button"
                           onClick={() => { updateFilter('city', city); setCitySearch(''); setCityFocused(false); }}
-                          className="w-full text-left px-3 py-2 hover:bg-primary-50 text-sm border-b border-gray-50 last:border-0"
+                          className="w-full text-left px-3 py-2 hover:bg-white/10 text-sm text-gray-200 border-b border-white/5 last:border-0 transition-colors"
                         >
                           {city}
                         </button>
@@ -279,13 +306,13 @@ export default function ListingsPage() {
 
           {/* Brand Filter */}
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-200 mb-1">
               Brand
             </label>
             <div className="relative">
               <input
                 type="text"
-                placeholder="🔍 Search or select..."
+                placeholder="Search or select..."
                 value={filters.brand || brandSearch}
                 onChange={(e) => {
                   setBrandSearch(e.target.value);
@@ -293,24 +320,25 @@ export default function ListingsPage() {
                 }}
                 onFocus={() => setBrandFocused(true)}
                 onBlur={() => setTimeout(() => setBrandFocused(false), 200)}
-                className="input-field w-full"
+                className="input-field w-full pl-10"
               />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             </div>
             {brandFocused && (
-              <div className="absolute z-10 mt-1 w-full max-h-60 overflow-y-auto border border-gray-300 rounded-lg bg-white shadow-lg">
+              <div className="absolute z-10 mt-1 w-full max-h-60 overflow-y-auto border border-white/10 rounded-lg bg-gray-900/95 backdrop-blur-md shadow-xl">
                 {filteredBrands.length > 0 ? (
                   filteredBrands.map((brand) => (
                     <button
                       key={brand}
                       type="button"
                       onClick={() => { updateFilter('brand', brand); setBrandSearch(''); setBrandFocused(false); }}
-                      className="w-full text-left px-3 py-2 hover:bg-primary-50 text-sm border-b border-gray-50 last:border-0"
+                      className="w-full text-left px-3 py-2 hover:bg-white/10 text-sm text-gray-200 border-b border-white/5 last:border-0 transition-colors"
                     >
                       {brand}
                     </button>
                   ))
                 ) : (
-                  <div className="px-3 py-2 text-sm text-gray-500">No brands found</div>
+                  <div className="px-3 py-2 text-sm text-gray-400">No brands found</div>
                 )}
               </div>
             )}
@@ -318,7 +346,7 @@ export default function ListingsPage() {
 
           {/* Condition Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-200 mb-1">
               Condition
             </label>
             <select
@@ -337,7 +365,7 @@ export default function ListingsPage() {
 
           {/* PTA Approval Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-200 mb-1">
               PTA Status
             </label>
             <select
@@ -349,14 +377,14 @@ export default function ListingsPage() {
               className="input-field"
             >
               <option value="">All Phones</option>
-              <option value="true">✅ PTA Approved</option>
-              <option value="false">⚠️ Non-PTA</option>
+              <option value="true">PTA Approved</option>
+              <option value="false">Non-PTA</option>
             </select>
           </div>
 
           {/* Price Range */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-200 mb-1">
               Price Range
             </label>
             <div className="flex gap-2">
@@ -378,14 +406,15 @@ export default function ListingsPage() {
           </div>
 
                 {/* Clear Filters */}
-                <div className="md:col-span-2 flex items-end">
+                <div className="md:col-span-4 flex justify-end mt-4">
                   <motion.button
                     onClick={clearFilters}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="btn-secondary w-full"
+                    className="btn-secondary flex items-center justify-center gap-2 px-6"
                   >
-                    🔄 Clear All Filters
+                    <RotateCcw className="w-4 h-4" />
+                    Clear All Filters
                   </motion.button>
                 </div>
               </div>
@@ -409,9 +438,9 @@ export default function ListingsPage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mb-4 text-sm text-gray-600 font-medium"
+            className="mb-4 text-sm text-gray-300 font-medium"
           >
-            📦 Found {data.results || 0} listings {sortBy !== 'newest' && `(sorted by ${sortBy.replace('-', ' ')})`}
+            <span className="flex items-center gap-2"><Package className="w-4 h-4" /> Found {data.results || 0} listings {sortBy !== 'newest' && `(sorted by ${sortBy.replace('-', ' ')})`}</span>
           </motion.div>
           
           <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8 relative z-10">
@@ -439,11 +468,12 @@ export default function ListingsPage() {
                 disabled={filters.page === 1}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                ⬅️ Previous
+                <ChevronLeft className="w-4 h-4" />
+                Previous
               </motion.button>
-              <span className="px-4 py-2 text-gray-700 font-medium flex items-center">
+              <span className="px-4 py-2 text-gray-200 font-medium flex items-center">
                 Page {filters.page || 1} of {data.data.pagination.totalPages}
               </span>
               <motion.button
@@ -451,9 +481,10 @@ export default function ListingsPage() {
                 disabled={filters.page === data.data.pagination.totalPages}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                Next ➡️
+                Next
+                <ChevronRight className="w-4 h-4" />
               </motion.button>
             </motion.div>
           )}
@@ -462,18 +493,21 @@ export default function ListingsPage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center py-12 card bg-linear-to-br from-primary-50 to-purple-50 relative z-10"
+          className="text-center py-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-lg relative z-10"
         >
-          <div className="text-6xl mb-4">📱</div>
-          <p className="text-gray-600 text-lg mb-4">No listings found matching your criteria</p>
+          <Package className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+          <p className="text-gray-300 text-lg mb-4">No listings found matching your criteria</p>
+          <div className="flex justify-center">
           <motion.button
             onClick={clearFilters}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="btn-primary mt-4"
+              className="btn-primary mt-4 flex items-center justify-center gap-2 mx-auto"
           >
-            🔄 Clear Filters
+              <RotateCcw className="w-4 h-4" />
+              Clear Filters
           </motion.button>
+          </div>
         </motion.div>
       )}
     </motion.div>

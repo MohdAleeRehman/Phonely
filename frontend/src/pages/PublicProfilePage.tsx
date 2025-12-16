@@ -95,8 +95,8 @@ export default function PublicProfilePage() {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Avatar */}
           <div className="shrink-0 relative">
-            <div className="h-32 w-32 rounded-full bg-linear-to-br from-primary-500 to-primary-700 p-1">
-              <div className="h-full w-full rounded-full bg-white flex items-center justify-center">
+            <div className="h-32 w-32 rounded-full bg-linear-to-br from-cyan-500 to-blue-600 p-1">
+              <div className="h-full w-full rounded-full bg-white/5 backdrop-blur-md flex items-center justify-center">
                 {user.avatar ? (
                   <img
                     src={user.avatar}
@@ -104,14 +104,14 @@ export default function PublicProfilePage() {
                     className="h-full w-full rounded-full object-cover"
                   />
                 ) : (
-                  <span className="text-4xl font-black text-primary-600">
+                  <span className="text-4xl font-black bg-linear-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
                     {user.name.charAt(0).toUpperCase()}
                   </span>
                 )}
               </div>
             </div>
             {user.isVerified && (
-              <div className="absolute -bottom-2 -right-2 bg-linear-to-r from-primary-600 to-primary-800 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+              <div className="absolute -bottom-2 -right-2 bg-linear-to-r from-cyan-500 to-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
                 ✓ Verified
               </div>
             )}
@@ -123,11 +123,11 @@ export default function PublicProfilePage() {
               <div>
                 <h1 className="text-4xl font-black mb-3 flex items-center gap-2">
                   <span>👤</span>
-                  <span className="bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
+                  <span className="bg-linear-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
                     {user.name}
                   </span>
                 </h1>
-                <div className="space-y-1 text-gray-600">
+                <div className="space-y-1 text-gray-300">
                   <p className="flex items-center gap-2">
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -145,9 +145,10 @@ export default function PublicProfilePage() {
               {currentUser && (
                 <button
                   onClick={() => setShowReportModal(true)}
-                  className="px-4 py-2 border-2 border-red-200 text-red-600 rounded-lg hover:bg-red-50 font-medium flex items-center gap-2 transition-colors"
+                  className="px-4 py-2 border-2 border-red-500/50 text-red-300 rounded-lg hover:bg-red-500/20 font-medium flex items-center gap-2 transition-colors backdrop-blur-sm"
                 >
-                  <span>🚨</span> Report User
+                  <Shield className="w-4 h-4" />
+                  Report User
                 </button>
               )}
             </div>
@@ -162,22 +163,26 @@ export default function PublicProfilePage() {
             </div>
 
             {/* Statistics */}
-            <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-primary-100 bg-linear-to-r from-primary-50 to-purple-50 rounded-lg p-4">
+            <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/10 bg-white/5 backdrop-blur-md rounded-lg p-4">
               <motion.div whileHover={{ scale: 1.05 }} className="text-center">
                 <p className="text-3xl font-black flex items-center justify-center gap-2">
-                  <span className="bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
+                  <span className="bg-linear-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
                     {listings.length}
                   </span>
                 </p>
-                <p className="text-sm text-gray-600 font-medium mt-1">Active Listings</p>
+                <p className="text-sm text-gray-300 font-medium mt-1">Active Listings</p>
               </motion.div>
               <motion.div whileHover={{ scale: 1.05 }} className="text-center">
                 <p className="text-3xl font-black flex items-center justify-center gap-2">
                   <span className="bg-linear-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
-                    {user.isVerified ? '✓' : '✗'}
+                    {user.isVerified ? (
+                    <CheckCircle2 className="w-6 h-6 text-green-400" />
+                  ) : (
+                    <X className="w-6 h-6 text-red-400" />
+                  )}
                   </span>
                 </p>
-                <p className="text-sm text-gray-600 font-medium mt-1">Verified</p>
+                <p className="text-sm text-gray-300 font-medium mt-1">Verified</p>
               </motion.div>
               <motion.div whileHover={{ scale: 1.05 }} className="text-center">
                 <p className="text-3xl font-black flex items-center justify-center gap-2">
@@ -185,7 +190,7 @@ export default function PublicProfilePage() {
                     {monthsActive}
                   </span>
                 </p>
-                <p className="text-sm text-gray-600 font-medium mt-1">Months Active</p>
+                <p className="text-sm text-gray-300 font-medium mt-1">Months Active</p>
               </motion.div>
             </div>
           </div>
@@ -195,8 +200,8 @@ export default function PublicProfilePage() {
       {/* User's Listings */}
       <div>
         <h2 className="text-2xl font-black mb-4 flex items-center gap-2">
-          <span>📱</span>
-          <span className="bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
+          <Smartphone className="w-6 h-6 text-cyan-400" />
+          <span className="bg-linear-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
             Active Listings
           </span>
         </h2>
@@ -217,8 +222,8 @@ export default function PublicProfilePage() {
             animate={{ opacity: 1, scale: 1 }}
             className="card text-center py-12"
           >
-            <div className="text-6xl mb-4">📱</div>
-            <p className="text-xl font-medium text-gray-600">No active listings</p>
+            <Package className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+            <p className="text-xl font-medium text-gray-300">No active listings</p>
             <p className="text-sm text-gray-500 mt-2">This user hasn't posted any listings yet</p>
           </motion.div>
         )}
@@ -228,7 +233,7 @@ export default function PublicProfilePage() {
       {user.ratings?.count > 0 && (
         <div className="mb-8">
           <h2 className="text-3xl font-black mb-6">
-            <span className="bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
               Recent Reviews
             </span>
           </h2>
@@ -256,7 +261,7 @@ export default function PublicProfilePage() {
                           className="h-full w-full rounded-full object-cover"
                         />
                       ) : (
-                        <span className="text-lg font-bold text-primary-600">
+                        <span className="text-lg font-bold bg-linear-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
                           {rating.rater?.name?.charAt(0).toUpperCase()}
                         </span>
                       )}
@@ -266,7 +271,7 @@ export default function PublicProfilePage() {
                       {/* Header */}
                       <div className="flex items-start justify-between mb-2">
                         <div>
-                          <p className="font-semibold text-gray-900">{rating.rater?.name}</p>
+                          <p className="font-semibold text-white">{rating.rater?.name}</p>
                           <p className="text-sm text-gray-500">
                             {new Date(rating.createdAt).toLocaleDateString('en-US', {
                               month: 'short',
@@ -280,7 +285,7 @@ export default function PublicProfilePage() {
 
                       {/* Review Text */}
                       {rating.review && (
-                        <p className="text-gray-700 mb-2">{rating.review}</p>
+                        <p className="text-gray-200 mb-2">{rating.review}</p>
                       )}
 
                       {/* Listing Info */}

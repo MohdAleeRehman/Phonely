@@ -1,9 +1,12 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { Lock, FileText, Clock, MessageSquare, AlertTriangle, Zap, Target } from 'lucide-react';
+import CircuitPattern from '../components/common/CircuitPattern';
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-linear-to-b from-gray-50 to-white py-12">
+    <div className="min-h-screen bg-linear-to-br from-gray-900 via-blue-950 to-gray-900 py-12">
+      <CircuitPattern />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div 
@@ -11,13 +14,16 @@ export default function PrivacyPolicyPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="text-5xl md:text-6xl font-black text-gray-900 mb-4">
-            Privacy Policy 🔒
+          <h1 className="text-5xl md:text-6xl font-black text-white mb-4">
+            <span className="flex items-center justify-center gap-3">
+              Privacy Policy
+              <Lock className="w-12 h-12 text-cyan-400" />
+            </span>
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-gray-300">
             Last updated: December 8, 2025
           </p>
-          <p className="text-gray-500 mt-2">
+          <p className="text-gray-400 mt-2">
             We take your privacy seriously. Here's how we handle your data!
           </p>
         </motion.div>
@@ -27,26 +33,26 @@ export default function PrivacyPolicyPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-lg p-8 md:p-12 space-y-8"
+          className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-lg p-8 md:p-12 space-y-8 relative z-10"
         >
           {/* Intro */}
           <section>
             <div className="flex items-center gap-3 mb-4">
               <span className="text-4xl">👋</span>
-              <h2 className="text-3xl font-black text-gray-900">Your Privacy Matters</h2>
+              <h2 className="text-3xl font-black text-white">Your Privacy Matters</h2>
             </div>
-            <p className="text-gray-700 leading-relaxed">
+            <p className="text-gray-300 leading-relaxed">
               At Phonely, we're committed to protecting your personal information. This Privacy Policy explains what data we collect, how we use it, and your rights. By using Phonely, you agree to this policy.
             </p>
           </section>
 
           {/* TL;DR */}
-          <section className="bg-primary-50 rounded-xl p-6">
+          <section className="bg-blue-500/20 border border-blue-400/30 rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-4xl">⚡</span>
-              <h2 className="text-3xl font-black text-gray-900">TL;DR (Too Long; Didn't Read)</h2>
+              <Zap className="w-10 h-10 text-cyan-400" />
+              <h2 className="text-3xl font-black text-white">TL;DR (Too Long; Didn't Read)</h2>
             </div>
-            <ul className="space-y-2 text-gray-700 leading-relaxed list-disc list-inside ml-4">
+            <ul className="space-y-2 text-gray-300 leading-relaxed list-disc list-inside ml-4">
               <li>We collect info you give us (name, email, phone)</li>
               <li>We use AI to analyze phone photos (not stored long-term)</li>
               <li>We DON'T sell your data to third parties</li>
@@ -59,13 +65,13 @@ export default function PrivacyPolicyPage() {
           {/* Information We Collect */}
           <section>
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-4xl">📝</span>
-              <h2 className="text-3xl font-black text-gray-900">What Information Do We Collect?</h2>
+              <FileText className="w-10 h-10 text-cyan-400" />
+              <h2 className="text-3xl font-black text-white">What Information Do We Collect?</h2>
             </div>
             <div className="space-y-6">
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">1. Information You Provide:</h3>
-                <ul className="list-disc list-inside space-y-2 ml-4 text-gray-700">
+                <h3 className="text-xl font-bold text-white mb-2">1. Information You Provide:</h3>
+                <ul className="list-disc list-inside space-y-2 ml-4 text-gray-300">
                   <li><strong>Account Info:</strong> Name, email, phone number, password</li>
                   <li><strong>Profile:</strong> Profile photo, bio, location (city)</li>
                   <li><strong>Listings:</strong> Phone photos, descriptions, condition details, pricing</li>
@@ -75,8 +81,8 @@ export default function PrivacyPolicyPage() {
               </div>
 
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">2. Automatically Collected:</h3>
-                <ul className="list-disc list-inside space-y-2 ml-4 text-gray-700">
+                <h3 className="text-xl font-bold text-white mb-2">2. Automatically Collected:</h3>
+                <ul className="list-disc list-inside space-y-2 ml-4 text-gray-300">
                   <li><strong>Device Info:</strong> IP address, browser type, operating system</li>
                   <li><strong>Usage Data:</strong> Pages visited, features used, time spent</li>
                   <li><strong>Location:</strong> Approximate location based on IP (not GPS tracking)</li>
@@ -85,8 +91,8 @@ export default function PrivacyPolicyPage() {
               </div>
 
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">3. AI Analysis Data:</h3>
-                <ul className="list-disc list-inside space-y-2 ml-4 text-gray-700">
+                <h3 className="text-xl font-bold text-white mb-2">3. AI Analysis Data:</h3>
+                <ul className="list-disc list-inside space-y-2 ml-4 text-gray-300">
                   <li>Phone images you upload for AI inspection</li>
                   <li>AI analysis results (condition, authenticity, pricing)</li>
                   <li>Training data to improve our AI (anonymized)</li>
@@ -98,10 +104,10 @@ export default function PrivacyPolicyPage() {
           {/* How We Use Data */}
           <section>
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-4xl">🎯</span>
-              <h2 className="text-3xl font-black text-gray-900">How Do We Use Your Data?</h2>
+              <Target className="w-8 h-8 text-cyan-400" />
+              <h2 className="text-3xl font-black text-white">How Do We Use Your Data?</h2>
             </div>
-            <ul className="list-disc list-inside space-y-3 ml-4 text-gray-700 leading-relaxed">
+            <ul className="list-disc list-inside space-y-3 ml-4 text-gray-300 leading-relaxed">
               <li><strong>Provide the Service:</strong> Create your account, display listings, enable chat</li>
               <li><strong>AI Inspection:</strong> Analyze phone photos to assess condition and authenticity</li>
               <li><strong>Communication:</strong> Send notifications, updates, and important alerts</li>
@@ -116,10 +122,10 @@ export default function PrivacyPolicyPage() {
           <section>
             <div className="flex items-center gap-3 mb-4">
               <span className="text-4xl">🤝</span>
-              <h2 className="text-3xl font-black text-gray-900">Do We Share Your Data?</h2>
+              <h2 className="text-3xl font-black text-white">Do We Share Your Data?</h2>
             </div>
-            <div className="space-y-4 text-gray-700 leading-relaxed">
-              <p className="font-bold text-gray-900">
+            <div className="space-y-4 text-gray-300 leading-relaxed">
+              <p className="font-bold text-white">
                 We DO NOT sell your personal data to third parties. Period.
               </p>
               <p>However, we may share data in these situations:</p>
@@ -133,12 +139,12 @@ export default function PrivacyPolicyPage() {
           </section>
 
           {/* Data Security */}
-          <section className="bg-green-50 rounded-xl p-6">
+          <section className="bg-green-500/20 border border-green-400/30 rounded-xl p-6 backdrop-blur-sm">
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-4xl">🔐</span>
-              <h2 className="text-3xl font-black text-green-900">How We Protect Your Data</h2>
+              <Lock className="w-8 h-8 text-green-400" />
+              <h2 className="text-3xl font-black text-white">How We Protect Your Data</h2>
             </div>
-            <ul className="space-y-2 text-green-900 leading-relaxed list-disc list-inside ml-4">
+            <ul className="space-y-2 text-gray-200 leading-relaxed list-disc list-inside ml-4">
               <li>All data transmitted using SSL/TLS encryption</li>
               <li>Passwords hashed with bcrypt (we never see your actual password)</li>
               <li>Regular security audits and updates</li>
@@ -147,7 +153,10 @@ export default function PrivacyPolicyPage() {
               <li>Two-factor authentication (coming soon)</li>
             </ul>
             <p className="font-bold mt-4 text-green-900">
-              ⚠️ No system is 100% secure. We do our best, but you should also: use strong passwords, don't share login info, and report suspicious activity!
+              <span className="flex items-start gap-2">
+                <AlertTriangle className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" />
+                <span>No system is 100% secure. We do our best, but you should also: use strong passwords, don't share login info, and report suspicious activity!</span>
+              </span>
             </p>
           </section>
 
@@ -155,9 +164,9 @@ export default function PrivacyPolicyPage() {
           <section>
             <div className="flex items-center gap-3 mb-4">
               <span className="text-4xl">🤖</span>
-              <h2 className="text-3xl font-black text-gray-900">AI Analysis & Your Photos</h2>
+              <h2 className="text-3xl font-black text-white">AI Analysis & Your Photos</h2>
             </div>
-            <div className="space-y-4 text-gray-700 leading-relaxed">
+            <div className="space-y-4 text-gray-300 leading-relaxed">
               <p>
                 When you upload photos for AI inspection:
               </p>
@@ -168,7 +177,7 @@ export default function PrivacyPolicyPage() {
                 <li>You can delete listings (and photos) anytime</li>
                 <li>Deleted photos are removed from our servers within 30 days</li>
               </ul>
-              <p className="font-bold text-gray-900 mt-4">
+              <p className="font-bold text-white mt-4">
                 Don't upload sensitive personal info in photos (documents, credit cards, etc.)!
               </p>
             </div>
@@ -178,9 +187,9 @@ export default function PrivacyPolicyPage() {
           <section>
             <div className="flex items-center gap-3 mb-4">
               <span className="text-4xl">🍪</span>
-              <h2 className="text-3xl font-black text-gray-900">Cookies & Tracking</h2>
+              <h2 className="text-3xl font-black text-white">Cookies & Tracking</h2>
             </div>
-            <div className="space-y-4 text-gray-700 leading-relaxed">
+            <div className="space-y-4 text-gray-300 leading-relaxed">
               <p>We use cookies for:</p>
               <ul className="list-disc list-inside space-y-2 ml-4">
                 <li><strong>Essential:</strong> Keep you logged in, remember preferences</li>
@@ -197,9 +206,9 @@ export default function PrivacyPolicyPage() {
           <section>
             <div className="flex items-center gap-3 mb-4">
               <span className="text-4xl">✊</span>
-              <h2 className="text-3xl font-black text-gray-900">Your Privacy Rights</h2>
+              <h2 className="text-3xl font-black text-white">Your Privacy Rights</h2>
             </div>
-            <div className="space-y-4 text-gray-700 leading-relaxed">
+            <div className="space-y-4 text-gray-300 leading-relaxed">
               <p>You have the right to:</p>
               <ul className="list-disc list-inside space-y-2 ml-4">
                 <li><strong>Access:</strong> Request a copy of all your data</li>
@@ -218,10 +227,10 @@ export default function PrivacyPolicyPage() {
           {/* Data Retention */}
           <section>
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-4xl">⏱️</span>
-              <h2 className="text-3xl font-black text-gray-900">How Long Do We Keep Data?</h2>
+              <Clock className="w-10 h-10 text-cyan-400" />
+              <h2 className="text-3xl font-black text-white">How Long Do We Keep Data?</h2>
             </div>
-            <ul className="list-disc list-inside space-y-2 ml-4 text-gray-700 leading-relaxed">
+            <ul className="list-disc list-inside space-y-2 ml-4 text-gray-300 leading-relaxed">
               <li><strong>Active Accounts:</strong> As long as your account exists</li>
               <li><strong>Deleted Accounts:</strong> Removed within 30 days (some data kept for legal/fraud prevention)</li>
               <li><strong>Chat Messages:</strong> Stored for 2 years for dispute resolution</li>
@@ -234,9 +243,9 @@ export default function PrivacyPolicyPage() {
           <section>
             <div className="flex items-center gap-3 mb-4">
               <span className="text-4xl">👶</span>
-              <h2 className="text-3xl font-black text-gray-900">Children's Privacy</h2>
+              <h2 className="text-3xl font-black text-white">Children's Privacy</h2>
             </div>
-            <p className="text-gray-700 leading-relaxed">
+            <p className="text-gray-300 leading-relaxed">
               Phonely is NOT intended for users under 18. We don't knowingly collect data from children. If you're a parent and believe your child has created an account, please contact us immediately at privacy@phonely.com.pk.
             </p>
           </section>
@@ -245,9 +254,9 @@ export default function PrivacyPolicyPage() {
           <section>
             <div className="flex items-center gap-3 mb-4">
               <span className="text-4xl">🔗</span>
-              <h2 className="text-3xl font-black text-gray-900">Third-Party Services</h2>
+              <h2 className="text-3xl font-black text-white">Third-Party Services</h2>
             </div>
-            <div className="space-y-4 text-gray-700 leading-relaxed">
+            <div className="space-y-4 text-gray-300 leading-relaxed">
               <p>We use these third-party services:</p>
               <ul className="list-disc list-inside space-y-2 ml-4">
                 <li><strong>Cloud Providers:</strong> Secure hosting and data storage</li>
@@ -264,21 +273,21 @@ export default function PrivacyPolicyPage() {
           {/* Changes to Policy */}
           <section>
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-4xl">📝</span>
-              <h2 className="text-3xl font-black text-gray-900">Changes to This Policy</h2>
+              <FileText className="w-10 h-10 text-cyan-400" />
+              <h2 className="text-3xl font-black text-white">Changes to This Policy</h2>
             </div>
-            <p className="text-gray-700 leading-relaxed">
+            <p className="text-gray-300 leading-relaxed">
               We may update this Privacy Policy from time to time. We'll notify you of significant changes via email or platform notification. Continued use after changes = you accept the new policy!
             </p>
           </section>
 
           {/* Contact */}
-          <section className="bg-primary-50 rounded-xl p-6">
+          <section className="bg-blue-500/20 border border-blue-400/30 rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-4xl">💬</span>
-              <h2 className="text-3xl font-black text-gray-900">Questions About Privacy?</h2>
+              <MessageSquare className="w-10 h-10 text-cyan-400" />
+              <h2 className="text-3xl font-black text-white">Questions About Privacy?</h2>
             </div>
-            <div className="space-y-4 text-gray-700 leading-relaxed">
+            <div className="space-y-4 text-gray-300 leading-relaxed">
               <p>
                 If you have privacy concerns or questions:
               </p>
@@ -289,14 +298,16 @@ export default function PrivacyPolicyPage() {
           </section>
 
           {/* Acceptance */}
-          <section className="text-center bg-linear-to-r from-primary-600 to-purple-700 text-white rounded-xl p-8">
-            <h2 className="text-2xl font-black mb-4">We Respect Your Privacy 🔒</h2>
+          <section className="text-center bg-linear-to-r from-cyan-500 to-blue-600 text-white rounded-xl p-8">
+            <h2 className="text-2xl font-black mb-4 flex items-center gap-2">
+              We Respect Your Privacy <Lock className="w-6 h-6 text-cyan-400" />
+            </h2>
             <p className="text-gray-100 mb-6">
               Thank you for trusting Phonely with your data. We're committed to keeping it safe and private!
             </p>
             <Link
               to="/"
-              className="inline-block px-8 py-3 bg-white text-primary-700 rounded-full font-bold hover:scale-105 transition-transform duration-200"
+              className="inline-block px-8 py-3 bg-white/10 backdrop-blur-md text-white border-2 border-white/20 rounded-full font-bold hover:scale-105 hover:bg-white/20 transition-all duration-200"
             >
               Back to Home
             </Link>

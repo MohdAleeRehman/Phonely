@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { chatService } from '../services/chat.service';
 import { socketService } from '../services/socket.service';
+import { Search, Sparkles, MessageSquare, Crown, LogOut, Rocket, Menu, X, User, Heart } from 'lucide-react';
 
 export default function MainLayout() {
   const { user, isAuthenticated, logout, token } = useAuthStore();
@@ -44,9 +45,9 @@ export default function MainLayout() {
   }, [isAuthenticated, user, token, queryClient]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-linear-to-br from-gray-50 via-white to-primary-50/20">
+    <div className="min-h-screen flex flex-col bg-linear-to-br from-gray-900 via-blue-950 to-gray-900">
       {/* Header with glassmorphism */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-gray-200/50 shadow-sm">
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-gray-900/80 border-b border-white/10 shadow-sm">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             {/* Logo & Nav - Main logo without tagline (gradient version) */}
@@ -55,8 +56,8 @@ export default function MainLayout() {
                 <img src="/phonely-logo-wo-tagline-no-bg.png" alt="Phonely" className="h-24" />
               </Link>
               <div className="hidden md:flex items-center space-x-6">
-                <Link to="/listings" className="text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 hover:scale-105 transform">
-                  🔍 Browse
+                <Link to="/listings" className="text-gray-200 hover:text-cyan-400 font-medium transition-colors duration-200 hover:scale-105 transform flex items-center gap-2">
+                  <Search className="w-4 h-4" /> Browse
                 </Link>
               </div>
             </div>
@@ -65,11 +66,11 @@ export default function MainLayout() {
             <div className="hidden md:flex items-center space-x-3">
               {isAuthenticated ? (
                 <>
-                  <Link to="/listings/create" className="px-5 py-2 bg-linear-to-r from-primary-600 to-primary-700 text-white rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200">
-                    ✨ Sell Phone
+                  <Link to="/listings/create" className="px-5 py-2 bg-linear-to-r from-cyan-500 to-blue-600 text-white rounded-full font-semibold hover:shadow-lg hover:shadow-cyan-500/50 hover:scale-105 transition-all duration-200 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" /> Sell Phone
                   </Link>
-                  <Link to="/chat" className="px-4 py-2 text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 relative">
-                    💬 Chat
+                  <Link to="/chat" className="px-4 py-2 text-gray-200 hover:text-cyan-400 font-medium transition-colors duration-200 relative flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4" /> Chat
                     {unreadCount > 0 && (
                       <motion.span
                         initial={{ scale: 0 }}
@@ -80,28 +81,29 @@ export default function MainLayout() {
                       </motion.span>
                     )}
                   </Link>
-                  <Link to="/profile" className="px-4 py-2 text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200 flex items-center space-x-2">
-                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white text-sm font-bold">
+                  <Link to="/profile" className="px-4 py-2 text-gray-200 hover:text-cyan-400 font-medium transition-colors duration-200 flex items-center space-x-2">
+                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white text-sm font-bold">
                       {user?.name?.charAt(0).toUpperCase()}
                     </div>
                     <span>{user?.name}</span>
                   </Link>
                   {user?.role === 'admin' && (
-                    <Link to="/admin" className="px-4 py-2 text-orange-600 hover:text-orange-700 font-medium transition-colors duration-200">
-                      👑 Admin
+                    <Link to="/admin" className="px-4 py-2 text-orange-600 hover:text-orange-700 font-medium transition-colors duration-200 flex items-center gap-2">
+                      <Crown className="w-4 h-4" /> Admin
                     </Link>
                   )}
-                  <button onClick={logout} className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg font-medium transition-all duration-200">
-                    Logout
+                  <button onClick={logout} className="px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium transition-all duration-200 flex items-center gap-2">
+                    <LogOut className="w-4 h-4" /> Logout
                   </button>
                 </>
               ) : (
                 <>
-                  <Link to="/login" className="px-4 py-2 text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200">
+                  <Link to="/login" className="px-4 py-2 text-gray-200 hover:text-cyan-400 font-medium transition-colors duration-200">
                     Login
                   </Link>
-                  <Link to="/register" className="px-5 py-2 bg-linear-to-r from-primary-600 to-primary-700 text-white rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200">
-                    🚀 Sign Up
+                  <Link to="/register" className="px-5 py-2 bg-linear-to-r from-cyan-500 to-blue-600 text-white rounded-full font-semibold hover:shadow-lg hover:shadow-cyan-500/50 hover:scale-105 transition-all duration-200 flex items-center gap-2">
+                    <Rocket className="w-4 h-4" />
+                    Sign Up
                   </Link>
                 </>
               )}
@@ -110,26 +112,29 @@ export default function MainLayout() {
             {/* Mobile menu button */}
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-gray-600 hover:text-primary-600"
+              className="md:hidden p-2 text-gray-300 hover:text-cyan-400"
             >
-              {mobileMenuOpen ? '✕' : '☰'}
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
 
           {/* Mobile Menu */}
           {mobileMenuOpen && (
-            <div className="md:hidden py-4 border-t border-gray-200 animate-fade-in">
+            <div className="md:hidden py-4 border-t border-white/10 animate-fade-in">
               <div className="flex flex-col space-y-3">
-                <Link to="/listings" className="text-gray-700 hover:text-primary-600 font-medium py-2">
-                  🔍 Browse Phones
+                <Link to="/listings" className="text-gray-200 hover:text-cyan-400 font-medium py-2 flex items-center gap-2">
+                  <Search className="w-4 h-4" />
+                  Browse Phones
                 </Link>
                 {isAuthenticated ? (
                   <>
-                    <Link to="/listings/create" className="text-primary-600 font-semibold py-2">
-                      ✨ Sell Phone
+                    <Link to="/listings/create" className="text-cyan-400 font-semibold py-2 hover:text-cyan-300 transition-colors flex items-center gap-2">
+                      <Sparkles className="w-4 h-4" />
+                      Sell Phone
                     </Link>
-                    <Link to="/chat" className="text-gray-700 hover:text-primary-600 py-2 relative inline-flex items-center">
-                      💬 Chat
+                    <Link to="/chat" className="text-gray-200 hover:text-cyan-400 py-2 relative inline-flex items-center gap-2">
+                      <MessageSquare className="w-4 h-4" />
+                      Chat
                       {unreadCount > 0 && (
                         <motion.span
                           initial={{ scale: 0 }}
@@ -140,22 +145,28 @@ export default function MainLayout() {
                         </motion.span>
                       )}
                     </Link>
-                    <Link to="/profile" className="text-gray-700 hover:text-primary-600 py-2">
-                      👤 {user?.name}
+                    <Link to="/profile" className="text-gray-200 hover:text-cyan-400 py-2 flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      {user?.name}
                     </Link>
                     {user?.role === 'admin' && (
-                      <Link to="/admin" className="text-orange-600 py-2">
-                        👑 Admin
+                      <Link to="/admin" className="text-orange-400 py-2 flex items-center gap-2">
+                        <Crown className="w-4 h-4" />
+                        Admin
                       </Link>
                     )}
-                    <button onClick={logout} className="text-left text-gray-600 py-2">
+                    <button onClick={logout} className="text-left text-gray-300 py-2 flex items-center gap-2">
+                      <LogOut className="w-4 h-4" />
                       Logout
                     </button>
                   </>
                 ) : (
                   <>
-                    <Link to="/login" className="text-gray-700 py-2">Login</Link>
-                    <Link to="/register" className="text-primary-600 font-semibold py-2">🚀 Sign Up</Link>
+                    <Link to="/login" className="text-gray-200 py-2">Login</Link>
+                    <Link to="/register" className="text-cyan-400 font-semibold py-2 hover:text-cyan-300 transition-colors flex items-center gap-2">
+                      <Rocket className="w-4 h-4" />
+                      Sign Up
+                    </Link>
                   </>
                 )}
               </div>
@@ -179,69 +190,54 @@ export default function MainLayout() {
         </AnimatePresence>
       </main>
 
-      {/* Footer - Clean Style */}
-      <footer className="bg-gray-50 text-gray-800 mt-auto border-t-2 border-gray-200">
+      {/* Footer */}
+      <footer className="bg-gray-900/80 backdrop-blur-md text-white mt-auto border-t-2 border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Brand - Main logo without tagline (gradient version) */}
+            {/* Brand */}
             <div className="space-y-4">
-              <div className="flex items-center">
-                <img src="/phonely-logo-wo-tagline-no-bg.png" alt="Phonely" className="h-24" />
-              </div>
-              <p className="text-gray-600 text-sm">
-                Your trusted marketplace for buying and selling phones. AI-powered authenticity checks. 🔥
+              <img src="/phonely-logo-wo-tagline-no-bg.png" alt="Phonely" className="h-30" />
+              <p className="text-gray-300 text-sm leading-relaxed">
+                Pakistan's first AI-verified phone marketplace. Buy and sell phones with confidence.
               </p>
-              <div className="flex space-x-4">
-                <a href="#" className="text-gray-600 hover:text-primary-600 transition-colors duration-200 text-xl">📘</a>
-                <a href="#" className="text-gray-600 hover:text-primary-600 transition-colors duration-200 text-xl">📷</a>
-                <a href="#" className="text-gray-600 hover:text-primary-600 transition-colors duration-200 text-xl">🐦</a>
-              </div>
             </div>
 
             {/* Quick Links */}
             <div>
-              <h4 className="font-bold mb-4 text-gray-900">Quick Links</h4>
+              <h4 className="font-bold mb-4 text-white">Quick Links</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link to="/listings" className="text-gray-600 hover:text-primary-600 transition-colors duration-200">Browse Phones</Link></li>
-                <li><Link to="/listings/create" className="text-gray-600 hover:text-primary-600 transition-colors duration-200">Sell Your Phone</Link></li>
-                <li><Link to="/chat" className="text-gray-600 hover:text-primary-600 transition-colors duration-200">Messages</Link></li>
-                <li><Link to="/profile" className="text-gray-600 hover:text-primary-600 transition-colors duration-200">My Profile</Link></li>
+                <li><Link to="/how-ai-verification-works" className="text-gray-300 hover:text-cyan-400 transition-colors duration-200">How AI Verification Works</Link></li>
+                <li><Link to="/safety-tips" className="text-gray-300 hover:text-cyan-400 transition-colors duration-200">Safety Tips</Link></li>
+                <li><Link to="/pricing-guide" className="text-gray-300 hover:text-cyan-400 transition-colors duration-200">Pricing Guide</Link></li>
+                <li><Link to="/about" className="text-gray-300 hover:text-cyan-400 transition-colors duration-200">About Us</Link></li>
+                <li><a href="mailto:support@phonely.com.pk" className="text-gray-300 hover:text-cyan-400 transition-colors duration-200">Contact Support</a></li>
               </ul>
             </div>
 
-            {/* Support */}
+            {/* Legal */}
             <div>
-              <h4 className="font-bold mb-4 text-gray-900">Support</h4>
+              <h4 className="font-bold mb-4 text-white">Legal</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="/faq" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-primary-600 transition-colors duration-200">FAQs</a></li>
-                <li><a href="mailto:support@phonely.com.pk" className="text-gray-600 hover:text-primary-600 transition-colors duration-200">Contact Us</a></li>
+                <li><Link to="/terms" className="text-gray-300 hover:text-cyan-400 transition-colors duration-200">Terms of Service</Link></li>
+                <li><Link to="/privacy" className="text-gray-300 hover:text-cyan-400 transition-colors duration-200">Privacy Policy</Link></li>
+                <li><Link to="/community-guidelines" className="text-gray-300 hover:text-cyan-400 transition-colors duration-200">Community Guidelines</Link></li>
               </ul>
             </div>
 
-            {/* Newsletter */}
+            {/* Connect */}
             <div>
-              <h4 className="font-bold mb-4 text-gray-900">Stay Updated 📬</h4>
-              <p className="text-gray-600 text-sm mb-3">Get the latest deals and updates!</p>
-              <div className="flex">
-                <input 
-                  type="email" 
-                  placeholder="Your email" 
-                  className="flex-1 px-3 py-2 bg-white border border-gray-300 text-gray-900 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-                <button className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-r-lg transition-colors duration-200 font-semibold">
-                  →
-                </button>
-              </div>
+              <h4 className="font-bold mb-4 text-white">Connect</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="https://wa.me/923001234567" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-cyan-400 transition-colors duration-200">WhatsApp Support</a></li>
+                <li><a href="https://facebook.com/phonelypk" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-cyan-400 transition-colors duration-200">Facebook</a></li>
+                <li><a href="https://instagram.com/phonelypk" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-cyan-400 transition-colors duration-200">Instagram</a></li>
+              </ul>
             </div>
           </div>
 
           {/* Bottom Bar */}
-          <div className="mt-8 pt-8 border-t border-gray-300 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-gray-600 text-sm">© 2025 Phonely. All rights reserved. Made with 💙 in Pakistan</p>
-            <div className="flex space-x-6 text-sm">
-              <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-primary-600 transition-colors duration-200">Privacy Policy</a>
-              <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-primary-600 transition-colors duration-200">Terms of Service</a>
-            </div>
+          <div className="mt-8 pt-8 border-t-2 border-white/20 text-center">
+            <p className="text-gray-400 text-sm flex items-center justify-center gap-1">© 2025 Phonely. All rights reserved. Made with <Heart className="w-4 h-4 text-red-500" /> in Pakistan</p>
           </div>
         </div>
       </footer>

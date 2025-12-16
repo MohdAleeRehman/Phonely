@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
+import { Smartphone, CheckCircle2, MessageSquare, AlertTriangle, AlertCircle, FileText, Package, Edit, Trash2, Shield, Sparkles, X, Zap, MapPin, Lock, Battery, Wrench, AlertCircle as AlertCircleIcon, Bot, ChevronLeft, ChevronRight, User } from 'lucide-react';
+import PKRIcon from '../../components/icons/PKRIcon';
 import { listingService } from '../../services/listing.service';
 import { chatService } from '../../services/chat.service';
 import { useAuthStore } from '../../store/authStore';
@@ -10,6 +12,7 @@ import ErrorMessage from '../../components/common/ErrorMessage';
 import ReportModal from '../../components/common/ReportModal';
 import AIInspectionReport from '../../components/listings/AIInspectionReport';
 import { MarkAsSoldModal } from '../../components/listing/MarkAsSoldModal';
+import CircuitPattern from '../../components/common/CircuitPattern';
 
 export default function ListingDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,6 +24,12 @@ export default function ListingDetailPage() {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportTarget, setReportTarget] = useState<{ type: 'user' | 'listing'; id: string; name: string } | null>(null);
   const [showMarkAsSold, setShowMarkAsSold] = useState(false);
+  
+  // Swipe gesture handling
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+  
+  const minSwipeDistance = 50;
 
   const { data: listing, isLoading, error, refetch } = useQuery({
     queryKey: ['listing', id],
@@ -61,24 +70,49 @@ export default function ListingDetailPage() {
     );
   }
 
+  // Swipe gesture handlers - defined after listing is available
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchEndX.current = null;
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+  
+  const onTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+  
+  const onTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current || !listing) return;
+    
+    const distance = touchStartX.current - touchEndX.current;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe && listing.images.length > 1) {
+      setSelectedImage((prev) => (prev === listing.images.length - 1 ? 0 : prev + 1));
+    }
+    if (isRightSwipe && listing.images.length > 1) {
+      setSelectedImage((prev) => (prev === 0 ? listing.images.length - 1 : prev - 1));
+    }
+  };
+
   // Check ownership - handle both _id and id fields, and seller as object or string
   const userId = user?._id || user?.id;
   const sellerId = typeof listing.seller === 'object' ? (listing.seller._id || listing.seller.id) : listing.seller;
   const isOwner = userId === sellerId;
   
   const imageTypeLabels: Record<string, string> = {
-    'front': '📱 Front',
-    'back': '🔄 Back',
-    'left-side': '◀️ Left',
-    'right-side': '▶️ Right',
-    'top': '⬆️ Top',
-    'bottom': '⬇️ Bottom',
-    'front-camera-on': '🤳 Selfie',
-    'back-camera-on': '📷 Camera',
-    'display-test': '🖥️ Display',
-    'screen': '🖥️ Screen',
-    'accessories': '📦 Box',
-    'other': '📸 Photo',
+    'front': 'Front',
+    'back': 'Back',
+    'left-side': 'Left',
+    'right-side': 'Right',
+    'top': 'Top',
+    'bottom': 'Bottom',
+    'front-camera-on': 'Selfie',
+    'back-camera-on': 'Camera',
+    'display-test': 'Display',
+    'screen': 'Screen',
+    'accessories': 'Box',
+    'other': 'Photo',
   };
 
   const getImageUrl = (img: string | { url: string }) => {
@@ -93,14 +127,15 @@ export default function ListingDetailPage() {
   };
 
   const conditionColor = {
-    excellent: 'bg-green-100 text-green-800 border-green-300',
-    good: 'bg-blue-100 text-blue-800 border-blue-300',
-    fair: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-    poor: 'bg-red-100 text-red-800 border-red-300',
+    excellent: 'bg-green-500/20 text-green-300 border-green-500/50',
+    good: 'bg-blue-500/20 text-blue-300 border-blue-500/50',
+    fair: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50',
+    poor: 'bg-red-500/20 text-red-300 border-red-500/50',
   }[listing.condition || 'good'];
 
   return (
-    <div className="min-h-screen bg-gray-50 relative overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-gray-900 via-blue-950 to-gray-900 relative overflow-hidden">
+      <CircuitPattern />
       {/* Animated Background Blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 -left-20 w-96 h-96 bg-primary-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
@@ -123,18 +158,24 @@ export default function ListingDetailPage() {
               className="space-y-4"
             >
               {/* Main Image */}
-              <div className="aspect-square bg-linear-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden relative shadow-xl border-4 border-white">
+              <div 
+                className="aspect-square bg-linear-to-br from-gray-800 to-gray-900 rounded-2xl overflow-hidden relative shadow-xl border-4 border-white/10 touch-pan-y"
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+              >
                 {listing.images.length > 0 ? (
                   <>
                     <img
                       src={getImageUrl(listing.images[selectedImage])}
                       alt={listing.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover select-none"
+                      draggable={false}
                     />
-                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-medium shadow-lg">
+                    <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-full text-sm font-semibold text-white shadow-xl border border-white/20">
                       {getImageType(listing.images[selectedImage], selectedImage)}
                     </div>
-                    <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium">
+                    <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-xl border border-white/20">
                       {selectedImage + 1} / {listing.images.length}
                     </div>
 
@@ -143,28 +184,24 @@ export default function ListingDetailPage() {
                       <>
                         <button
                           onClick={() => setSelectedImage((prev) => (prev === 0 ? listing.images.length - 1 : prev - 1))}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white backdrop-blur-sm p-3 rounded-full shadow-lg transition-all hover:scale-110"
+                          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-md p-3 rounded-full shadow-lg transition-all hover:scale-110 border-2 border-white/30 hidden md:block"
                           aria-label="Previous image"
                         >
-                          <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                          </svg>
+                          <ChevronLeft className="w-6 h-6 text-white" />
                         </button>
                         <button
                           onClick={() => setSelectedImage((prev) => (prev === listing.images.length - 1 ? 0 : prev + 1))}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white backdrop-blur-sm p-3 rounded-full shadow-lg transition-all hover:scale-110"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-md p-3 rounded-full shadow-lg transition-all hover:scale-110 border-2 border-white/30 hidden md:block"
                           aria-label="Next image"
                         >
-                          <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
+                          <ChevronRight className="w-6 h-6 text-white" />
                         </button>
                       </>
                     )}
                   </>
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400 text-6xl">
-                    📱
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    <Smartphone className="w-16 h-16" />
                   </div>
                 )}
               </div>
@@ -178,8 +215,8 @@ export default function ListingDetailPage() {
                       onClick={() => setSelectedImage(index)}
                       className={`transition-all ${
                         selectedImage === index
-                          ? 'w-8 h-2 bg-primary-600'
-                          : 'w-2 h-2 bg-gray-300 hover:bg-gray-400'
+                          ? 'w-8 h-2 bg-cyan-500'
+                          : 'w-2 h-2 bg-gray-500 hover:bg-gray-400'
                       } rounded-full`}
                       aria-label={`Go to image ${index + 1}`}
                     />
@@ -196,10 +233,10 @@ export default function ListingDetailPage() {
               className="space-y-6"
             >
               {/* Title and Price */}
-              <div className="card bg-linear-to-br from-white to-gray-50 border-2 border-primary-100">
+              <div className="card bg-linear-to-br from-cyan-500/10 to-blue-500/10 backdrop-blur-md border-2 border-cyan-400/30">
                 <div className="flex flex-col gap-3 mb-4">
-                  <h1 className="text-4xl font-bold text-gray-900 leading-tight">
-                    <span className="bg-linear-to-r from-primary-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  <h1 className="text-4xl font-bold text-white leading-tight">
+                    <span className="bg-linear-to-r from-cyan-400 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                       {listing.title}
                     </span>
                   </h1>
@@ -208,52 +245,58 @@ export default function ListingDetailPage() {
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ delay: 0.5, type: "spring" }}
-                      className="flex items-center gap-2 text-base text-green-600 bg-green-50 px-4 py-2 rounded-full font-semibold border-2 border-green-200 w-fit"
+                      className="flex items-center gap-2 text-base text-green-300 bg-green-500/20 px-4 py-2 rounded-full font-semibold border-2 border-green-400/50 w-fit backdrop-blur-md"
                     >
-                      <span className="text-xl">✅</span>
+                      <CheckCircle2 className="w-5 h-5" />
                       AI Verified
                     </motion.span>
                   )}
                 </div>
                 <div className="flex items-end gap-3 mb-4 flex-wrap">
-                  <p className="text-5xl font-bold bg-linear-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
+                  <p className="text-5xl font-bold bg-linear-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
                     PKR {listing.price.toLocaleString()}
                   </p>
                   <span className={`px-5 py-2.5 rounded-full text-base font-bold ${conditionColor} border-2 capitalize`}>
                     {listing.condition}
                   </span>
                   {listing.priceNegotiable && (
-                    <span className="px-5 py-2.5 rounded-full text-base font-bold bg-blue-50 text-blue-700 border-2 border-blue-200">
-                      💬 Negotiable
+                    <span className="px-5 py-2.5 rounded-full text-base font-bold bg-blue-500/20 text-blue-300 border-2 border-blue-400/50 backdrop-blur-md flex items-center gap-2">
+                      <MessageSquare className="w-4 h-4" />
+                      Negotiable
                     </span>
                   )}
                   {listing.ptaApproved && (
-                    <span className="px-5 py-2.5 rounded-full text-base font-bold bg-green-50 text-green-700 border-2 border-green-200">
-                      ✅ PTA Approved
+                    <span className="px-5 py-2.5 rounded-full text-base font-bold bg-green-500/20 text-green-300 border-2 border-green-400/50 backdrop-blur-md flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4" />
+                      PTA Approved
                     </span>
                   )}
                   {!listing.ptaApproved && (
-                    <span className="px-5 py-2.5 rounded-full text-base font-bold bg-red-50 text-red-700 border-2 border-red-200">
-                      ❌ Non-PTA
+                    <span className="px-5 py-2.5 rounded-full text-base font-bold bg-red-500/20 text-red-300 border-2 border-red-400/50 backdrop-blur-md flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4" />
+                      Non-PTA
                     </span>
                   )}
                 </div>
                 {listing.priceRange && (
-                  <div className="bg-linear-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl p-4">
-                    <p className="text-base font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                      <span className="text-xl">💰</span> AI Suggested Price Range
+                  <div className="bg-linear-to-r from-blue-500/20 to-purple-500/20 border-2 border-blue-400/40 rounded-xl p-4 backdrop-blur-md">
+                    <p className="text-base font-semibold text-gray-300 mb-2 flex items-center gap-2">
+                      <PKRIcon className="w-5 h-5 text-cyan-400" />
+                      AI Suggested Price Range
                     </p>
-                    <p className="text-2xl font-bold text-primary-600">
+                    <p className="text-2xl font-bold text-cyan-300">
                       PKR {listing.priceRange.min.toLocaleString()} - {listing.priceRange.max.toLocaleString()}
                     </p>
                     {listing.price < listing.priceRange.min && (
-                      <p className="text-base text-green-600 font-semibold mt-2 flex items-center gap-2">
-                        <span className="text-lg">🔥</span> Great deal! Below market value
+                      <p className="text-base text-green-300 font-semibold mt-2 flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-yellow-400" />
+                        Great deal! Below market value
                       </p>
                     )}
                     {listing.price > listing.priceRange.max && (
-                      <p className="text-base text-orange-600 font-semibold mt-2 flex items-center gap-2">
-                        <span>⚠️</span> Above suggested price range
+                      <p className="text-base text-orange-300 font-semibold mt-2 flex items-center gap-2">
+                        <AlertTriangle className="w-5 h-5" />
+                        Above suggested price range
                       </p>
                     )}
                   </div>
@@ -261,70 +304,125 @@ export default function ListingDetailPage() {
 
                 {/* Report Listing Button - Only show if not owner and user is logged in */}
                 {!isOwner && user && (
-                  <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="mt-4 pt-4 border-t border-white/10">
                     <button
                       onClick={() => {
                         setReportTarget({ type: 'listing', id: listing._id, name: listing.title });
                         setShowReportModal(true);
                       }}
-                      className="text-sm text-red-600 hover:text-red-700 font-medium flex items-center gap-2"
+                      className="text-sm text-red-400 hover:text-red-300 font-medium flex items-center gap-2"
                     >
-                      <span>🚨</span> Report this listing
+                      <Shield className="w-4 h-4" />
+                      Report this listing
                     </button>
                   </div>
                 )}
               </div>
 
+              {/* AI Inspection Report */}
+              {listing.inspectionReport && (() => {
+                // Extract reportId - handle string, object with _id, or object with $oid
+                let reportId: string | null = null;
+                const reportIdValue = listing.inspectionReport.reportId;
+                
+                if (typeof reportIdValue === 'string') {
+                  reportId = reportIdValue;
+                } else if (reportIdValue && typeof reportIdValue === 'object') {
+                  // Handle populated object or MongoDB $oid format
+                  const reportIdObj = reportIdValue as { _id?: string; $oid?: string; id?: string };
+                  reportId = reportIdObj._id || reportIdObj.$oid || reportIdObj.id || null;
+                  // Convert to string if it's an ObjectId
+                  if (reportId && typeof reportId !== 'string') {
+                    reportId = String(reportId);
+                  }
+                }
+
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                  >
+                    {reportId ? (
+                      <AIInspectionReport 
+                        inspectionId={reportId} 
+                        listingPrice={listing.price}
+                      />
+                    ) : (
+                      <div className="card bg-linear-to-br from-green-500/20 to-emerald-500/20 border-2 border-green-500/50 backdrop-blur-sm">
+                        <div className="flex items-center justify-center py-8">
+                          <div className="text-center">
+                            <Bot className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
+                            <p className="text-gray-300 text-lg font-semibold mb-2">AI Inspection in Progress</p>
+                            <p className="text-gray-400 text-sm">The inspection report is being generated. Please check back shortly.</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
+                );
+              })()}
+
               {/* Phone Specifications */}
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="card bg-linear-to-br from-blue-50 to-blue-100 border-2 border-blue-200"
+                transition={{ delay: 0.45 }}
+                className="card bg-linear-to-br from-blue-500/10 to-blue-600/10 backdrop-blur-md border-2 border-blue-400/30"
               >
-                <h2 className="text-xl font-bold mb-4">
-                  <span className="mr-2">📱</span>
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <Smartphone className="w-6 h-6 text-cyan-400" />
                   <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                     Specifications
                   </span>
                 </h2>
                 <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="bg-white rounded-lg p-3 border border-blue-200">
-                    <p className="text-gray-600 text-xs mb-1">Brand</p>
-                    <p className="font-bold text-lg">{listing.phone.brand}</p>
+                  <div className="bg-white/5 backdrop-blur-md rounded-lg p-3 border border-white/10">
+                    <p className="text-gray-300 text-xs mb-1">Brand</p>
+                    <p className="font-bold text-lg text-white">{listing.phone.brand}</p>
                   </div>
-                  <div className="bg-white rounded-lg p-3 border border-blue-200">
-                    <p className="text-gray-600 text-xs mb-1">Model</p>
-                    <p className="font-bold text-lg">{listing.phone.model}</p>
+                  <div className="bg-white/5 backdrop-blur-md rounded-lg p-3 border border-white/10">
+                    <p className="text-gray-300 text-xs mb-1">Model</p>
+                    <p className="font-bold text-lg text-white">{listing.phone.model}</p>
                   </div>
-                  <div className="bg-white rounded-lg p-3 border border-blue-200">
-                    <p className="text-gray-600 text-xs mb-1">Storage</p>
-                    <p className="font-bold text-lg">{listing.phone.storage}</p>
+                  <div className="bg-white/5 backdrop-blur-md rounded-lg p-3 border border-white/10">
+                    <p className="text-gray-300 text-xs mb-1">Storage</p>
+                    <p className="font-bold text-lg text-white">{listing.phone.storage}</p>
                   </div>
                   {listing.phone.ram && (
-                    <div className="bg-white rounded-lg p-3 border border-blue-200">
-                      <p className="text-gray-600 text-xs mb-1">RAM</p>
-                      <p className="font-bold text-lg">{listing.phone.ram}</p>
+                    <div className="bg-white/5 backdrop-blur-md rounded-lg p-3 border border-white/10">
+                      <p className="text-gray-300 text-xs mb-1">RAM</p>
+                      <p className="font-bold text-lg text-white">{listing.phone.ram}</p>
                     </div>
                   )}
                   {listing.phone.color && (
-                    <div className="bg-white rounded-lg p-3 border border-blue-200">
-                      <p className="text-gray-600 text-xs mb-1">Color</p>
-                      <p className="font-bold text-lg">{listing.phone.color}</p>
+                    <div className="bg-white/5 backdrop-blur-md rounded-lg p-3 border border-white/10">
+                      <p className="text-gray-300 text-xs mb-1">Color</p>
+                      <p className="font-bold text-lg text-white">{listing.phone.color}</p>
                     </div>
                   )}
                   {listing.phone.imei && (
-                    <div className="bg-white rounded-lg p-3 border border-blue-200 col-span-2">
-                      <p className="text-gray-600 text-xs mb-1">IMEI</p>
-                      <p className="font-bold text-sm font-mono">{listing.phone.imei}</p>
+                    <div className="bg-white/5 backdrop-blur-md rounded-lg p-3 border border-white/10 col-span-2">
+                      <p className="text-gray-300 text-xs mb-1">IMEI</p>
+                      <p className="font-bold text-sm font-mono text-white">{listing.phone.imei}</p>
                     </div>
                   )}
-                  <div className="bg-white rounded-lg p-3 border border-blue-200">
-                    <p className="text-gray-600 text-xs mb-1">Warranty</p>
-                    <p className="font-bold text-lg">
-                      {listing.phone.warranty?.hasWarranty ? '✅ Yes' : '❌ No'}
+                  <div className="bg-white/5 backdrop-blur-md rounded-lg p-3 border border-white/10">
+                    <p className="text-gray-300 text-xs mb-1">Warranty</p>
+                    <p className="font-bold text-lg flex items-center gap-2">
+                      {listing.phone.warranty?.hasWarranty ? (
+                        <>
+                          <CheckCircle2 className="w-5 h-5 text-green-400" />
+                          Yes
+                        </>
+                      ) : (
+                        <>
+                          <X className="w-5 h-5 text-red-400" />
+                          No
+                        </>
+                      )}
                       {listing.phone.warranty?.hasWarranty && listing.phone.warranty.type && (
-                        <span className="text-sm font-normal text-gray-600 ml-2">({listing.phone.warranty.type})</span>
+                        <span className="text-sm font-normal text-gray-300 ml-2">({listing.phone.warranty.type})</span>
                       )}
                     </p>
                   </div>
@@ -337,30 +435,30 @@ export default function ListingDetailPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.45 }}
-                  className="card bg-linear-to-br from-emerald-50 to-emerald-100 border-2 border-emerald-200"
+                  className="card bg-linear-to-br from-emerald-500/10 to-emerald-600/10 backdrop-blur-md border-2 border-emerald-400/30"
                 >
-                  <h2 className="text-xl font-bold mb-4">
-                    <span className="mr-2">✅</span>
+                  <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <CheckCircle2 className="w-6 h-6 text-green-400" />
                     <span className="bg-linear-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                       Warranty Information
                     </span>
                   </h2>
                   <div className="space-y-3">
-                    <div className="bg-white rounded-lg p-4 border border-emerald-200">
+                    <div className="bg-white/5 backdrop-blur-md rounded-lg p-4 border border-emerald-500/50">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-gray-600 text-sm mb-1">Warranty Type</p>
-                          <p className="font-bold text-lg capitalize">{listing.phone.warranty.type}</p>
+                          <p className="text-gray-300 text-sm mb-1">Warranty Type</p>
+                          <p className="font-bold text-lg capitalize text-white">{listing.phone.warranty.type}</p>
                         </div>
-                        <div className="bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-bold">
+                        <div className="bg-emerald-500/20 text-emerald-300 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-sm border border-emerald-500/50">
                           Active
                         </div>
                       </div>
                     </div>
                     {listing.phone.warranty.expiryDate && (
-                      <div className="bg-white rounded-lg p-4 border border-emerald-200">
-                        <p className="text-gray-600 text-sm mb-1">Valid Until</p>
-                        <p className="font-bold text-lg">
+                      <div className="bg-white/5 backdrop-blur-md rounded-lg p-4 border border-emerald-500/50">
+                        <p className="text-gray-300 text-sm mb-1">Valid Until</p>
+                          <p className="font-bold text-lg text-white">
                           {new Date(listing.phone.warranty.expiryDate).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'long',
@@ -379,10 +477,10 @@ export default function ListingDetailPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="card bg-linear-to-br from-purple-50 to-purple-100 border-2 border-purple-200"
+                  className="card bg-linear-to-br from-purple-500/10 to-purple-600/10 backdrop-blur-md border-2 border-purple-400/30"
                 >
-                  <h2 className="text-xl font-bold mb-4">
-                    <span className="mr-2">🔋</span>
+                  <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <Battery className="w-6 h-6 text-purple-400" />
                     <span className="bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                       Device Condition
                     </span>
@@ -391,20 +489,21 @@ export default function ListingDetailPage() {
                   <div className="space-y-4">
                     {/* Battery Health - Apple Only */}
                     {listing.phone?.brand === 'Apple' && listing.conditionDetails?.batteryHealth && (
-                      <div className="bg-white rounded-xl p-4 border-2 border-purple-200">
+                      <div className="bg-white/5 backdrop-blur-md rounded-xl p-4 border-2 border-purple-500/50">
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-gray-700 font-medium flex items-center gap-2">
-                            <span>🔋</span> Battery Health
+                          <span className="text-gray-200 font-medium flex items-center gap-2">
+                            <Battery className="w-4 h-4 text-cyan-400" />
+                            Battery Health
                           </span>
                           <span className={`text-2xl font-bold ${
-                            listing.conditionDetails.batteryHealth >= 80 ? 'text-green-600' :
-                            listing.conditionDetails.batteryHealth >= 60 ? 'text-yellow-600' :
-                            'text-red-600'
+                            listing.conditionDetails.batteryHealth >= 80 ? 'text-green-400' :
+                            listing.conditionDetails.batteryHealth >= 60 ? 'text-yellow-400' :
+                            'text-red-400'
                           }`}>
                             {listing.conditionDetails.batteryHealth}%
                           </span>
                         </div>
-                        <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-4 bg-gray-700/50 rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${listing.conditionDetails.batteryHealth}%` }}
@@ -416,57 +515,104 @@ export default function ListingDetailPage() {
                             }`}
                           />
                         </div>
-                        <p className="text-xs text-gray-500 mt-2">
-                          {listing.conditionDetails.batteryHealth >= 80 ? '✓ Excellent battery condition' :
-                           listing.conditionDetails.batteryHealth >= 60 ? '⚠ Battery showing wear' :
-                           '⚠ Consider battery replacement'}
+                        <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">
+                          {listing.conditionDetails.batteryHealth >= 80 ? (
+                            <>
+                              <CheckCircle2 className="w-3 h-3 text-green-400" />
+                              Excellent battery condition
+                            </>
+                          ) : listing.conditionDetails.batteryHealth >= 60 ? (
+                            <>
+                              <AlertTriangle className="w-3 h-3 text-yellow-400" />
+                              Battery showing wear
+                            </>
+                          ) : (
+                            <>
+                              <AlertTriangle className="w-3 h-3 text-red-400" />
+                              Consider battery replacement
+                            </>
+                          )}
                         </p>
                       </div>
                     )}
 
                     {/* Screen Condition */}
                     {listing.conditionDetails?.screenCondition && (
-                      <div className="bg-white rounded-lg p-4 border border-purple-200">
-                        <p className="text-gray-600 text-sm mb-1 flex items-center gap-2">
-                          <span>📱</span> Screen Condition
+                      <div className="bg-white/5 backdrop-blur-md rounded-lg p-4 border border-purple-500/50">
+                        <p className="text-gray-300 text-sm mb-1 flex items-center gap-2">
+                          <Smartphone className="w-4 h-4 text-cyan-400" />
+                          Screen Condition
                         </p>
-                        <p className="font-bold text-lg capitalize">{listing.conditionDetails.screenCondition}</p>
+                        <p className="font-bold text-lg capitalize text-white">{listing.conditionDetails.screenCondition}</p>
                       </div>
                     )}
 
                     {/* Body Condition */}
                     {listing.conditionDetails?.bodyCondition && (
-                      <div className="bg-white rounded-lg p-4 border border-purple-200">
-                        <p className="text-gray-600 text-sm mb-1 flex items-center gap-2">
-                          <span>📦</span> Body Condition
+                      <div className="bg-white/5 backdrop-blur-md rounded-lg p-4 border border-purple-500/50">
+                        <p className="text-gray-300 text-sm mb-1 flex items-center gap-2">
+                          <Package className="w-4 h-4 text-cyan-400" />
+                          Body Condition
                         </p>
-                        <p className="font-bold text-lg capitalize">{listing.conditionDetails.bodyCondition}</p>
+                        <p className="font-bold text-lg capitalize text-white">{listing.conditionDetails.bodyCondition}</p>
                       </div>
                     )}
 
                     {/* Display Quality */}
                     {listing.conditionDetails?.displayQuality && (
-                      <div className="bg-white rounded-lg p-4 border border-purple-200">
-                        <p className="text-gray-600 text-sm mb-1 flex items-center gap-2">
-                          <span>✨</span> Display Quality
+                      <div className="bg-white/5 backdrop-blur-md rounded-lg p-4 border border-purple-500/50">
+                        <p className="text-gray-300 text-sm mb-1 flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-cyan-400" />
+                          Display Quality
                         </p>
                         <p className="font-bold text-lg capitalize flex items-center gap-2">
-                          {listing.conditionDetails.displayQuality === 'flawless' && '💎 Flawless'}
-                          {listing.conditionDetails.displayQuality === 'minor-scratches' && '✓ Minor Scratches'}
-                          {listing.conditionDetails.displayQuality === 'noticeable-wear' && '⚠ Noticeable Wear'}
-                          {listing.conditionDetails.displayQuality === 'cracked' && '❌ Cracked'}
+                          {listing.conditionDetails.displayQuality === 'flawless' && (
+                            <>
+                              <Sparkles className="w-5 h-5 text-cyan-400" />
+                              Flawless
+                            </>
+                          )}
+                          {listing.conditionDetails.displayQuality === 'minor-scratches' && (
+                            <>
+                              <CheckCircle2 className="w-5 h-5 text-green-400" />
+                              Minor Scratches
+                            </>
+                          )}
+                          {listing.conditionDetails.displayQuality === 'noticeable-wear' && (
+                            <>
+                              <AlertTriangle className="w-5 h-5 text-yellow-400" />
+                              Noticeable Wear
+                            </>
+                          )}
+                          {listing.conditionDetails.displayQuality === 'cracked' && (
+                            <>
+                              <X className="w-5 h-5 text-red-400" />
+                              Cracked
+                            </>
+                          )}
                         </p>
                       </div>
                     )}
 
                     {/* All Features Working */}
                     {listing.conditionDetails?.allFeaturesWorking !== undefined && (
-                      <div className="bg-white rounded-lg p-4 border border-purple-200">
-                        <p className="text-gray-600 text-sm mb-1 flex items-center gap-2">
-                          <span>⚙️</span> Functionality Status
+                      <div className="bg-white/5 backdrop-blur-md rounded-lg p-4 border border-purple-500/50">
+                        <p className="text-gray-300 text-sm mb-1 flex items-center gap-2">
+                          <Zap className="w-4 h-4 text-cyan-400" />
+                          Functionality Status
                         </p>
-                        <p className={`font-bold text-lg ${listing.conditionDetails.allFeaturesWorking ? 'text-green-600' : 'text-orange-600'}`}>
-                          {listing.conditionDetails.allFeaturesWorking ? '✅ All Features Working' : '⚠️ Some Issues Present'}
+                        <p className={`font-bold text-lg flex items-center gap-2 ${listing.conditionDetails.allFeaturesWorking ? 'text-green-400' : 'text-orange-400'}`}>
+                          {listing.conditionDetails.allFeaturesWorking ? (
+                            <>
+                              <CheckCircle2 className="w-5 h-5" />
+                              All Features Working
+                            </>
+                          ) : (
+                            <>
+                              <AlertTriangle className="w-5 h-5" />
+                              Some Issues Present
+                            </>
+                          )}
                         </p>
                       </div>
                     )}
@@ -480,19 +626,19 @@ export default function ListingDetailPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.55 }}
-                  className="card bg-linear-to-br from-orange-50 to-orange-100 border-2 border-orange-200"
+                  className="card bg-linear-to-br from-orange-500/10 to-orange-600/10 backdrop-blur-md border-2 border-orange-400/30"
                 >
-                  <h2 className="text-xl font-bold mb-4">
-                    <span className="mr-2">⚠️</span>
+                  <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <AlertTriangle className="w-6 h-6 text-orange-400" />
                     <span className="bg-linear-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
                       Known Issues
                     </span>
                   </h2>
                   <div className="space-y-2">
                     {listing.conditionDetails.functionalIssues.map((issue, index) => (
-                      <div key={index} className="bg-white rounded-lg p-3 border border-orange-200 flex items-start gap-3">
-                        <span className="text-orange-600 text-lg mt-0.5">⚠️</span>
-                        <span className="text-gray-700 font-medium">{issue}</span>
+                      <div key={index} className="bg-white/5 backdrop-blur-md rounded-lg p-3 border border-orange-500/50 flex items-start gap-3">
+                        <AlertTriangle className="w-5 h-5 text-orange-400 mt-0.5 shrink-0" />
+                        <span className="text-gray-200 font-medium">{issue}</span>
                       </div>
                     ))}
                   </div>
@@ -505,26 +651,18 @@ export default function ListingDetailPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 }}
-                  className="card bg-linear-to-br from-gray-50 to-gray-100 border-2 border-gray-200"
+                  className="card bg-linear-to-br from-white/5 to-white/10 backdrop-blur-md border-2 border-white/10"
                 >
-                  <h2 className="text-xl font-bold mb-4">
-                    <span className="mr-2">📝</span>
-                    <span className="bg-linear-to-r from-gray-600 to-gray-800 bg-clip-text text-transparent">
+                  <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <FileText className="w-6 h-6 text-cyan-400" />
+                    <span className="bg-linear-to-r from-gray-300 to-gray-500 bg-clip-text text-transparent">
                       Additional Notes
                     </span>
                   </h2>
-                  <div className="bg-white rounded-lg p-4 border border-gray-200">
-                    <p className="text-gray-700 whitespace-pre-wrap">{listing.conditionDetails.additionalNotes}</p>
+                  <div className="bg-white/5 backdrop-blur-md rounded-lg p-4 border border-white/10">
+                    <p className="text-gray-200 whitespace-pre-wrap">{listing.conditionDetails.additionalNotes}</p>
                   </div>
                 </motion.div>
-              )}
-
-              {/* AI Inspection Report */}
-              {listing.inspectionReport?.reportId && typeof listing.inspectionReport.reportId === 'string' && (
-                <AIInspectionReport 
-                  inspectionId={listing.inspectionReport.reportId} 
-                  listingPrice={listing.price}
-                />
               )}
 
               {/* Description */}
@@ -532,15 +670,15 @@ export default function ListingDetailPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="card bg-linear-to-br from-purple-50 to-purple-100 border-2 border-purple-200"
+                className="card bg-linear-to-br from-purple-500/10 to-purple-600/10 backdrop-blur-md border-2 border-purple-400/30"
               >
-                <h2 className="text-xl font-bold mb-4">
-                  <span className="mr-2">📝</span>
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <FileText className="w-6 h-6 text-purple-400" />
                   <span className="bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                     Description
                   </span>
                 </h2>
-                <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{listing.description}</p>
+                <p className="text-gray-200 whitespace-pre-wrap leading-relaxed">{listing.description}</p>
               </motion.div>
 
               {/* Functionality Issues */}
@@ -549,19 +687,19 @@ export default function ListingDetailPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.65 }}
-                  className="card bg-linear-to-br from-orange-50 to-orange-100 border-2 border-orange-200"
+                  className="card bg-linear-to-br from-orange-500/10 to-orange-600/10 backdrop-blur-md border-2 border-orange-400/30"
                 >
-                  <h2 className="text-xl font-bold mb-4">
-                    <span className="mr-2">⚠️</span>
+                  <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <AlertTriangle className="w-6 h-6 text-orange-400" />
                     <span className="bg-linear-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
                       Functionality Issues
                     </span>
                   </h2>
                   <div className="space-y-2">
                     {listing.functionalityIssues.map((issue: string, index: number) => (
-                      <div key={index} className="bg-white rounded-lg p-3 border-2 border-orange-200 flex items-center gap-2">
-                        <span className="text-orange-600">❌</span>
-                        <span className="text-gray-700 font-medium">{issue}</span>
+                      <div key={index} className="bg-white/5 backdrop-blur-md rounded-lg p-3 border-2 border-orange-500/50 flex items-center gap-2">
+                        <X className="w-5 h-5 text-orange-400" />
+                        <span className="text-gray-200 font-medium">{issue}</span>
                       </div>
                     ))}
                   </div>
@@ -574,19 +712,19 @@ export default function ListingDetailPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.7 }}
-                  className="card bg-linear-to-br from-red-50 to-red-100 border-2 border-red-200"
+                  className="card bg-linear-to-br from-red-500/10 to-red-600/10 backdrop-blur-md border-2 border-red-400/30"
                 >
-                  <h2 className="text-xl font-bold mb-4">
-                    <span className="mr-2">💔</span>
+                  <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <AlertCircleIcon className="w-6 h-6 text-red-400" />
                     <span className="bg-linear-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
                       Physical Damage
                     </span>
                   </h2>
                   <div className="space-y-2">
                     {listing.physicalDamage.map((damage: string, index: number) => (
-                      <div key={index} className="bg-white rounded-lg p-3 border-2 border-red-200 flex items-center gap-2">
-                        <span className="text-red-600">🔴</span>
-                        <span className="text-gray-700 font-medium">{damage}</span>
+                      <div key={index} className="bg-white/5 backdrop-blur-md rounded-lg p-3 border-2 border-red-500/50 flex items-center gap-2">
+                        <AlertCircleIcon className="w-5 h-5 text-red-400" />
+                        <span className="text-gray-200 font-medium">{damage}</span>
                       </div>
                     ))}
                   </div>
@@ -599,19 +737,19 @@ export default function ListingDetailPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.75 }}
-                  className="card bg-linear-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-200"
+                  className="card bg-linear-to-br from-yellow-500/10 to-yellow-600/10 backdrop-blur-md border-2 border-yellow-400/30"
                 >
-                  <h2 className="text-xl font-bold mb-4">
-                    <span className="mr-2">🔧</span>
+                  <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <Wrench className="w-6 h-6 text-yellow-400" />
                     <span className="bg-linear-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
                       Repair History
                     </span>
                   </h2>
                   <div className="space-y-2">
                     {listing.repairHistory.map((repair: string, index: number) => (
-                      <div key={index} className="bg-white rounded-lg p-3 border-2 border-yellow-200 flex items-center gap-2">
-                        <span className="text-yellow-600">🔧</span>
-                        <span className="text-gray-700 font-medium">{repair}</span>
+                      <div key={index} className="bg-white/5 backdrop-blur-md rounded-lg p-3 border-2 border-yellow-500/50 flex items-center gap-2">
+                        <Wrench className="w-5 h-5 text-yellow-400" />
+                        <span className="text-gray-200 font-medium">{repair}</span>
                       </div>
                     ))}
                   </div>
@@ -624,37 +762,37 @@ export default function ListingDetailPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.8 }}
-                  className="card bg-linear-to-br from-teal-50 to-teal-100 border-2 border-teal-200"
+                  className="card bg-linear-to-br from-teal-500/10 to-teal-600/10 backdrop-blur-md border-2 border-teal-400/30"
                 >
-                  <h2 className="text-xl font-bold mb-4">
-                    <span className="mr-2">✨</span>
+                  <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <Sparkles className="w-6 h-6 text-teal-400" />
                     <span className="bg-linear-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
                       Cosmetic Condition
                     </span>
                   </h2>
                   <div className="grid grid-cols-2 gap-4">
                     {listing.cosmeticCondition.screenCondition && (
-                      <div className="bg-white rounded-lg p-3 border-2 border-teal-200">
-                        <p className="text-gray-600 text-xs mb-1">Screen</p>
-                        <p className="font-bold text-lg capitalize">{listing.cosmeticCondition.screenCondition}</p>
+                      <div className="bg-white/5 backdrop-blur-md rounded-lg p-3 border-2 border-teal-500/50">
+                        <p className="text-gray-300 text-xs mb-1">Screen</p>
+                        <p className="font-bold text-lg capitalize text-white">{listing.cosmeticCondition.screenCondition}</p>
                       </div>
                     )}
                     {listing.cosmeticCondition.bodyCondition && (
-                      <div className="bg-white rounded-lg p-3 border-2 border-teal-200">
-                        <p className="text-gray-600 text-xs mb-1">Body</p>
-                        <p className="font-bold text-lg capitalize">{listing.cosmeticCondition.bodyCondition}</p>
+                      <div className="bg-white/5 backdrop-blur-md rounded-lg p-3 border-2 border-teal-500/50">
+                        <p className="text-gray-300 text-xs mb-1">Body</p>
+                        <p className="font-bold text-lg capitalize text-white">{listing.cosmeticCondition.bodyCondition}</p>
                       </div>
                     )}
                     {listing.cosmeticCondition.backCondition && (
-                      <div className="bg-white rounded-lg p-3 border-2 border-teal-200">
-                        <p className="text-gray-600 text-xs mb-1">Back</p>
-                        <p className="font-bold text-lg capitalize">{listing.cosmeticCondition.backCondition}</p>
+                      <div className="bg-white/5 backdrop-blur-md rounded-lg p-3 border-2 border-teal-500/50">
+                        <p className="text-gray-300 text-xs mb-1">Back</p>
+                        <p className="font-bold text-lg capitalize text-white">{listing.cosmeticCondition.backCondition}</p>
                       </div>
                     )}
                     {listing.cosmeticCondition.cameraCondition && (
-                      <div className="bg-white rounded-lg p-3 border-2 border-teal-200">
-                        <p className="text-gray-600 text-xs mb-1">Camera</p>
-                        <p className="font-bold text-lg capitalize">{listing.cosmeticCondition.cameraCondition}</p>
+                      <div className="bg-white/5 backdrop-blur-md rounded-lg p-3 border-2 border-teal-500/50">
+                        <p className="text-gray-300 text-xs mb-1">Camera</p>
+                        <p className="font-bold text-lg capitalize text-white">{listing.cosmeticCondition.cameraCondition}</p>
                       </div>
                     )}
                   </div>
@@ -667,10 +805,10 @@ export default function ListingDetailPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.85 }}
-                  className="card bg-linear-to-br from-indigo-50 to-indigo-100 border-2 border-indigo-200"
+                  className="card bg-linear-to-br from-indigo-500/10 to-indigo-600/10 backdrop-blur-md border-2 border-indigo-400/30"
                 >
-                  <h2 className="text-xl font-bold mb-4">
-                    <span className="mr-2">📦</span>
+                  <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <Package className="w-6 h-6 text-indigo-400" />
                     <span className="bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                       Included Accessories
                     </span>
@@ -688,9 +826,9 @@ export default function ListingDetailPage() {
                           screenProtector: 'Screen Protector'
                         };
                         return (
-                          <div key={key} className="bg-white rounded-lg p-3 border-2 border-indigo-200 flex items-center gap-2">
-                            <span className="text-green-600">✅</span>
-                            <span className="text-gray-700 font-medium">{labels[key] || key}</span>
+                          <div key={key} className="bg-white/5 backdrop-blur-md rounded-lg p-3 border-2 border-indigo-500/50 flex items-center gap-2">
+                            <CheckCircle2 className="w-5 h-5 text-green-400" />
+                            <span className="text-gray-200 font-medium">{labels[key] || key}</span>
                           </div>
                         );
                       })}
@@ -703,10 +841,10 @@ export default function ListingDetailPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
-                className="card bg-linear-to-br from-pink-50 to-pink-100 border-2 border-pink-200"
+                className="card bg-linear-to-br from-pink-500/10 to-pink-600/10 backdrop-blur-md border-2 border-pink-400/30"
               >
-                <h2 className="text-xl font-bold mb-4">
-                  <span className="mr-2">👤</span>
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <User className="w-6 h-6 text-pink-400" />
                   <span className="bg-linear-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
                     Seller Information
                   </span>
@@ -721,12 +859,13 @@ export default function ListingDetailPage() {
                   <div className="flex-1">
                     <button
                       onClick={() => navigate(`/profile/${listing.seller._id}`)}
-                      className="font-bold text-lg hover:text-primary-600 transition-colors text-left"
+                      className="font-bold text-lg hover:text-cyan-400 transition-colors text-left"
                     >
                       {listing.seller.name}
                     </button>
-                    <p className="text-gray-600 text-sm flex items-center gap-1">
-                      <span>📍</span> {listing.location.city}
+                    <p className="text-gray-300 text-sm flex items-center gap-1">
+                      <MapPin className="w-4 h-4" />
+                      {listing.location.city}
                     </p>
                   </div>
                   {!isOwner && user && (
@@ -735,9 +874,10 @@ export default function ListingDetailPage() {
                         setReportTarget({ type: 'user', id: listing.seller._id, name: listing.seller.name });
                         setShowReportModal(true);
                       }}
-                      className="text-sm text-red-600 hover:text-red-700 font-medium flex items-center gap-1 px-3 py-2 rounded-lg border border-red-200 hover:bg-red-50 transition-colors"
+                      className="text-sm text-red-300 hover:text-red-200 font-medium flex items-center gap-1 px-3 py-2 rounded-lg border border-red-500/50 hover:bg-red-500/20 transition-colors backdrop-blur-sm"
                     >
-                      <span>🚨</span> Report User
+                      <Shield className="w-4 h-4" />
+                      Report User
                     </button>
                   )}
                 </div>
@@ -748,7 +888,7 @@ export default function ListingDetailPage() {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => contactMutation.mutate()}
                     disabled={contactMutation.isPending || !user}
-                    className="w-full btn-primary bg-linear-to-r from-primary-600 via-purple-600 to-pink-600 text-lg py-4 rounded-xl font-bold shadow-xl"
+                    className="w-full bg-linear-to-r from-cyan-500 via-purple-600 to-pink-600 text-white text-lg py-4 rounded-xl font-bold shadow-xl hover:shadow-cyan-500/50 transition-all"
                   >
                     {contactMutation.isPending ? (
                       <span className="flex items-center justify-center gap-2">
@@ -757,11 +897,13 @@ export default function ListingDetailPage() {
                       </span>
                     ) : !user ? (
                       <span className="flex items-center justify-center gap-2">
-                        <span>🔒</span> Login to Contact Seller
+                        <Lock className="w-5 h-5" />
+                        Login to Contact Seller
                       </span>
                     ) : (
                       <span className="flex items-center justify-center gap-2">
-                        <span>💬</span> Contact Seller
+                        <MessageSquare className="w-5 h-5" />
+                        Contact Seller
                       </span>
                     )}
                   </motion.button>
@@ -775,7 +917,8 @@ export default function ListingDetailPage() {
                     className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-bold shadow-lg transition-colors mb-3"
                   >
                     <span className="flex items-center justify-center gap-2">
-                      <span>✅</span> Mark as Sold
+                      <CheckCircle2 className="w-5 h-5" />
+                      Mark as Sold
                     </span>
                   </motion.button>
                 )}
@@ -789,7 +932,8 @@ export default function ListingDetailPage() {
                       className="flex-1 btn-secondary py-4 rounded-xl font-bold"
                     >
                       <span className="flex items-center justify-center gap-2">
-                        <span>✏️</span> Edit
+                        <Edit className="w-5 h-5" />
+                        Edit
                       </span>
                     </motion.button>
                     <motion.button
@@ -799,7 +943,8 @@ export default function ListingDetailPage() {
                       className="flex-1 bg-red-500 hover:bg-red-600 text-white py-4 rounded-xl font-bold transition-colors"
                     >
                       <span className="flex items-center justify-center gap-2">
-                        <span>🗑️</span> Delete
+                        <Trash2 className="w-5 h-5" />
+                        Delete
                       </span>
                     </motion.button>
                   </div>
@@ -819,7 +964,7 @@ export default function ListingDetailPage() {
             className="card max-w-md w-full"
           >
             <h3 className="text-xl font-bold mb-4">Delete Listing?</h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-300 mb-6">
               Are you sure you want to delete this listing? This action cannot be undone.
             </p>
             <div className="flex gap-3">

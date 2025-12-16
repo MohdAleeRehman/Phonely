@@ -27,6 +27,11 @@ const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const FAQPage = lazy(() => import('./pages/FAQPage'));
 const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
+const HowAIVerificationWorks = lazy(() => import('./pages/info/HowAIVerificationWorks'));
+const SafetyTips = lazy(() => import('./pages/info/SafetyTips'));
+const PricingGuide = lazy(() => import('./pages/info/PricingGuide'));
+const AboutUs = lazy(() => import('./pages/info/AboutUs'));
+const CommunityGuidelines = lazy(() => import('./pages/CommunityGuidelines'));
 
 // Loading component
 const PageLoader = () => (
@@ -99,6 +104,11 @@ function AnimatedRoutes() {
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/terms" element={<TermsOfServicePage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/how-ai-verification-works" element={<HowAIVerificationWorks />} />
+            <Route path="/safety-tips" element={<SafetyTips />} />
+            <Route path="/pricing-guide" element={<PricingGuide />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/community-guidelines" element={<CommunityGuidelines />} />
           </Route>
 
           {/* Auth Routes */}
